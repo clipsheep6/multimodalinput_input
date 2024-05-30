@@ -1247,7 +1247,7 @@ bool KeyEvent::ReadEnhanceDataFromParcel(Parcel &in)
     }
 
     for (int32_t i = 0; i < size; i++) {
-        uint32_t val;
+        uint32_t val = 0;
         READUINT32(in, val);
         enhanceData_.emplace_back(val);
     }
@@ -1334,6 +1334,22 @@ bool KeyEvent::IsRepeat() const
 void KeyEvent::SetRepeat(bool repeat)
 {
     repeat_ = repeat;
+}
+
+std::string_view KeyEvent::ActionToShortStr(int32_t action)
+{
+    switch (action) {
+        case KeyEvent::KEY_ACTION_CANCEL:
+            return "K:C:";
+        case KeyEvent::KEY_ACTION_UNKNOWN:
+            return "K:UK:";
+        case KeyEvent::KEY_ACTION_UP:
+            return "K:U:";
+        case KeyEvent::KEY_ACTION_DOWN:
+            return "K:D:";
+        default:
+            return "A:?:";
+    }
 }
 
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT

@@ -54,10 +54,7 @@ int32_t ANRManager::MarkProcessed(int32_t pid, int32_t eventType, int32_t eventI
     CALL_DEBUG_ENTER;
     MMI_HILOGD("pid:%{public}d, eventType:%{public}d, eventId:%{public}d", pid, eventType, eventId);
     SessionPtr sess = udsServer_->GetSessionByPid(pid);
-    if (sess == nullptr) {
-        MMI_HILOGD("sess is nullptr");
-        return RET_ERR;
-    }
+    CHKPR(sess, RET_ERR);
     std::list<int32_t> timerIds = sess->DelEvents(eventType, eventId);
     for (int32_t item : timerIds) {
         if (item != -1) {
@@ -118,7 +115,7 @@ void ANRManager::AddTimer(int32_t type, int32_t id, int64_t currentTime, Session
     }
     int32_t timerId = TimerMgr->AddTimer(INPUT_UI_TIMEOUT_TIME / TIME_CONVERT_RATIO, 1, [this, id, type, sess]() {
         CHKPV(sess);
-        if (type == ANR_MONITOR || WinMgr->IsWindowVisible(sess->GetPid())) {
+        if (type == ANR_MONITOR || WIN_MGR->IsWindowVisible(sess->GetPid())) {
             sess->SetAnrStatus(type, true);
             DfxHisysevent::ApplicationBlockInput(sess);
             MMI_HILOGE("Application not responding. pid:%{public}d, anr type:%{public}d, eventId:%{public}d",

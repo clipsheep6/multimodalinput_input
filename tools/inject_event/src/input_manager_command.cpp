@@ -72,6 +72,8 @@ constexpr int32_t BUTTON_PARAM_SIZE = 8;
 constexpr int32_t KEY_PARAM_SIZE = 5;
 constexpr int32_t KEY_TIME_PARAM_SIZE = 6;
 constexpr int32_t INTERVAL_TIME_MS = 100;
+constexpr int32_t MIN_PINCH_FINGER = 2;
+constexpr int32_t MAX_PINCH_FINGER = 5;
 enum JoystickEvent {
     JOYSTICK_BUTTON_UP,
     JOYSTICK_BUTTON_PRESS,
@@ -132,6 +134,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
         {"mouse", no_argument, nullptr, 'M'},
         {"keyboard", no_argument, nullptr, 'K'},
         {"touch", no_argument, nullptr, 'T'},
+        {"touchpad", no_argument, nullptr, 'P'},
         {"joystick", no_argument, nullptr, 'J'},
         {"help", no_argument, nullptr, '?'},
         {nullptr, 0, nullptr, 0}
@@ -152,6 +155,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
         {"down", required_argument, nullptr, 'd'},
         {"up", required_argument, nullptr, 'u'},
         {"long_press", required_argument, nullptr, 'l'},
+        {"repeat", required_argument, nullptr, 'r'},
         {"interval", required_argument, nullptr, 'i'},
         {nullptr, 0, nullptr, 0}
     };
@@ -176,7 +180,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
     int32_t c = 0;
     int32_t optionIndex = 0;
     optind = 0;
-    if ((c = getopt_long(argc, argv, "MKTJ?", headOptions, &optionIndex)) != -1) {
+    if ((c = getopt_long(argc, argv, "MKTJP?", headOptions, &optionIndex)) != -1) {
         switch (c) {
             case 'M': {
                 int32_t px = 0;
@@ -215,7 +219,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     return RET_ERR;
                                 }
                                 if ((px < 0) || (py < 0)) {
-                                    std::cout << "Coordinate value must be greater than 0" << std::endl;
+                                    std::cout << "Coordinate value must be greater or equal than 0" << std::endl;
                                     return RET_ERR;
                                 }
                                 std::cout << "move to " << px << " " << py << std::endl;
@@ -249,7 +253,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     optind += 3;
                                 }
                                 if ((px1 < 0) || (py1 < 0) || (px2 < 0) || (py2 < 0)) {
-                                    std::cout << "Coordinate value must be greater than 0" << std::endl;
+                                    std::cout << "Coordinate value must be greater or equal than 0" << std::endl;
                                     return RET_ERR;
                                 }
                                 if (argc - optind >= 1) {
@@ -492,7 +496,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 return RET_ERR;
                             }
                             if ((px < 0) || (py < 0)) {
-                                std::cout << "Coordinate value must be greater than 0" << std::endl;
+                                std::cout << "Coordinate value must be greater or equal than 0" << std::endl;
                                 return RET_ERR;
                             }
                             if (!StrToInt(argv[optind + 1], buttonId)) {
@@ -586,7 +590,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 }
                             }
                             if ((px1 < 0) || (py1 < 0) || (px2 < 0) || (py2 < 0)) {
-                                std::cout << "Coordinate value must be greater than 0" << std::endl;
+                                std::cout << "Coordinate value must be greater or equal than 0" << std::endl;
                                 return RET_ERR;
                             }
                             if (argc >= 8) {
@@ -687,7 +691,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                 int32_t keyCode = 0;
                 int32_t isCombinationKey = 0;
                 int64_t time = GetSysClockTime();
-                while ((c = getopt_long(argc, argv, "d:u:l:i:", keyboardSensorOptions, &optionIndex)) != -1) {
+                while ((c = getopt_long(argc, argv, "d:u:l:r:i:", keyboardSensorOptions, &optionIndex)) != -1) {
                     switch (c) {
                         case 'd': {
                             if (!StrToInt(optarg, keyCode)) {
@@ -816,6 +820,84 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             InputManager::GetInstance()->SimulateInputEvent(keyEvent);
                             break;
                         }
+                        case 'r': {
+                            constexpr int32_t ARGC_MIN = 4;
+                            if (argc < ARGC_MIN) {
+                                std::cout << "argc:" << argc << std::endl;
+                                std::cout << "wrong number of parameters" << std::endl;
+                                return RET_ERR;
+                            }
+                            if (argc >= ARGC_MIN) {
+                                if (!StrToInt(optarg, keyCode)) {
+                                    std::cout << "invalid key code value" << std::endl;
+                                    return RET_ERR;
+                                }
+                            }
+                            int32_t pressTimeMs = 3000;
+                            constexpr int32_t ARGC_MAX = 5;
+                            if (argc >= ARGC_MAX) {
+                                if (!StrToInt(argv[optind], pressTimeMs)) {
+                                    std::cout << "invalid key code value or press time" << std::endl;
+                                    return RET_ERR;
+                                }
+                            }
+                            static constexpr int32_t minKeyCode = 0;
+                            static constexpr int32_t maxKeyCode = 5000;
+                            if ((keyCode < minKeyCode) || (keyCode > maxKeyCode)) {
+                                std::cout << "key code is out of range:" << minKeyCode << " <= "
+                                    << keyCode << " <= " << maxKeyCode << std::endl;
+                                return RET_ERR;
+                            }
+                            static constexpr int32_t minPressTimeMs = 3000;
+                            static constexpr int32_t maxPressTimeMs = 15000;
+                            if ((pressTimeMs < minPressTimeMs) || (pressTimeMs > maxPressTimeMs)) {
+                                std::cout << "press time is out of range:" << minPressTimeMs << " ms" << " <= "
+                                    << pressTimeMs << " <= " << maxPressTimeMs << " ms" << std::endl;
+                                return RET_ERR;
+                            }
+                            std::cout << " key code: " << keyCode << std::endl
+                                << "long press time: " << pressTimeMs << " ms" << std::endl;
+                            auto keyEvent = KeyEvent::Create();
+                            if (keyEvent == nullptr) {
+                                std::cout << "failed to create input event object" << std::endl;
+                                return RET_ERR;
+                            }
+                            keyEvent->SetKeyCode(keyCode);
+                            keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+                            KeyEvent::KeyItem item;
+                            item.SetKeyCode(keyCode);
+                            int64_t time = GetSysClockTime();
+                            item.SetPressed(true);
+                            auto keyEventTemp = KeyEvent::Clone(keyEvent);
+                            if (keyEventTemp == nullptr) {
+                                std::cout << "failed to clone key event object" << std::endl;
+                                return RET_ERR;
+                            }
+                            keyEventTemp->SetActionTime(time);
+                            keyEventTemp->AddKeyItem(item);
+                            keyEventTemp->SetRepeat(true);
+                            std::string isRepeat = keyEventTemp->IsRepeat() ? "true" : "false";
+                            MMI_HILOGI("KeyCode:%{public}d, ActionTime:%{public}" PRId64
+                                ",KeyAction:%{public}s, IsRepeat:%{public}s",
+                                keyEventTemp->GetKeyCode(), keyEventTemp->GetActionTime(),
+                                KeyEvent::ActionToString(keyEventTemp->GetKeyAction()), isRepeat.c_str());
+                            InputManager::GetInstance()->SimulateInputEvent(keyEventTemp);
+                            std::this_thread::sleep_for(std::chrono::milliseconds(pressTimeMs));
+
+                            keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+                            item.SetPressed(false);
+                            keyEvent->AddKeyItem(item);
+                            time = GetSysClockTime();
+                            keyEvent->SetActionTime(time);
+                            keyEvent->SetRepeat(true);
+                            isRepeat = keyEvent->IsRepeat() ? "true" : "false";
+                            MMI_HILOGI("KeyCode:%{public}d, ActionTime:%{public}" PRId64
+                                ",KeyAction:%{public}s, IsRepeat:%{public}s",
+                                keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
+                                KeyEvent::ActionToString(keyEvent->GetKeyAction()), isRepeat.c_str());
+                            InputManager::GetInstance()->SimulateInputEvent(keyEvent);
+                            break;
+                        }
                         case 'i': {
                             int32_t taktTime = 0;
                             if (!StrToInt(optarg, taktTime)) {
@@ -881,7 +963,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 }
                             }
                             if ((px1 < 0) || (py1 < 0) || (px2 < 0) || (py2 < 0)) {
-                                std::cout << "Coordinate value must be greater than 0" << std::endl;
+                                std::cout << "Coordinate value must be greater or equal than 0" << std::endl;
                                 return RET_ERR;
                             }
                             const int64_t minTotalTimeMs = 1;
@@ -959,7 +1041,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 return EVENT_REG_FAIL;
                             }
                             if ((px1 < 0) || (py1 < 0)) {
-                                std::cout << "Coordinate value must be greater than 0" << std::endl;
+                                std::cout << "Coordinate value must be greater or equal than 0" << std::endl;
                                 return RET_ERR;
                             }
                             std::cout << "touch down " << px1 << " " << py1 << std::endl;
@@ -987,7 +1069,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 return EVENT_REG_FAIL;
                             }
                             if ((px1 < 0) || (py1 < 0)) {
-                                std::cout << "Coordinate value must be greater than 0" << std::endl;
+                                std::cout << "Coordinate value must be greater or equal than 0" << std::endl;
                                 return RET_ERR;
                             }
                             std::cout << "touch up " << px1 << " " << py1 << std::endl;
@@ -1033,7 +1115,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 return RET_ERR;
                             }
                             if ((px1 < 0) || (py1 < 0)) {
-                                std::cout << "Coordinate value must be greater than 0" << std::endl;
+                                std::cout << "Coordinate value must be greater or equal than 0" << std::endl;
                                 return RET_ERR;
                             }
                             std::cout << "   click coordinate: ("<< px1 << ", "  << py1 << ")" << std::endl;
@@ -1107,7 +1189,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 }
                             }
                             if ((px1 < 0) || (py1 < 0) || (px2 < 0) || (py2 < 0)) {
-                                std::cout << "Coordinate value must be greater than 0" << std::endl;
+                                std::cout << "Coordinate value must be greater or equal than 0" << std::endl;
                                 return RET_ERR;
                             }
                             const int32_t minTotalTimeMs = 1000;
@@ -1334,6 +1416,13 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                 }
                 break;
             }
+            case 'P': {
+                int32_t ret = ProcessTouchPadGestureInput(argc, argv, optionIndex);
+                if (ret != ERR_OK) {
+                    return ret;
+                }
+                break;
+            }
             case '?': {
                 ShowUsage();
                 return ERR_OK;
@@ -1419,7 +1508,7 @@ int32_t InputManagerCommand::SingleKnuckleGestureProcesser(int32_t argc, char *a
         return EVENT_REG_FAIL;
     }
     if (IsCoordinateInvalid(firstDownX, firstDownY, secondDownX, secondDownY)) {
-        std::cout << "Coordinate value must be greater than 0" << std::endl;
+        std::cout << "Coordinate value must be greater or equal than 0" << std::endl;
         return RET_ERR;
     }
     std::cout << "single knuckle first down coordinate: ("<< firstDownX << ", " << firstDownY << ")" << std::endl;
@@ -1469,7 +1558,7 @@ int32_t InputManagerCommand::DoubleKnuckleGestureProcesser(int32_t argc, char *a
         return EVENT_REG_FAIL;
     }
     if (IsCoordinateInvalid(firstDownX, firstDownY, secondDownX, secondDownY)) {
-        std::cout << "Coordinate value must be greater than 0" << std::endl;
+        std::cout << "Coordinate value must be greater or equal than 0" << std::endl;
         return RET_ERR;
     }
     std::cout << "double knukle first click coordinate: ("<< firstDownX << ", "  << firstDownY << ")" << std::endl;
@@ -1554,6 +1643,105 @@ int32_t InputManagerCommand::DoubleKnuckleClickEvent(int32_t downX, int32_t down
     return ERR_OK;
 }
 
+int32_t InputManagerCommand::ProcessTouchPadGestureInput(int32_t argc, char *argv[], int32_t optionIndex)
+{
+    struct option touchPadSensorOptions[] = {
+        {"rotate", required_argument, nullptr, 'r'},
+        {"swipe", required_argument, nullptr, 's'},
+        {"pinch", required_argument, nullptr, 'p'},
+        {nullptr, 0, nullptr, 0}
+    };
+    int32_t opt = 0;
+    if ((opt = getopt_long(argc, argv, "r:s:p:", touchPadSensorOptions, &optionIndex)) != -1) {
+        switch (opt) {
+            case 'r': {
+                break;
+            }
+            case 's': {
+                break;
+            }
+            case 'p': {
+                // uinput -P -p <finger count> <scale percent numerator> e.g. uinput -P -p 2 200
+                int32_t indexPercent = optind;
+                int32_t ret = ProcessPinchGesture(argc, argv, indexPercent);
+                if (ret != ERR_OK) {
+                    return ret;
+                }
+                break;
+            }
+            default: {
+                std::cout << "invalid command" << std::endl;
+                ShowUsage();
+                return EVENT_REG_FAIL;
+            }
+        }
+    }
+    return ERR_OK;
+}
+
+int32_t InputManagerCommand::ProcessPinchGesture(int32_t argc, char *argv[], int32_t indexPercent)
+{
+    CHKPR(argv, ERROR_NULL_POINTER);
+    // e.g. uinput -P -p 2 200
+    constexpr int32_t maxArgcIndex = 4;
+    if (indexPercent != maxArgcIndex) {
+        std::cout << "wrong optind pointer index" << std::endl;
+        return EVENT_REG_FAIL;
+    }
+
+    char *fingerArg = argv[indexPercent - 1];
+    int32_t fingerCount = 0;
+    int32_t scalePercentNumerator = 0;
+    if (!StrToInt(fingerArg, fingerCount)) {
+        std::cout << "invalid finger count" << std::endl;
+        return EVENT_REG_FAIL;
+    }
+    if (!StrToInt(argv[indexPercent], scalePercentNumerator)) {
+        std::cout << "invalid scale percent numerator" << std::endl;
+        return EVENT_REG_FAIL;
+    }
+
+    if ((fingerCount < MIN_PINCH_FINGER) || (fingerCount > MAX_PINCH_FINGER)) {
+        std::cout << "invalid finger count:" << fingerCount << std::endl;
+        return EVENT_REG_FAIL;
+    }
+
+    constexpr int32_t minScaleNumerator = 0;
+    constexpr int32_t maxScaleNumerator = 500;
+    if ((scalePercentNumerator <= minScaleNumerator) || (scalePercentNumerator > maxScaleNumerator)) {
+        std::cout << "Invalid scale numberator:" << scalePercentNumerator << std::endl;
+        std::cout << std::endl;
+        return RET_ERR;
+    }
+    return InjectPinchEvent(fingerCount, scalePercentNumerator);
+}
+
+int32_t InputManagerCommand::InjectPinchEvent(int32_t fingerCount, int32_t scalePercentNumerator)
+{
+    auto pointerEvent = PointerEvent::Create();
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    if (fingerCount == MIN_PINCH_FINGER) {
+        pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    } else {
+        pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    }
+
+    // Convert percentage to decimal
+    constexpr int32_t PERCENT_DENOMINATOR = 100;
+    double scalePinch = static_cast<double>(scalePercentNumerator) / PERCENT_DENOMINATOR;
+
+    pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, scalePinch);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
+    pointerEvent->SetPointerId(0);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+    MMI_HILOGD("Inject fingerCount:%{public}d,scalePinch:%{public}f,PointerId:%{public}d,", fingerCount, scalePinch,
+        pointerEvent->GetPointerId());
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    return ERR_OK;
+}
+
 void InputManagerCommand::PrintMouseUsage()
 {
     std::cout << "-m <dx> <dy>              --move   <dx> <dy>  -move to relative position (dx,dy),"    << std::endl;
@@ -1591,6 +1779,8 @@ void InputManagerCommand::PrintKeyboardUsage()
     std::cout << "-u <key>                   --up     <key>     -release a key   " << std::endl;
     std::cout << "-l <key> [long press time] --long_press <key> [long press time] -press and hold the key";
     std::cout << std::endl;
+    std::cout << "-r <key> [repeat output time] --repeat output <key> [repeat output time] -press and hold the key";
+    std::cout << std::endl;
     std::cout << "-i <time>                  --interval <time>  -the program interval for the (time) milliseconds";
     std::cout << std::endl;
 }
@@ -1612,6 +1802,15 @@ void InputManagerCommand::PrintKnuckleUsage()
     std::cout << "-i <time>                  --interval <time>  -the program interval for the (time) milliseconds";
 }
 
+void InputManagerCommand::PrintTouchPadUsage()
+{
+    std::cout << "-p <finger count> <scale percent numerator>  --pinch <finger count> <scale percent numerator>";
+    std::cout << std::endl;
+    std::cout << "  <finger count> finger count range is [2, 5]"                                     << std::endl;
+    std::cout << "  <scale percent numerator> numerator of percent scale, divided by 100 is scale, it is an integer,";
+    std::cout << "  range is (0, 500]"                                                               << std::endl;
+}
+
 void InputManagerCommand::ShowUsage()
 {
     std::cout << "Usage: uinput <option> <command> <arg>..." << std::endl;
@@ -1620,20 +1819,30 @@ void InputManagerCommand::ShowUsage()
     std::cout << "commands for mouse:                            " << std::endl;
     PrintMouseUsage();
     std::cout << std::endl;
+
     std::cout << "-K  --keyboard                                                " << std::endl;
     std::cout << "commands for keyboard:                                        " << std::endl;
     PrintKeyboardUsage();
     std::cout << std::endl;
+
     std::cout << "-T  --touch                                                   " << std::endl;
     std::cout << "commands for touch:                                           " << std::endl;
     PrintTouchUsage();
+
     std::cout << "-k --knuckle                                                  " << std::endl;
     std::cout << "commands for knucle:                                          " << std::endl;
     PrintKnuckleUsage();
     std::cout << std::endl;
+
     std::cout << "-g <dx1> <dy1> <dx2> <dy2> [press time] [total time]     -drag, "                       << std::endl;
     std::cout << "  [Press time] not less than 500ms and [total time] - [Press time] not less than 500ms" << std::endl;
     std::cout << "  Otherwise the operation result may produce error or invalid operation"                << std::endl;
+    std::cout << std::endl;
+
+    std::cout << "-P  --touchpad                                                " << std::endl;
+    std::cout << "commands for touchpad:                                        " << std::endl;
+    PrintTouchPadUsage();
+
     std::cout << "                                                              " << std::endl;
     std::cout << "-?  --help                                                    " << std::endl;
 }

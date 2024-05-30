@@ -163,9 +163,9 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonit
             THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
             return nullptr;
         }
-        CHKRP(napi_create_reference(env, argv[INPUT_PARAMETER_MIDDLE], 1, &event->callback[0]), REFERENCE_REF);
+        CHKRP(napi_create_reference(env, argv[INPUT_PARAMETER_MIDDLE], 1, &event->callback), REFERENCE_REF);
     } else {
-        event->callback[0] = nullptr;
+        event->callback = nullptr;
     }
     napi_value ret;
     CHKRP(napi_create_int32(env, RET_OK, &ret), CREATE_INT32);
@@ -252,7 +252,6 @@ static void SubKeyEventCallback(std::shared_ptr<KeyEvent> keyEvent)
         while (infoIter != list.end()) {
             auto monitorInfo = *infoIter;
             if (MatchCombinationKeys(monitorInfo, keyEvent)) {
-                monitorInfo->keyEvent = keyEvent;
                 EmitAsyncCallbackWork(monitorInfo);
             }
             ++infoIter;
@@ -284,7 +283,6 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
         return nullptr;
     }
     if (GetEventInfoAPI9(env, info, event, keyOption) == nullptr) {
-        napi_delete_reference(env, event->callback[0]);
         delete event;
         MMI_HILOGE("GetEventInfo failed");
         return nullptr;
@@ -297,7 +295,6 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
         subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, SubKeyEventCallback);
         if (subscribeId < 0) {
             MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
-            napi_delete_reference(env, event->callback[0]);
             delete event;
             return nullptr;
         }
@@ -338,7 +335,6 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
         return nullptr;
     }
     if (GetEventInfoAPI9(env, info, event, keyOption) == nullptr) {
-        napi_delete_reference(env, event->callback[0]);
         delete event;
         MMI_HILOGE("GetEventInfo failed");
         return nullptr;
@@ -353,9 +349,6 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
     if (subscribeId >= 0) {
         InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
     }
-    if (event->callback[0] != nullptr) {
-        napi_delete_reference(env, event->callback[0]);
-    }
     delete event;
     return nullptr;
 }
@@ -364,7 +357,7 @@ static napi_value SetShieldStatus(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
     size_t argc = 2;
-    napi_value argv[2];
+    napi_value argv[2] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < INPUT_PARAMETER_MIDDLE) {
         MMI_HILOGE("At least two parameters is required");
@@ -406,9 +399,9 @@ static napi_value GetShieldStatus(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
     size_t argc = 1;
-    napi_value argv[1];
+    napi_value argv[1] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc == 0) {
+    if (argc < 1) {
         MMI_HILOGE("At least 1 parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "shieldMode", "number");
         return nullptr;
@@ -461,6 +454,19 @@ static napi_value CreateShieldMode(napi_env env, napi_value exports)
         sizeof(desc) / sizeof(*desc), desc, &result), DEFINE_CLASS);
     CHKRP(napi_set_named_property(env, exports, "ShieldMode", result), SET_NAMED_PROPERTY);
     return exports;
+}
+
+KeyEventMonitorInfo::~KeyEventMonitorInfo()
+{
+    if (callback == nullptr) {
+        return;
+    }
+    uint32_t refcount = 0;
+    CHKRV(napi_reference_unref(env, callback, &refcount), REFERENCE_UNREF);
+    if (refcount == 0) {
+        CHKRV(napi_delete_reference(env, callback), DELETE_REFERENCE);
+    }
+    callback = nullptr;
 }
 
 EXTERN_C_START

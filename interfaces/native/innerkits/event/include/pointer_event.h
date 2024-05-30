@@ -334,6 +334,13 @@ public:
     static constexpr int32_t SOURCE_TYPE_FINGERPRINT = 5;
 
     /**
+     * Indicates that the input source generates a crown event.
+     *
+     * @since 12
+     */
+    static constexpr int32_t SOURCE_TYPE_CROWN = 6;
+
+    /**
      * Indicates an invalid button ID.
      *
      * @since 9
@@ -455,7 +462,7 @@ public:
     /**
      * Indicates a knuckle.
      *
-     * @since 9
+     * @since 11
      */
     static constexpr int32_t TOOL_TYPE_KNUCKLE = 8;
 
@@ -1126,15 +1133,15 @@ public:
         double windowYPos_ {};
         int32_t width_ {};
         int32_t height_ {};
-        double  tiltX_ {};
-        double  tiltY_ {};
+        double tiltX_ {};
+        double tiltY_ {};
         int32_t toolDisplayX_ {};
         int32_t toolDisplayY_ {};
         int32_t toolWindowX_ {};
         int32_t toolWindowY_ {};
         int32_t toolWidth_ {};
         int32_t toolHeight_ {};
-        double  pressure_ {};
+        double pressure_ {};
         int32_t longAxis_ {};
         int32_t shortAxis_ {};
         int32_t deviceId_ {};
@@ -1411,6 +1418,21 @@ public:
     uint32_t GetAxes() const;
 
     /**
+     * @brief Obtains the axis value velocity.
+     * @return Returns the axis value velocity.
+     * @since 12
+     */
+    double GetVelocity() const;
+
+    /**
+     * @brief Sets the axis value velocity.
+     * @param velocity Indicates the axis value velocity.
+     * @return void
+     * @since 12
+     */
+    void SetVelocity(double velocity);
+
+    /**
      * @brief Set the front keys in the key combination.
      * @param pressedKeys Indicates the front keys to set.
      * @return void.
@@ -1479,6 +1501,13 @@ public:
      */
     static bool HasAxis(uint32_t axes, AxisType axis);
 
+    /**
+     * @brief Converts a pointer event action into a short string.
+     * @param Indicates the pointer event action.
+     * @return Returns the string converted from the pointer action.
+     * @since 12
+     */
+    static std::string_view ActionToShortStr(int32_t action);
 public:
     /**
      * @brief Writes data to a <b>Parcel</b> object.
@@ -1572,6 +1601,7 @@ private:
     float zOrder_ { -1.0f };
     uint32_t axes_ { 0U };
     std::array<double, AXIS_TYPE_MAX> axisValues_ {};
+    double velocity_ { 0.0 };
     std::vector<int32_t> pressedKeys_;
     std::vector<uint8_t> buffer_;
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT

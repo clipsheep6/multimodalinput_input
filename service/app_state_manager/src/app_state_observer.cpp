@@ -32,7 +32,7 @@ void ApplicationStateObserver::OnProcessStateChanged(const AppExecFwk::ProcessDa
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
-    MMI_HILOGD("process state change app name = %{public}s, uid = %{public}d, state = %{public}d ",
+    MMI_HILOGD("process state change app name:%{public}s, uid:%{public}d, state:%{public}d",
         processData.bundleName.c_str(),
         processData.uid,
         processData.state);
@@ -61,10 +61,7 @@ int32_t ApplicationStateObserver::GetForegroundApplicationInfo(std::vector<AppEx
 {
     CALL_DEBUG_ENTER;
     auto appMgr = GetAppMgr();
-    if (appMgr == nullptr) {
-        MMI_HILOGE("GetAppMgr failed");
-        return RET_ERR;
-    }
+    CHKPR(appMgr, RET_ERR);
     int32_t ret = appMgr->GetForegroundApplications(list);
     if (ret == RET_OK) {
         MMI_HILOGD("GetForegroundApplications success");

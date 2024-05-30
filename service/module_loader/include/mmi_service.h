@@ -26,6 +26,7 @@
 
 #include "app_debug_listener.h"
 #include "delegate_tasks.h"
+#include "display_manager.h"
 #include "input_event_handler.h"
 #include "libinput_adapter.h"
 #include "multimodal_input_connect_stub.h"
@@ -138,7 +139,7 @@ public:
     int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys) override;
     int32_t TransmitInfrared(int64_t number, std::vector<int64_t>& pattern) override;
     int32_t OnHasIrEmitter(bool &hasIrEmitter);
-    int32_t OnGetInfraredFrequencies(std::vector<InfraredFrequency>& requencys);
+    int32_t OnGetInfraredFrequencies(std::vector<InfraredFrequency>& frequencies);
     int32_t OnTransmitInfrared(int64_t number, std::vector<int64_t>& pattern);
     int32_t SetPixelMapData(int32_t infoId, void* pixelMap) override;
     int32_t SetCurrentUser(int32_t userId) override;
@@ -195,6 +196,7 @@ protected:
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid, bool isNativeInject);
+    int32_t AdaptScreenResolution(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     bool InitLibinputService();
     bool InitService();
@@ -221,6 +223,7 @@ private:
     bool isCesStart_ { false };
     std::mutex mu_;
     std::thread t_;
+    sptr<Rosen::Display> displays_[2] = { nullptr, nullptr };
 #ifdef OHOS_RSS_CLIENT
     std::atomic<uint64_t> tid_ = 0;
 #endif // OHOS_RSS_CLIENT

@@ -25,6 +25,11 @@ inline constexpr int32_t GLOBAL_WINDOW_ID = -1;
 
 inline constexpr int32_t DEFAULT_DISPLAY_ID = -1;
 
+enum SecureFlag {
+    DEFAULT_MODE = 0,
+    PRIVACY_MODE = 1,
+};
+
 /**
  * @brief Enumerates the fold display mode.
  */
@@ -175,7 +180,9 @@ struct WindowInfo {
      *
      * @since 9
      */
-    static constexpr int32_t MAX_HOTAREA_COUNT = 10;
+    static constexpr int32_t MAX_HOTAREA_COUNT = 50;
+
+    static constexpr int32_t DEFAULT_HOTAREA_COUNT = 10;
 
     /**
      * The number of pointer change areas
@@ -308,6 +315,8 @@ struct WindowInfo {
     void* pixelMap { nullptr };
 
     WindowInputType windowInputType { WindowInputType::NORMAL };
+
+    SecureFlag privacyMode { SecureFlag::DEFAULT_MODE };
 };
 
 /**

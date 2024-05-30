@@ -27,7 +27,6 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-const std::string REFERENCE_UNREF = "napi_reference_unref";
 constexpr int32_t MONITOR_REGISTER_EXCEED_MAX { 4100001 };
 } // namespace
 
@@ -247,7 +246,7 @@ void JsInputMonitorManager::RemoveEnv(napi_env env)
 void JsInputMonitorManager::RemoveEnv(std::map<napi_env, napi_ref>::iterator it)
 {
     CALL_DEBUG_ENTER;
-    uint32_t refCount;
+    uint32_t refCount = 0;
     CHKRV(napi_reference_unref(it->first, it->second, &refCount), REFERENCE_UNREF);
     envManager_.erase(it);
 }

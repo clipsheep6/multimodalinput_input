@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -46,9 +46,9 @@ int32_t SwitchEventInputSubscribeManager::SubscribeSwitchEvent(
     int32_t switchType,
     std::function<void(std::shared_ptr<SwitchEvent>)> callback)
 {
-    CALL_INFO_TRACE;
-    CHKPR(callback, INVALID_SUBSCRIBE_ID);
-    if (switchType < SwitchEvent::SwitchType::DEFAULT) {
+    CALL_DEBUG_ENTER;
+    CHKPR(callback, ERROR_NULL_POINTER);
+    if (switchType < SwitchEvent::SwitchType::SWITCH_DEFAULT) {
         MMI_HILOGE("switch type error");
         return RET_ERR;
     }
@@ -56,7 +56,7 @@ int32_t SwitchEventInputSubscribeManager::SubscribeSwitchEvent(
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Client init failed");
-        return INVALID_SUBSCRIBE_ID;
+        return EVENT_REG_FAIL;
     }
     if (SwitchEventInputSubscribeManager::subscribeManagerId_ >= INT_MAX) {
         MMI_HILOGE("The subscribeId has reached the upper limit, cannot continue the subscription");

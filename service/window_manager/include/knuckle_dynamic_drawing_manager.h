@@ -32,7 +32,7 @@ namespace MMI {
 class KnuckleDynamicDrawingManager {
 public:
     KnuckleDynamicDrawingManager();
-    ~KnuckleDynamicDrawingManager();
+    ~KnuckleDynamicDrawingManager() = default;
     void KnuckleDynamicDrawHandler(std::shared_ptr<PointerEvent> pointerEvent);
     void UpdateDisplayInfo(const DisplayInfo& displayInfo);
 
@@ -57,7 +57,7 @@ private:
 
 private:
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode_ { nullptr };
-    std::shared_ptr<Rosen::RSCanvasDrawingNode> canvasNode_ { nullptr };
+    std::shared_ptr<Rosen::RSCanvasNode> canvasNode_ { nullptr };
     DisplayInfo displayInfo_ {};
     uint64_t screenId_ { 0 };
     Rosen::Drawing::Brush brush_;
@@ -73,6 +73,9 @@ private:
 
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap_ { nullptr };
     bool isStop_ { false };
+    int32_t lastDownX_ { 0 };
+    int32_t lastDownY_ { 0 };
+    int64_t lastUpTime_ { 0 };
 };
 } // namespace MMI
 } // namespace OHOS

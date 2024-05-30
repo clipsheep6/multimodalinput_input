@@ -13,6 +13,8 @@
 
 import("//build/ohos.gni")
 
+mmi_part_name = "input"
+mmi_subsystem_name = "multimodalinput"
 mmi_path = "//foundation/multimodalinput/input"
 graphics_path = "//foundation/graphic/graphic_2d/rosen/modules"
 preferences_path = "//foundation/distributeddatamgr/preferences"
@@ -38,7 +40,9 @@ declare_args() {
   input_feature_coverage = false
   input_ext_feature_anco = false
   input_ext_feature_fingersense = true
+  input_ext_feature_gesturesense = true
   input_feature_fingerprint = false
+  input_feature_crown = true
   input_ext_feature_magiccursor = false
   input_feature_infrared_emitter = true
 
@@ -62,6 +66,7 @@ declare_args() {
   ]
 
   libmmi_common_sources = [
+    "events/src/axis_event.cpp",
     "events/src/input_device.cpp",
     "events/src/input_event.cpp",
     "events/src/key_event.cpp",
@@ -78,7 +83,6 @@ declare_args() {
     "event_handler/src/input_manager_impl.cpp",
     "event_handler/src/multimodal_event_handler.cpp",
     "event_handler/src/scene_board_judgement.cpp",
-    "events/src/axis_event.cpp",
     "events/src/input_manager.cpp",
     "module_loader/src/mmi_client.cpp",
     "module_loader/src/mmi_fd_listener.cpp",
@@ -104,9 +108,11 @@ declare_args() {
     "event_handler/src/key_event_value_transformation.cpp",
     "event_handler/src/key_map_manager.cpp",
     "fingersense_wrapper/src/fingersense_wrapper.cpp",
+    "gesturesense_wrapper/src/gesturesense_wrapper.cpp",
     "libinput_adapter/src/hotplug_detector.cpp",
     "libinput_adapter/src/libinput_adapter.cpp",
     "message_handle/src/authorization_dialog.cpp",
+    "message_handle/src/inject_notice_manager.cpp",
     "message_handle/src/server_msg_handler.cpp",
     "module_loader/src/app_debug_listener.cpp",
     "module_loader/src/mmi_service.cpp",
@@ -200,6 +206,7 @@ declare_args() {
   ]
 
   libmmi_virtual_device_sources = [
+    "src/virtual_crown.cpp",
     "src/virtual_device.cpp",
     "src/virtual_finger.cpp",
     "src/virtual_fingerprint_key.cpp",
@@ -308,6 +315,10 @@ if (input_feature_fingerprint) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_FINGERPRINT" ]
 }
 
+if (input_feature_crown) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_CROWN" ]
+}
+
 if (!defined(global_parts_info) ||
     defined(global_parts_info.security_security_component_manager)) {
   security_component_enable = true
@@ -321,6 +332,10 @@ if (security_component_enable) {
 
 if (input_ext_feature_fingersense) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER" ]
+}
+
+if (input_ext_feature_gesturesense) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER" ]
 }
 
 if (input_ext_feature_anco) {
@@ -351,7 +366,9 @@ if (input_ext_feature_magiccursor) {
   surface_path = "//foundation/graphic/graphic_surface"
   input_default_defines += [ "OHOS_BUILD_ENABLE_MAGICCURSOR" ]
   libmmi_service_sources += [
+    "${mmi_ext_path}/magic_cursor/src/least_squares_velocity_tracker.cpp",
     "${mmi_ext_path}/magic_cursor/src/magic_pointer_drawing_manager.cpp",
+    "${mmi_ext_path}/magic_cursor/src/magic_pointer_velocity_tracker.cpp",
     "${mmi_ext_path}/magic_cursor/src/render_context_gl.cpp",
   ]
 }

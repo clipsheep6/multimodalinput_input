@@ -113,6 +113,7 @@ public:
 
     static constexpr uint32_t EVENT_FLAG_RAW_POINTER_MOVEMENT = 0x00000010;
     static constexpr uint32_t EVENT_FLAG_TOUCHPAD_POINTER = 0x00000020;
+    static constexpr uint32_t EVENT_FLAG_PRIVACY_MODE = 0x00000040;
 
 public:
     /**
@@ -391,6 +392,13 @@ public:
      */
     void SetMarkEnabled(bool markEnabled);
 
+    /**
+     * @brief Converts a input event action into a short string.
+     * @param Indicates the input event action.
+     * @return Returns the string converted from the input action.
+     * @since 12
+    */
+    static std::string_view ActionToShortStr(int32_t action);
 public:
     /**
      * @brief Writes data to a <b>Parcel</b> object.
@@ -417,17 +425,17 @@ protected:
     explicit InputEvent(int32_t eventType);
 
 private:
-    int32_t eventType_;
-    int32_t id_;
-    int64_t actionTime_;
+    int32_t eventType_ { -1 };
+    int32_t id_ { -1 };
+    int64_t actionTime_ { -1 };
     uint64_t sensorInputTime_ { 0 };
-    int32_t action_;
-    int64_t actionStartTime_;
-    int32_t deviceId_;
-    int32_t targetDisplayId_;
-    int32_t targetWindowId_;
-    int32_t agentWindowId_;
-    uint32_t bitwise_;
+    int32_t action_ { -1 };
+    int64_t actionStartTime_ { -1 };
+    int32_t deviceId_ { -1 };
+    int32_t targetDisplayId_ { -1 };
+    int32_t targetWindowId_ { -1 };
+    int32_t agentWindowId_ { -1 };
+    uint32_t bitwise_ { 0 };
     bool markEnabled_ { true };
     std::function<void(int32_t, int64_t)> processedCallback_;
     std::shared_ptr<const uint8_t[]> extraData_;
