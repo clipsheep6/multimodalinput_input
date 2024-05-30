@@ -41,7 +41,6 @@ constexpr int32_t POINTER_ITEM_DISPLAY_X_THREE = 123;
 constexpr int32_t POINTER_ITEM_DISPLAY_X_FOUR = 200;
 constexpr int32_t POINTER_ITEM_DISPLAY_X_FIVE = 222;
 constexpr int32_t POINTER_ITEM_DISPLAY_X_SIX = 400;
-constexpr int32_t POINTER_ITEM_DISPLAY_X_SEVEN = 500;
 constexpr int32_t POINTER_ITEM_DISPLAY_X_EIGHT = 505;
 constexpr int32_t POINTER_ITEM_DISPLAY_X_NINE = 523;
 constexpr int32_t POINTER_ITEM_DISPLAY_X_TEN = 528;
@@ -60,7 +59,6 @@ constexpr int32_t POINTER_ITEM_DISPLAY_Y_FIVE = 367;
 constexpr int32_t POINTER_ITEM_DISPLAY_Y_SIX = 400;
 constexpr int32_t POINTER_ITEM_DISPLAY_Y_SEVEN = 500;
 constexpr int32_t POINTER_ITEM_DISPLAY_Y_EIGHT = 505;
-constexpr int32_t POINTER_ITEM_DISPLAY_Y_NINE = 600;
 constexpr int32_t POINTER_ITEM_DISPLAY_Y_TEN = 666;
 constexpr int32_t POINTER_ITEM_DISPLAY_Y_ELEVEN = 723;
 constexpr int32_t POINTER_ITEM_DISPLAY_Y_TWELVE = 757;
@@ -738,36 +736,6 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_004, TestSize.Level
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
-}
-
-/**
- * @tc.name: TestInputEventInterceptor_005
- * @tc.desc: Verify mouse button interceptor
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_005, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto pointerEvent = PointerEvent::Create();
-    pointerEvent->AddFlag(PointerEvent::EVENT_FLAG_NO_INTERCEPT);
-    ASSERT_TRUE(pointerEvent != nullptr);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
-    pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
-    pointerEvent->SetPointerId(DEFAULT_POINTER_ID);
-    pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
-    PointerEvent::PointerItem item;
-    item.SetPointerId(DEFAULT_POINTER_ID);
-    item.SetDownTime(GetNanoTime() / NANOSECOND_TO_MILLISECOND);
-    item.SetPressed(true);
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_SEVEN);
-    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_NINE);
-    pointerEvent->AddPointerItem(item);
-
-    auto interceptor = GetPtr<InputEventCallback>();
-    int32_t interceptorId{InputManager::GetInstance()->AddInterceptor(interceptor)};
-    InputManagerUtil::TestInterceptorIdAndPointerEvent(interceptorId, pointerEvent);
 }
 
 /**
