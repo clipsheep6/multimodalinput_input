@@ -17,6 +17,7 @@
 
 #include "define_multimodal.h"
 #include "event_dispatch_handler.h"
+#include "mmi_log.h"
 
 namespace OHOS {
 namespace MMI {
@@ -38,6 +39,7 @@ public:
  */
 HWTEST_F(EventDispatchTest, EventDispatchTest_HandleTouchEvent_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     EventDispatchHandler eventdispatchhandler;
     int32_t eventType = 3;
     std::shared_ptr<PointerEvent> sharedPointerEvent = std::make_shared<PointerEvent>(eventType);
@@ -52,6 +54,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_HandleTouchEvent_001, TestSize.Lev
  */
 HWTEST_F(EventDispatchTest, EventDispatchTest_FilterInvalidPointerItem_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     EventDispatchHandler eventdispatchhandler;
     int32_t fd = 1;
     int32_t eventType = 3;
@@ -67,6 +70,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_FilterInvalidPointerItem_001, Test
  */
 HWTEST_F(EventDispatchTest, EventDispatchTest_NotifyPointerEventToRS_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     EventDispatchHandler eventdispatchhandler;
     int32_t action = 1;
     std::string name = "ExampleProgram";
@@ -83,6 +87,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_NotifyPointerEventToRS_001, TestSi
  */
 HWTEST_F(EventDispatchTest, EventDispatchTest_HandlePointerEventInner_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     EventDispatchHandler eventdispatchhandler;
     int32_t eventType = 3;
     PointerEvent* pointerEvent = new PointerEvent(eventType);
@@ -98,6 +103,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_HandlePointerEventInner_001, TestS
  */
 HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchKeyEventPid_001, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     EventDispatchHandler eventdispatchhandler;
     UDSServer udsServer;
     int32_t keyevent = 3;
@@ -115,6 +121,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchKeyEventPid_001, TestSize.
  */
 HWTEST_F(EventDispatchTest, EventDispatchTest_AcquireEnableMark, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     EventDispatchHandler dispatch;
     std::shared_ptr<PointerEvent> event = PointerEvent::Create();
     ASSERT_NE(event, nullptr);
@@ -132,6 +139,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_AcquireEnableMark, TestSize.Level1
  */
 HWTEST_F(EventDispatchTest, EventDispatchTest_HandlePointerEventInner, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     EventDispatchHandler dispatch;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
@@ -150,6 +158,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_HandlePointerEventInner, TestSize.
  */
 HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchPointerEventInner, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     EventDispatchHandler dispatch;
     int32_t fd = -1;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
@@ -167,6 +176,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchPointerEventInner, TestSiz
  */
 HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchKeyEventPid, TestSize.Level1)
 {
+    CALL_TEST_DEBUG;
     EventDispatchHandler dispatch;
     UDSServer udsServer;
     std::shared_ptr<KeyEvent> KeyEvent = KeyEvent::Create();

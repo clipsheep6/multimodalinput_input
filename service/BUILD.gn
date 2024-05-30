@@ -900,7 +900,10 @@ ohos_unittest("EventDispatchTest") {
     "${mmi_path}/util:libmmi-util",
   ]
 
-  external_deps = [ "c_utils:utils" ]
+  external_deps = [
+    "c_utils:utils",
+    "hilog:libhilog",
+  ]
 }
 
 ohos_unittest("ServerMsgHandlerTest") {
