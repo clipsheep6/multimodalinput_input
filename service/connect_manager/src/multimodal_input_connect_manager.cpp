@@ -769,5 +769,20 @@ int32_t MultimodalInputConnectManager::SetCurrentUser(int32_t userId)
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetCurrentUser(userId);
 }
+
+int32_t MultimodalInputConnectManager::AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->AddVirtualInputDevice(device, deviceId);
+}
+
+int32_t MultimodalInputConnectManager::RemoveVirtualInputDevice(int32_t deviceId)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->RemoveVirtualInputDevice(deviceId);
+}
+
 } // namespace MMI
 } // namespace OHOS

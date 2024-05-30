@@ -143,6 +143,8 @@ public:
     int32_t OnTransmitInfrared(int64_t number, std::vector<int64_t>& pattern);
     int32_t SetPixelMapData(int32_t infoId, void* pixelMap) override;
     int32_t SetCurrentUser(int32_t userId) override;
+    int32_t AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId) override;
+    int32_t RemoveVirtualInputDevice(int32_t deviceId) override;
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
     void InitAncoUds();

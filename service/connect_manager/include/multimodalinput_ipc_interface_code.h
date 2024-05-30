@@ -107,6 +107,8 @@ enum class MultimodalinputConnectInterfaceCode {
     NATIVE_CANCEL_TRANSMIT = 85,
     SET_PIXEL_MAP_DATA = 86,
     SET_CURRENT_USERID = 87,
+    ADD_VIRTUAL_INPUT_DEVICE = 88,
+    REMOVE_VIRTUAL_INPUT_DEVICE = 89,
 };
 
 enum class MultimodalinputEventObserverCode {
