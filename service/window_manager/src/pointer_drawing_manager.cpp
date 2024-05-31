@@ -1033,9 +1033,10 @@ void PointerDrawingManager::GetPreferenceKey(std::string &name)
 int32_t PointerDrawingManager::SetPointerColor(int32_t color)
 {
     CALL_DEBUG_ENTER;
-    if (color < 0) {
-        MMI_HILOGE("color is invalid, color:%{public}d", color);
-        return RET_ERR;
+    if (color < MIN_POINTER_COLOR) {
+        color = MIN_POINTER_COLOR;
+    } else if (color > MAX_POINTER_COLOR) {
+        color = MAX_POINTER_COLOR;
     }
     if (surfaceNode_ != nullptr) {
         float alphaRatio = (static_cast<uint32_t>(color) >> RGB_CHANNEL_BITS_LENGTH) / MAX_ALPHA_VALUE;
@@ -1046,7 +1047,7 @@ int32_t PointerDrawingManager::SetPointerColor(int32_t color)
         }
     }
     MMI_HILOGI("PointerColor:%{public}x", color);
-    color = static_cast<uint32_t>(color) & static_cast<uint32_t>(MAX_POINTER_COLOR);
+    color = static_cast<int32_t>(static_cast<uint32_t>(color) & static_cast<uint32_t>(MAX_POINTER_COLOR));
     std::string name = POINTER_COLOR;
     GetPreferenceKey(name);
     int32_t ret = PREFERENCES_MGR->SetIntValue(name, MOUSE_FILE_NAME, color);
