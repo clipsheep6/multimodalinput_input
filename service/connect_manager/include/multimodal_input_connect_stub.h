@@ -126,6 +126,9 @@ protected:
     int32_t StubSetPixelMapData(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetMoveEventFilters(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetCurrentUser(MessageParcel& data, MessageParcel& reply);
+    int32_t StubEnableHardwareCursorStats(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetHardwareCursorStats(MessageParcel& data, MessageParcel& reply);
+
 private:
     int32_t VerifyTouchPadSetting(void);
 };

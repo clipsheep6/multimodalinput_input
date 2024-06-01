@@ -59,6 +59,8 @@ constexpr float MIN_LETTER_GESTURE_SQUARENESS = 0.15f;
 constexpr int32_t EVEN_NUMBER = 2;
 const std::string AIBASE_BUNDLE_NAME = "com.hmos.aibase";
 const std::string WAKEUP_ABILITY_NAME = "WakeUpExtAbility";
+const std::string SCREENSHOT_BUNDLE_NAME = "com.hmos.screenshot";
+const std::string SCREENSHOT_ABILITY_NAME = "com.hmos.screenshot.ServiceExtAbility";
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -620,16 +622,19 @@ void KeyCommandHandler::HandleKnuckleGestureTouchUp()
 void KeyCommandHandler::ProcessKnuckleGestureTouchUp(NotifyType type)
 {
     Ability ability;
-    ability.abilityName = WAKEUP_ABILITY_NAME;
-    ability.bundleName = AIBASE_BUNDLE_NAME;
     ability.abilityType = EXTENSION_ABILITY;
     if (type == NotifyType::REGIONGESTURE) {
+        ability.abilityName = WAKEUP_ABILITY_NAME;
+        ability.bundleName = AIBASE_BUNDLE_NAME;
         ability.params.emplace(std::make_pair("shot_type", "smart-shot"));
         ability.params.emplace(std::make_pair("fingerPath", GesturePointsToStr()));
+        ability.params.emplace(std::make_pair("launch_type", "knuckle_gesture"));
     } else if (type == NotifyType::LETTERGESTURE) {
+        ability.abilityName = SCREENSHOT_ABILITY_NAME;
+        ability.bundleName = SCREENSHOT_BUNDLE_NAME;
         ability.params.emplace(std::make_pair("shot_type", "scroll-shot"));
+        ability.params.emplace(std::make_pair("trigger_type", "knuckle"));
     }
-    ability.params.emplace(std::make_pair("launch_type", "knuckle_gesture"));
     LaunchAbility(ability, 0);
 }
 
@@ -646,13 +651,13 @@ void KeyCommandHandler::ResetKnuckleGesture()
 
 std::string KeyCommandHandler::GesturePointsToStr() const
 {
-    auto count = gesturePoints_.size();
+    int32_t count = static_cast<int32_t>(gesturePoints_.size());
     if (count % EVEN_NUMBER != 0 || count == 0) {
         MMI_HILOGE("Invalid gesturePoints_ size");
         return {};
     }
     cJSON *jsonArray = cJSON_CreateArray();
-    for (auto i = 0; i < count; i += EVEN_NUMBER) {
+    for (int32_t i = 0; i < count; i += EVEN_NUMBER) {
         cJSON *jsonData = cJSON_CreateObject();
         cJSON_AddItemToObject(jsonData, "x", cJSON_CreateNumber(gesturePoints_[i]));
         cJSON_AddItemToObject(jsonData, "y", cJSON_CreateNumber(gesturePoints_[i + 1]));
@@ -1076,11 +1081,7 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<PointerEvent> pointe
         }
         isParseConfig_ = true;
     }
-    bool isHandled = HandleMulFingersTap(pointer);
-    if (isHandled) {
-        return true;
-    }
-    return false;
+    return HandleMulFingersTap(pointer);
 }
 
 bool KeyCommandHandler::HandleRepeatKeys(const std::shared_ptr<KeyEvent> keyEvent)
@@ -1352,7 +1353,7 @@ bool KeyCommandHandler::HandleSequences(const std::shared_ptr<KeyEvent> keyEvent
     }
 
     if (filterSequences_.empty()) {
-        MMI_HILOGW("no sequences matched");
+        MMI_HILOGD("no sequences matched");
         keys_.clear();
         return false;
     }
@@ -1837,7 +1838,7 @@ void KeyCommandHandler::Dump(int32_t fd, const std::vector<std::string> &args)
     for (const auto &item : sequences_) {
         for (const auto& sequenceKey : item.sequenceKeys) {
             mprintf(fd, "keyCode: %d | keyAction: %s",
-                sequenceKey.keyCode, KeyActionToString(sequenceKey.keyAction).c_str());
+                sequenceKey.keyCode, ConvertKeyActionToString(sequenceKey.keyAction).c_str());
         }
         mprintf(fd, "BundleName: %s | AbilityName: %s | Action: %s ",
             item.ability.bundleName.c_str(), item.ability.abilityName.c_str(), item.ability.action.c_str());
@@ -1845,7 +1846,7 @@ void KeyCommandHandler::Dump(int32_t fd, const std::vector<std::string> &args)
     mprintf(fd, "-------------------------- ExcludeKey information --------------------------------\t");
     mprintf(fd, "ExcludeKey: count = %zu", excludeKeys_.size());
     for (const auto &item : excludeKeys_) {
-        mprintf(fd, "keyCode: %d | keyAction: %s", item.keyCode, KeyActionToString(item.keyAction).c_str());
+        mprintf(fd, "keyCode: %d | keyAction: %s", item.keyCode, ConvertKeyActionToString(item.keyAction).c_str());
     }
     mprintf(fd, "-------------------------- RepeatKey information ---------------------------------\t");
     mprintf(fd, "RepeatKey: count = %zu", repeatKeys_.size());
@@ -1853,7 +1854,7 @@ void KeyCommandHandler::Dump(int32_t fd, const std::vector<std::string> &args)
         mprintf(fd,
             "KeyCode: %d | KeyAction: %s | Times: %d"
             "| StatusConfig: %s | StatusConfigValue: %s | BundleName: %s | AbilityName: %s"
-            "| Action:%s \t", item.keyCode, KeyActionToString(item.keyAction).c_str(), item.times,
+            "| Action:%s \t", item.keyCode, ConvertKeyActionToString(item.keyAction).c_str(), item.times,
             item.statusConfig.c_str(), item.statusConfigValue ? "true" : "false",
             item.ability.bundleName.c_str(), item.ability.abilityName.c_str(), item.ability.action.c_str());
     }
@@ -1886,7 +1887,7 @@ void KeyCommandHandler::PrintGestureInfo(int32_t fd)
         doubleKnuckleGesture_.ability.bundleName.c_str(), doubleKnuckleGesture_.ability.abilityName.c_str(),
         doubleKnuckleGesture_.ability.action.c_str());
 }
-std::string KeyCommandHandler::KeyActionToString(int32_t keyAction)
+std::string KeyCommandHandler::ConvertKeyActionToString(int32_t keyAction)
 {
     static const std::unordered_map<int32_t, std::string> actionMap = {
         {0, "UNKNOWN"},

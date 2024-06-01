@@ -378,6 +378,129 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerVisible_00
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_DrawPointer_001
+ * @tc.desc: Test the funcation DrawPointer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawPointer_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager manager;
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "pointer window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    manager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_TRUE(manager.surfaceNode_ != nullptr);
+    int32_t displayId = 10;
+    int32_t physicalX = 100;
+    int32_t physicalY = 200;
+    PointerStyle pointerStyle;
+    Direction direction = DIRECTION0;
+    pointerStyle.id = 2;
+    manager.lastMouseStyle_.id = 3;
+    ASSERT_NO_FATAL_FAILURE(manager.DrawPointer(displayId, physicalX, physicalY, pointerStyle, direction));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_DrawPointer_002
+ * @tc.desc: Test the funcation DrawPointer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawPointer_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager manager;
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "pointer window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    manager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_TRUE(manager.surfaceNode_ != nullptr);
+    int32_t displayId = 10;
+    int32_t physicalX = 100;
+    int32_t physicalY = 200;
+    PointerStyle pointerStyle;
+    Direction direction = DIRECTION0;
+    pointerStyle.id = 2;
+    manager.lastMouseStyle_.id = 2;
+    ASSERT_NO_FATAL_FAILURE(manager.DrawPointer(displayId, physicalX, physicalY, pointerStyle, direction));
+    manager.surfaceNode_ = nullptr;
+    ASSERT_NO_FATAL_FAILURE(manager.DrawPointer(displayId, physicalX, physicalY, pointerStyle, direction));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_DrawLoadingPointerStyle_002
+ * @tc.desc: Test the funcation DrawLoadingPointerStyle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawLoadingPointerStyle_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager manager;
+    MOUSE_ICON mouseStyle = WEST;
+    manager.surfaceNode_ = nullptr;
+    ASSERT_NO_FATAL_FAILURE(manager.DrawLoadingPointerStyle(mouseStyle));
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "pointer window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    manager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_TRUE(manager.surfaceNode_ != nullptr);
+    ASSERT_NO_FATAL_FAILURE(manager.DrawLoadingPointerStyle(mouseStyle));
+    mouseStyle = LOADING;
+    ASSERT_NO_FATAL_FAILURE(manager.DrawLoadingPointerStyle(mouseStyle));
+    mouseStyle = DEFAULT;
+    ASSERT_NO_FATAL_FAILURE(manager.DrawLoadingPointerStyle(mouseStyle));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_AttachToDisplay_001
+ * @tc.desc: Test the funcation AttachToDisplay
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AttachToDisplay_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager manager;
+    manager.surfaceNode_ = nullptr;
+    ASSERT_NO_FATAL_FAILURE(manager.AttachToDisplay());
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "pointer window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    manager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_TRUE(manager.surfaceNode_ != nullptr);
+    manager.screenId_ = 0;
+    ASSERT_NO_FATAL_FAILURE(manager.AttachToDisplay());
+    manager.screenId_ = 1;
+    ASSERT_NO_FATAL_FAILURE(manager.AttachToDisplay());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_DrawCursor_002
+ * @tc.desc: Test the funcation DrawCursor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawCursor_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager manager;
+    MOUSE_ICON mouseStyle = EAST;
+    manager.surfaceNode_ = nullptr;
+    int32_t ret = manager.DrawCursor(mouseStyle);
+    EXPECT_EQ(ret, RET_ERR);
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "pointer window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    manager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    ASSERT_TRUE(manager.surfaceNode_ != nullptr);
+    ret = manager.DrawCursor(mouseStyle);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
  * @tc.name: InputWindowsManagerTest_SetPointerStyle_001
  * @tc.desc: Test SetPointerStyle
  * @tc.type: FUNC
@@ -1265,6 +1388,165 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawPointerStyle_005
     pointerStyle.size = 2;
     pointerDrawingManager.hasDisplay_ = false;
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawPointerStyle(pointerStyle));
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_ConvertToColorSpace
+ * @tc.desc: Test ConvertToColorSpace
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ConvertToColorSpace, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    Media::ColorSpace colorSpace = Media::ColorSpace::DISPLAY_P3;
+    EXPECT_NE(pointerDrawingManager.ConvertToColorSpace(colorSpace), nullptr);
+    colorSpace = Media::ColorSpace::LINEAR_SRGB;
+    EXPECT_NE(pointerDrawingManager.ConvertToColorSpace(colorSpace), nullptr);
+    colorSpace = Media::ColorSpace::SRGB;
+    EXPECT_NE(pointerDrawingManager.ConvertToColorSpace(colorSpace), nullptr);
+    colorSpace = static_cast<Media::ColorSpace>(5);
+    EXPECT_NE(pointerDrawingManager.ConvertToColorSpace(colorSpace), nullptr);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_PixelFormatToColorType
+ * @tc.desc: Test PixelFormatToColorType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_PixelFormatToColorType, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    Media::PixelFormat pixelFmt = Media::PixelFormat::RGB_565;
+    EXPECT_EQ(pointerDrawingManager.PixelFormatToColorType(pixelFmt),
+        Rosen::Drawing::ColorType::COLORTYPE_RGB_565);
+    pixelFmt = Media::PixelFormat::RGBA_8888;
+    EXPECT_EQ(pointerDrawingManager.PixelFormatToColorType(pixelFmt),
+        Rosen::Drawing::ColorType::COLORTYPE_RGBA_8888);
+    pixelFmt = Media::PixelFormat::BGRA_8888;
+    EXPECT_EQ(pointerDrawingManager.PixelFormatToColorType(pixelFmt),
+        Rosen::Drawing::ColorType::COLORTYPE_BGRA_8888);
+    pixelFmt = Media::PixelFormat::ALPHA_8;
+    EXPECT_EQ(pointerDrawingManager.PixelFormatToColorType(pixelFmt),
+        Rosen::Drawing::ColorType::COLORTYPE_ALPHA_8);
+    pixelFmt = Media::PixelFormat::RGBA_F16;
+    EXPECT_EQ(pointerDrawingManager.PixelFormatToColorType(pixelFmt),
+        Rosen::Drawing::ColorType::COLORTYPE_RGBA_F16);
+    pixelFmt = Media::PixelFormat::UNKNOWN;
+    EXPECT_EQ(pointerDrawingManager.PixelFormatToColorType(pixelFmt),
+        Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
+    pixelFmt = Media::PixelFormat::ARGB_8888;
+    EXPECT_EQ(pointerDrawingManager.PixelFormatToColorType(pixelFmt),
+        Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
+    pixelFmt = Media::PixelFormat::RGB_888;
+    EXPECT_EQ(pointerDrawingManager.PixelFormatToColorType(pixelFmt),
+        Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
+    pixelFmt = Media::PixelFormat::NV21;
+    EXPECT_EQ(pointerDrawingManager.PixelFormatToColorType(pixelFmt),
+        Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
+    pixelFmt = Media::PixelFormat::NV12;
+    EXPECT_EQ(pointerDrawingManager.PixelFormatToColorType(pixelFmt),
+        Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
+    pixelFmt = Media::PixelFormat::CMYK;
+    EXPECT_EQ(pointerDrawingManager.PixelFormatToColorType(pixelFmt),
+        Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
+    pixelFmt = static_cast<Media::PixelFormat>(100);
+    EXPECT_EQ(pointerDrawingManager.PixelFormatToColorType(pixelFmt),
+        Rosen::Drawing::ColorType::COLORTYPE_UNKNOWN);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest__AlphaTypeToAlphaType
+ * @tc.desc: Test AlphaTypeToAlphaType
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_AlphaTypeToAlphaType, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    Media::AlphaType alphaType = Media::AlphaType::IMAGE_ALPHA_TYPE_UNKNOWN;
+    EXPECT_EQ(pointerDrawingManager.AlphaTypeToAlphaType(alphaType),
+        Rosen::Drawing::AlphaType::ALPHATYPE_UNKNOWN);
+    alphaType = Media::AlphaType::IMAGE_ALPHA_TYPE_OPAQUE;
+    EXPECT_EQ(pointerDrawingManager.AlphaTypeToAlphaType(alphaType),
+        Rosen::Drawing::AlphaType::ALPHATYPE_OPAQUE);
+    alphaType = Media::AlphaType::IMAGE_ALPHA_TYPE_PREMUL;
+    EXPECT_EQ(pointerDrawingManager.AlphaTypeToAlphaType(alphaType),
+        Rosen::Drawing::AlphaType::ALPHATYPE_PREMUL);
+    alphaType = Media::AlphaType::IMAGE_ALPHA_TYPE_UNPREMUL;
+    EXPECT_EQ(pointerDrawingManager.AlphaTypeToAlphaType(alphaType),
+        Rosen::Drawing::AlphaType::ALPHATYPE_UNPREMUL);
+    alphaType = static_cast<Media::AlphaType>(5);
+    EXPECT_EQ(pointerDrawingManager.AlphaTypeToAlphaType(alphaType),
+        Rosen::Drawing::AlphaType::ALPHATYPE_UNKNOWN);
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_ExtractDrawingImage_001
+ * @tc.desc: Test ExtractDrawingImage
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ExtractDrawingImage_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OHOS::Rosen::Drawing::Bitmap bitmap;
+    OHOS::Rosen::Drawing::BitmapFormat format { OHOS::Rosen::Drawing::COLORTYPE_RGBA_8888,
+        OHOS::Rosen::Drawing::ALPHATYPE_OPAQUE };
+    PointerDrawingManager pointerDrawingManager;
+    bitmap.Build(64, 64, format);
+    OHOS::Rosen::Drawing::Canvas canvas(256, 256);
+    canvas.Bind(bitmap);
+    canvas.Clear(OHOS::Rosen::Drawing::Color::COLOR_TRANSPARENT);
+    MOUSE_ICON mouseStyle = MOUSE_ICON::RUNNING_LEFT;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawImage(canvas, mouseStyle));
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_ExtractDrawingImage_002
+ * @tc.desc: Test ExtractDrawingImage
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ExtractDrawingImage_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OHOS::Rosen::Drawing::Bitmap bitmap;
+    OHOS::Rosen::Drawing::BitmapFormat format { OHOS::Rosen::Drawing::COLORTYPE_RGBA_8888,
+        OHOS::Rosen::Drawing::ALPHATYPE_OPAQUE };
+    PointerDrawingManager pointerDrawingManager;
+    bitmap.Build(64, 64, format);
+    OHOS::Rosen::Drawing::Canvas canvas(256, 256);
+    canvas.Bind(bitmap);
+    canvas.Clear(OHOS::Rosen::Drawing::Color::COLOR_TRANSPARENT);
+    MOUSE_ICON mouseStyle = MOUSE_ICON::RUNNING;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawImage(canvas, mouseStyle));
+}
+
+/**
+ * @tc.name: PointerDrawingManagerTest_ExtractDrawingImage_003
+ * @tc.desc: Test ExtractDrawingImage
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_ExtractDrawingImage_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OHOS::Rosen::Drawing::Bitmap bitmap;
+    OHOS::Rosen::Drawing::BitmapFormat format { OHOS::Rosen::Drawing::COLORTYPE_RGBA_8888,
+        OHOS::Rosen::Drawing::ALPHATYPE_OPAQUE };
+    PointerDrawingManager pointerDrawingManager;
+    bitmap.Build(64, 64, format);
+    OHOS::Rosen::Drawing::Canvas canvas(256, 256);
+    canvas.Bind(bitmap);
+    canvas.Clear(OHOS::Rosen::Drawing::Color::COLOR_TRANSPARENT);
+    MOUSE_ICON mouseStyle = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawImage(canvas, mouseStyle));
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.SetPointerLocation(200, 200));
 }
 } // namespace MMI
 } // namespace OHOS

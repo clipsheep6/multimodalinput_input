@@ -107,7 +107,9 @@ enum class MultimodalinputConnectInterfaceCode {
     NATIVE_CANCEL_TRANSMIT = 85,
     SET_PIXEL_MAP_DATA = 86,
     SET_CURRENT_USERID = 87,
-    SET_MOVE_EVENT_FILTERS = 88,
+    ENABLE_HARDWARE_CURSOR_STATS = 88,
+    GET_HARDWARE_CURSOR_STATS = 89,
+    SET_MOVE_EVENT_FILTERS = 90,
 };
 
 enum class MultimodalinputEventObserverCode {
