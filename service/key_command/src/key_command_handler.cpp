@@ -59,6 +59,8 @@ constexpr float MIN_LETTER_GESTURE_SQUARENESS = 0.15f;
 constexpr int32_t EVEN_NUMBER = 2;
 const std::string AIBASE_BUNDLE_NAME = "com.hmos.aibase";
 const std::string WAKEUP_ABILITY_NAME = "WakeUpExtAbility";
+const std::string SCREENSHOT_BUNDLE_NAME = "com.hmos.screenshot";
+const std::string SCREENSHOT_ABILITY_NAME = "com.hmos.screenshot.ServiceExtAbility";
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -94,10 +96,6 @@ void KeyCommandHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> poi
     CHKPV(pointerEvent);
     CHKPV(nextHandler_);
     OnHandleTouchEvent(pointerEvent);
-    if (isKnuckleState_) {
-        MMI_HILOGD("current pointer event is knuckle");
-        return;
-    }
     nextHandler_->HandleTouchEvent(pointerEvent);
 }
 
@@ -190,7 +188,7 @@ void KeyCommandHandler::HandlePointerActionMoveEvent(const std::shared_ptr<Point
         return;
     }
     if (twoFingerGesture_.timerId == -1) {
-        MMI_HILOGD("Two finger gesture timer id is -1.");
+        MMI_HILOGD("Two finger gesture timer id is -1");
         return;
     }
     auto pos = std::find_if(std::begin(twoFingerGesture_.touches), std::end(twoFingerGesture_.touches),
@@ -271,6 +269,10 @@ void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<Poin
     CHKPV(touchEvent);
     if (!singleKnuckleGesture_.statusConfigValue) {
         MMI_HILOGI("Knuckle switch closed");
+        return;
+    }
+    if (touchEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) {
+        MMI_HILOGD("Inject knuckle event, skip");
         return;
     }
     int32_t id = touchEvent->GetPointerId();
@@ -620,16 +622,19 @@ void KeyCommandHandler::HandleKnuckleGestureTouchUp()
 void KeyCommandHandler::ProcessKnuckleGestureTouchUp(NotifyType type)
 {
     Ability ability;
-    ability.abilityName = WAKEUP_ABILITY_NAME;
-    ability.bundleName = AIBASE_BUNDLE_NAME;
     ability.abilityType = EXTENSION_ABILITY;
     if (type == NotifyType::REGIONGESTURE) {
+        ability.abilityName = WAKEUP_ABILITY_NAME;
+        ability.bundleName = AIBASE_BUNDLE_NAME;
         ability.params.emplace(std::make_pair("shot_type", "smart-shot"));
         ability.params.emplace(std::make_pair("fingerPath", GesturePointsToStr()));
+        ability.params.emplace(std::make_pair("launch_type", "knuckle_gesture"));
     } else if (type == NotifyType::LETTERGESTURE) {
+        ability.abilityName = SCREENSHOT_ABILITY_NAME;
+        ability.bundleName = SCREENSHOT_BUNDLE_NAME;
         ability.params.emplace(std::make_pair("shot_type", "scroll-shot"));
+        ability.params.emplace(std::make_pair("trigger_type", "knuckle"));
     }
-    ability.params.emplace(std::make_pair("launch_type", "knuckle_gesture"));
     LaunchAbility(ability, 0);
 }
 
@@ -1772,7 +1777,7 @@ int32_t KeyCommandHandler::UpdateSettingsXml(const std::string &businessId, int3
         return COMMON_PARAMETER_ERROR;
     }
     if (delay < MIN_SHORT_KEY_DOWN_DURATION || delay > MAX_SHORT_KEY_DOWN_DURATION) {
-        MMI_HILOGE("delay is not in valid range.");
+        MMI_HILOGE("Delay is not in valid range");
         return COMMON_PARAMETER_ERROR;
     }
     return PREFERENCES_MGR->SetShortKeyDuration(businessId, delay);

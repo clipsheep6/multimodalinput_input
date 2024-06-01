@@ -57,6 +57,8 @@ constexpr int32_t ROTATION_ANGLE_90 = 90;
 constexpr int32_t ROTATION_ANGLE_180 = 180;
 constexpr int32_t ROTATION_ANGLE_270 = 270;
 constexpr float TEXT_SIZE = 28.0f;
+constexpr uint64_t FOLD_SCREEN_MAIN_ID = 5;
+constexpr uint64_t FOLD_SCREEN_FULL_ID = 0;
 constexpr float TEXT_SCALE = 1.0f;
 constexpr float TEXT_SKEW = 0.0f;
 constexpr float CALCULATE_TEMP = 2.0f;
@@ -355,9 +357,10 @@ void TouchDrawingManager::CreateTouchWindow()
 {
     CALL_DEBUG_ENTER;
     if (surfaceNode_ != nullptr) {
-        if ((displayInfo_.displayDirection) != DIRECTION0 && (displayInfo_.direction != DIRECTION90)) {
+        if ((displayInfo_.displayDirection != DIRECTION0) && (displayInfo_.direction != direction_)) {
             surfaceNode_->SetBounds(0, 0, displayInfo_.width, displayInfo_.height);
             surfaceNode_->SetFrame(0, 0, displayInfo_.width, displayInfo_.height);
+            direction_ = displayInfo_.direction;
         }
         return;
     }
@@ -370,6 +373,7 @@ void TouchDrawingManager::CreateTouchWindow()
     surfaceNode_->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
     surfaceNode_->SetBounds(0, 0, displayInfo_.width, displayInfo_.height);
     surfaceNode_->SetFrame(0, 0, displayInfo_.width, displayInfo_.height);
+    direction_ = displayInfo_.direction;
 #ifndef USE_ROSEN_DRAWING
     surfaceNode_->SetBackgroundColor(SK_ColorTRANSPARENT);
 #else
@@ -392,7 +396,14 @@ void TouchDrawingManager::CreateTouchWindow()
         MMI_HILOGD("Add child labels canvas node");
         surfaceNode_->AddChild(labelsCanvasNode_, DEFAULT_VALUE);
     }
-    surfaceNode_->AttachToDisplay(static_cast<uint64_t>(pointerEvent_->GetTargetDisplayId()));
+    uint64_t screenId = static_cast<uint64_t>(pointerEvent_->GetTargetDisplayId());
+    if (displayInfo_.displayMode == DisplayMode::MAIN) {
+        screenId = FOLD_SCREEN_MAIN_ID;
+    } else if (displayInfo_.displayMode == DisplayMode::FULL) {
+        screenId = FOLD_SCREEN_FULL_ID;
+    }
+    surfaceNode_->AttachToDisplay(screenId);
+    MMI_HILOGI("Setting screen:%{public}" PRIu64 ", displayNode:%{public}" PRIu64, screenId, surfaceNode_->GetId());
 }
 
 void TouchDrawingManager::DrawBubbleHandler()
@@ -573,7 +584,7 @@ void TouchDrawingManager::DrawLabels()
     } else {
         color = std::abs(dx) < TOUCH_SLOP ? LABELS_DEFAULT_COLOR : LABELS_RED_COLOR;
         DrawRectItem(canvas, viewDx, rect, color);
-        color = std::abs(dx) < TOUCH_SLOP ? LABELS_DEFAULT_COLOR : LABELS_RED_COLOR;
+        color = std::abs(dy) < TOUCH_SLOP ? LABELS_DEFAULT_COLOR : LABELS_RED_COLOR;
         DrawRectItem(canvas, viewDy, rect, color);
     }
     DrawRectItem(canvas, viewXv, rect, LABELS_DEFAULT_COLOR);

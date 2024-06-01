@@ -29,10 +29,8 @@
 #include "mouse_event_normalize.h"
 #include "pointer_drawing_manager.h"
 #include "preferences.h"
-#include "preferences_impl.h"
 #include "preferences_errno.h"
 #include "preferences_helper.h"
-#include "preferences_xml_utils.h"
 #include "util.h"
 #include "mmi_matrix3.h"
 #include "util_ex.h"
@@ -214,7 +212,10 @@ void InputWindowsManager::FoldStatusLisener::OnFoldStatusChanged(Rosen::FoldStat
         MMI_HILOG_HANDLERD("No need to set foldStatus");
         return;
     }
-    CHKPV(WIN_MGR->lastPointerEventForFold_);
+    if (WIN_MGR->lastPointerEventForFold_ == nullptr) {
+        MMI_HILOG_HANDLERE("lastPointerEventForFold_ is nullptr");
+        return;
+    }
     auto pointerEvent = std::make_shared<PointerEvent>(*(WIN_MGR->lastPointerEventForFold_));
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
     pointerEvent->SetActionTime(GetSysClockTime());
@@ -265,6 +266,13 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
     }
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
     for (const auto &item : windowsInfo) {
+        bool checkWindow = (item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE ||
+            !IsValidZorderWindow(item, pointerEvent);
+        if (checkWindow) {
+            MMI_HILOG_DISPATCHD("Skip the untouchable or invalid zOrder window to continue searching,"
+                "window:%{public}d, flags:%{public}d", item.id, item.flags);
+            continue;
+        }
         if (item.id == pointerEvent->GetTargetWindowId()) {
             MMI_HILOG_DISPATCHD("find windowinfo by window id %{public}d", item.id);
             windowInfo = &item;
@@ -384,13 +392,23 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
     const WindowInfo* windowInfo = nullptr;
     std::vector<WindowInfo> windowInfos = GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
     for (const auto &item : windowInfos) {
+        bool checkWindow = (item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE ||
+            !IsValidZorderWindow(item, pointerEvent);
+        if (checkWindow) {
+            MMI_HILOG_DISPATCHD("Skip the untouchable or invalid zOrder window to continue searching,"
+                "window:%{public}d, flags:%{public}d", item.id, item.flags);
+            continue;
+        }
         if (item.id == windowId) {
             MMI_HILOGD("Find windowInfo by window id %{public}d", item.id);
             windowInfo = &item;
             break;
         }
     }
-    CHKPR(windowInfo, INVALID_FD);
+    if (windowInfo == nullptr) {
+        MMI_HILOGE("WindowInfo is nullptr, pointerAction:%{public}d", pointerEvent->GetPointerAction());
+        return INVALID_FD;
+    }
     MMI_HILOGD("Get pid:%{public}d from idxPidMap", windowInfo->pid);
     return udsServer_->GetClientFd(windowInfo->pid);
 }
@@ -720,7 +738,10 @@ void InputWindowsManager::UpdateDisplayMode()
         return;
     }
     displayMode_ = mode;
-    CHKPV(FINGERSENSE_WRAPPER->sendFingerSenseDisplayMode_);
+    if (FINGERSENSE_WRAPPER->sendFingerSenseDisplayMode_ == nullptr) {
+        MMI_HILOGD("send fingersense display mode is nullptr");
+        return;
+    }
     MMI_HILOGI("update fingersense display mode, displayMode:%{public}d", displayMode_);
     FINGERSENSE_WRAPPER->sendFingerSenseDisplayMode_(static_cast<int32_t>(displayMode_));
 }
@@ -1013,7 +1034,10 @@ void InputWindowsManager::NotifyPointerToWindow()
 {
     CALL_DEBUG_ENTER;
     std::optional<WindowInfo> windowInfo;
-    CHKPV(lastPointerEvent_);
+    if (lastPointerEvent_ == nullptr) {
+        MMI_HILOGD("lastPointerEvent_ is nullptr");
+        return;
+    }
     windowInfo = GetWindowInfo(lastLogicX_, lastLogicY_);
     if (!windowInfo) {
         MMI_HILOGE("The windowInfo is nullptr");
@@ -2485,7 +2509,7 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction)
     if (pointerAction == PointerEvent::POINTER_ACTION_PULL_IN_WINDOW) {
         WindowInfo touchWindow;
         bool isChanged { false };
-        for (auto item : displayGroupInfo_.windowsInfo) {
+        for (const auto &item : displayGroupInfo_.windowsInfo) {
             if ((item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE) {
                 MMI_HILOGD("Skip the untouchable window to continue searching, "
                     "window:%{public}d, flags:%{public}d", item.id, item.flags);
@@ -2537,7 +2561,10 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction)
     pointerEvent->SetDeviceId(lastTouchEvent_->GetDeviceId());
     auto fd = udsServer_->GetClientFd(lastTouchWindowInfo_.pid);
     auto sess = udsServer_->GetSession(fd);
-    CHKPV(sess);
+    if (sess == nullptr) {
+        MMI_HILOGI("The last window has disappeared");
+        return;
+    }
 
     EventLogHelper::PrintEventData(pointerEvent, MMI_LOG_HEADER);
     NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
