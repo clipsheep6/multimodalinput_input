@@ -61,7 +61,7 @@ const std::string KEY_PATH = "/vendor/etc/keymap/";
 constexpr size_t BUF_TID_SIZE = 10;
 constexpr size_t BUF_CMD_SIZE = 512;
 constexpr size_t PROGRAM_NAME_SIZE = 256;
-constexpr int32_t TIME_CONVERSION_UNIT = 1000;
+constexpr int64_t TIME_CONVERSION_UNIT = 1000;
 } // namespace
 
 int64_t GetSysClockTime()
