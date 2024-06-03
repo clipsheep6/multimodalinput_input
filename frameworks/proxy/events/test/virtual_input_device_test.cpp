@@ -35,8 +35,28 @@ public:
     void TearDown();
     static void SetUpTestCase();
     std::string GetEventDump();
+    static bool CmpInputDevice(std::shared_ptr<InputDevice> one, std::shared_ptr<InputDevice> other);
 };
 
+class VirtualInputDeviceListener : public IInputDeviceListener {
+public:
+    ~VirtualInputDeviceListener() override = default;
+    void OnDeviceAdded(int32_t deviceId, const std::string &type) override
+    {
+        MMI_HILOGI("DeviceId:%{public}d added, type:%{public}s", deviceId, type.c_str());
+        KeyboardType keyType { KeyboardType::KEYBOARD_TYPE_NONE };
+        auto keyboardCallback = [&keyType] (int32_t keyboardType) {
+            MMI_HILOGI("KeyboardType:%{public}d", keyboardType);
+        };
+        int32_t ret = InputManager::GetInstance()->GetKeyboardType(deviceId, keyboardCallback);
+        ASSERT_EQ(ret, RET_OK);
+    }
+
+    void OnDeviceRemoved(int32_t deviceId, const std::string &type) override
+    {
+        MMI_HILOGI("DeviceId:%{public}d removed, type:%{public}s", deviceId, type.c_str());
+    }
+};
 
 void VirtualInputDeviceTest::SetUpTestCase()
 {
@@ -59,6 +79,24 @@ std::string VirtualInputDeviceTest::GetEventDump()
     return TestUtil->GetEventDump();
 }
 
+bool VirtualInputDeviceTest::CmpInputDevice(std::shared_ptr<InputDevice> one, std::shared_ptr<InputDevice> other)
+{
+    if (one == nullptr && other == nullptr) {
+        return true;
+    }
+    if (one == nullptr || other == nullptr) {
+        return false;
+    }
+    return one->GetName() == other->GetName() && one->GetType() == other->GetType() &&
+        one->GetBus() == other->GetBus() && one->GetVersion() == other->GetVersion() &&
+        one->GetProduct() == other->GetProduct() && one->GetVendor() == other->GetVendor() &&
+        one->GetPhys() == other->GetPhys() && one->GetUniq() == other->GetUniq() &&
+        one->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD) ==
+        other->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD) &&
+        one->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER) ==
+        other->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER);
+};
+
 /**
  * @tc.name: VirtualInputDeviceTest_AddVirtualInputDevice_001
  * @tc.desc: Add virtual input device
@@ -68,17 +106,6 @@ std::string VirtualInputDeviceTest::GetEventDump()
 HWTEST_F(VirtualInputDeviceTest, VirtualInputDeviceTest_AddVirtualInputDevice_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto cmpInputDevice = [] (std::shared_ptr<InputDevice> one, std::shared_ptr<InputDevice> other) -> bool {
-        return one->GetName() == other->GetName() && one->GetType() == other->GetType() &&
-            one->GetBus() == other->GetBus() && one->GetVersion() == other->GetVersion() &&
-            one->GetProduct() == other->GetProduct() && one->GetVendor() == other->GetVendor() &&
-            one->GetPhys() == other->GetPhys() && one->GetUniq() == other->GetUniq() &&
-            one->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD) ==
-            other->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD) &&
-            one->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER) ==
-            other->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER);
-    };
-
     auto inputDeviceAdd = std::make_shared<InputDevice>();
     inputDeviceAdd->SetName("VirtualDeviceName");
     inputDeviceAdd->SetType(-1);
@@ -90,14 +117,16 @@ HWTEST_F(VirtualInputDeviceTest, VirtualInputDeviceTest_AddVirtualInputDevice_00
     inputDeviceAdd->SetUniq("unique");
     inputDeviceAdd->AddCapability(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD);
     int32_t deviceId { -1 };
-    InputManager::GetInstance()->AddVirtualInputDevice(inputDeviceAdd, deviceId);
+    int32_t ret = InputManager::GetInstance()->AddVirtualInputDevice(inputDeviceAdd, deviceId);
+    ASSERT_EQ(ret, RET_OK);
     auto inputDeviceGet = std::make_shared<InputDevice>();
-    inputDeviceGet = nullptr;
-    auto inputDevFun = [] (std::shared_ptr<InputDevice>) {
-        MMI_HILOGI("GetDevice Executed");
+    auto inputDevFun = [&inputDeviceGet] (std::shared_ptr<InputDevice> dev) {
+        inputDeviceGet = dev;
     };
     ASSERT_TRUE(InputManager::GetInstance()->GetDevice(deviceId, inputDevFun) == RET_OK);
-    ASSERT_TRUE(cmpInputDevice(inputDeviceAdd, inputDeviceGet));
+    ASSERT_TRUE(CmpInputDevice(inputDeviceAdd, inputDeviceGet));
+    ret = InputManager::GetInstance()->RemoveVirtualInputDevice(deviceId);
+    ASSERT_EQ(ret, RET_OK);
 }
 
 /**
@@ -110,16 +139,47 @@ HWTEST_F(VirtualInputDeviceTest, VirtualInputDeviceTest_RemoveVirtualInputDevice
 {
     auto inputDeviceAdd = std::make_shared<InputDevice>();
     int32_t deviceId { -1 };
-    InputManager::GetInstance()->AddVirtualInputDevice(inputDeviceAdd, deviceId);
+    int32_t ret = InputManager::GetInstance()->AddVirtualInputDevice(inputDeviceAdd, deviceId);
+    ASSERT_EQ(ret, RET_OK);
     auto inputDeviceGet = std::make_shared<InputDevice>();
-    inputDeviceGet = nullptr;
-    auto inputDevFun = [] (std::shared_ptr<InputDevice>) {
-        MMI_HILOGI("GetDevice Executed");
+    auto inputDevFun = [&inputDeviceGet] (std::shared_ptr<InputDevice> dev) {
+        inputDeviceGet = dev;
     };
-    ASSERT_TRUE(InputManager::GetInstance()->GetDevice(deviceId, inputDevFun) == RET_OK);
-    ASSERT_TRUE(inputDeviceAdd == inputDeviceGet);
-    InputManager::GetInstance()->RemoveVirtualInputDevice(deviceId);
-    ASSERT_TRUE(InputManager::GetInstance()->GetDevice(deviceId, inputDevFun) != RET_OK);
+    ret = InputManager::GetInstance()->GetDevice(deviceId, inputDevFun);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InputManager::GetInstance()->RemoveVirtualInputDevice(deviceId);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InputManager::GetInstance()->RemoveVirtualInputDevice(deviceId);
+    ASSERT_NE(ret, RET_OK);
+    ret = InputManager::GetInstance()->GetDevice(deviceId, inputDevFun);
+    ASSERT_NE(ret, RET_OK);
 }
+
+/**
+ * @tc.name: VirtualInputDeviceTest_RemoveVirtualInputDevice_001
+ * @tc.desc: Remove virtual input device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(VirtualInputDeviceTest, VirtualInputDeviceTest_RemoveVirtualInputDevice_001, TestSize.Level1)
+{
+    auto inputDeviceAdd = std::make_shared<InputDevice>();
+    int32_t deviceId { -1 };
+    int32_t ret = InputManager::GetInstance()->AddVirtualInputDevice(inputDeviceAdd, deviceId);
+    ASSERT_EQ(ret, RET_OK);
+    auto inputDeviceGet = std::make_shared<InputDevice>();
+    auto inputDevFun = [&inputDeviceGet] (std::shared_ptr<InputDevice> dev) {
+        inputDeviceGet = dev;
+    };
+    ret = InputManager::GetInstance()->GetDevice(deviceId, inputDevFun);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InputManager::GetInstance()->RemoveVirtualInputDevice(deviceId);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InputManager::GetInstance()->RemoveVirtualInputDevice(deviceId);
+    ASSERT_NE(ret, RET_OK);
+    ret = InputManager::GetInstance()->GetDevice(deviceId, inputDevFun);
+    ASSERT_NE(ret, RET_OK);
+}
+
 } // namespace MMI
 } // namespace OHOS
