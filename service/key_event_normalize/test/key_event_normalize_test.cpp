@@ -20,7 +20,7 @@
 #include "define_multimodal.h"
 #include "general_keyboard.h"
 #include "input_device_manager.h"
-#include "input_windows_manager.h"
+#include "i_input_windows_manager.h"
 #include "key_event_normalize.h"
 #include "libinput_wrapper.h"
 #include "pointer_event.h"

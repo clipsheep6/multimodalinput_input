@@ -21,7 +21,7 @@
 #include "event_resample.h"
 #include "general_touchpad.h"
 #include "input_device_manager.h"
-#include "input_windows_manager.h"
+#include "i_input_windows_manager.h"
 #include "libinput_wrapper.h"
 
 #include "libinput-private.h"

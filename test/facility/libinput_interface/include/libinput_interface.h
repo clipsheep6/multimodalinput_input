@@ -93,7 +93,12 @@ public:
     virtual ~LibinputInterface() = default;
 
     virtual enum libinput_event_type GetEventType(struct libinput_event *event) = 0;
+    virtual struct libinput_device* GetDevice(struct libinput_event *event) = 0;
+    virtual uint64_t GetSensorTime(struct libinput_event *event) = 0;
+    virtual struct libinput_event_touch* GetTouchEvent(struct libinput_event *event) = 0;
     virtual struct libinput_event_gesture* GetGestureEvent(struct libinput_event *event) = 0;
+    virtual uint64_t TouchEventGetTime(struct libinput_event_touch *event) = 0;
+    virtual double TouchEventGetPressure(struct libinput_event_touch* event) = 0;
     virtual uint32_t GestureEventGetTime(struct libinput_event_gesture *event) = 0;
     virtual int GestureEventGetFingerCount(struct libinput_event_gesture *event) = 0;
     virtual int GestureEventGetDevCoordsX(struct libinput_event_gesture *event, uint32_t idx) = 0;

@@ -18,6 +18,7 @@
 
 #include "define_multimodal.h"
 #include "libinput_interface.h"
+#include "preferences_manager_mock.h"
 #include "touchpad_transform_processor.h"
 
 #undef MMI_LOG_TAG
@@ -27,19 +28,6 @@ namespace OHOS {
 namespace MMI {
 using namespace testing;
 using namespace testing::ext;
-
-class LibinputInterfaceMock : public LibinputInterface {
-public:
-    LibinputInterfaceMock() = default;
-    ~LibinputInterfaceMock() override = default;
-
-    MOCK_METHOD1(GetEventType, enum libinput_event_type (struct libinput_event *event));
-    MOCK_METHOD1(GetGestureEvent, struct libinput_event_gesture* (struct libinput_event *event));
-    MOCK_METHOD1(GestureEventGetTime, uint32_t (struct libinput_event_gesture *event));
-    MOCK_METHOD1(GestureEventGetFingerCount, int (struct libinput_event_gesture *event));
-    MOCK_METHOD2(GestureEventGetDevCoordsX, int (struct libinput_event_gesture *, uint32_t));
-    MOCK_METHOD2(GestureEventGetDevCoordsY, int (struct libinput_event_gesture *, uint32_t));
-};
 
 class TouchPadGestureTest : public testing::Test {
 public:
@@ -78,6 +66,8 @@ HWTEST_F(TouchPadGestureTest, OnEventTouchPadSwipeBegin_001, TestSize.Level1)
     EXPECT_CALL(libinputMock, GestureEventGetFingerCount).WillOnce(Return(1));
     EXPECT_CALL(libinputMock, GestureEventGetDevCoordsX).WillOnce(Return(150));
     EXPECT_CALL(libinputMock, GestureEventGetDevCoordsY).WillOnce(Return(250));
+
+    EXPECT_CALL(*PREFERENCES_MGR, GetBoolValue).WillOnce(Return(true));
 
     int32_t deviceId = 6;
     TouchPadTransformProcessor processor(deviceId);

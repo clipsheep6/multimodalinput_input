@@ -15,7 +15,7 @@
 
 #include <gtest/gtest.h>
 
-#include "input_windows_manager.h"
+#include "i_input_windows_manager.h"
 #include "mmi_log.h"
 #include "knuckle_glow_trace_system.h"
 
