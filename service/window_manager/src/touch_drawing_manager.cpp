@@ -44,9 +44,9 @@ constexpr int32_t CALCULATE_MIDDLE = 2;
 constexpr int32_t DEFAULT_VALUE = -1;
 constexpr int32_t RECT_COUNT = 6;
 constexpr int32_t PHONE_RECT_TOP = 118;
-constexpr int32_t PAD_RECT_TOP = 58;
-constexpr int32_t RECT_HEIGHT = 50;
-constexpr int32_t TEXT_TOP = 40;
+constexpr int32_t PAD_RECT_TOP = 0;
+constexpr int32_t RECT_HEIGHT = 35;
+constexpr int32_t TEXT_TOP = 30;
 constexpr int32_t PEN_WIDTH = 1;
 constexpr int32_t TOUCH_SLOP = 30;
 constexpr int32_t RECT_SPACEING = 1;
@@ -56,9 +56,9 @@ constexpr int32_t ONE_PRECISION = 1;
 constexpr int32_t ROTATION_ANGLE_90 = 90;
 constexpr int32_t ROTATION_ANGLE_180 = 180;
 constexpr int32_t ROTATION_ANGLE_270 = 270;
+constexpr float TEXT_SIZE = 28.0f;
 constexpr uint64_t FOLD_SCREEN_MAIN_ID = 5;
 constexpr uint64_t FOLD_SCREEN_FULL_ID = 0;
-constexpr float TEXT_SIZE = 40.0f;
 constexpr float TEXT_SCALE = 1.0f;
 constexpr float TEXT_SKEW = 0.0f;
 constexpr float CALCULATE_TEMP = 2.0f;
@@ -586,7 +586,7 @@ void TouchDrawingManager::DrawLabels()
     } else {
         color = std::abs(dx) < TOUCH_SLOP ? LABELS_DEFAULT_COLOR : LABELS_RED_COLOR;
         DrawRectItem(canvas, viewDx, rect, color);
-        color = std::abs(dx) < TOUCH_SLOP ? LABELS_DEFAULT_COLOR : LABELS_RED_COLOR;
+        color = std::abs(dy) < TOUCH_SLOP ? LABELS_DEFAULT_COLOR : LABELS_RED_COLOR;
         DrawRectItem(canvas, viewDy, rect, color);
     }
     DrawRectItem(canvas, viewXv, rect, LABELS_DEFAULT_COLOR);
