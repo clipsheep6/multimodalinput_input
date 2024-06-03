@@ -15,8 +15,10 @@
 
 #include <cstdio>
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 
 #include "libinput.h"
+#include "libinput_interface.h"
 #include "define_multimodal.h"
 #include "tablet_tool_tranform_processor.h"
 
@@ -25,9 +27,22 @@
 
 namespace OHOS {
 namespace MMI {
-namespace {
+using namespace testing;
 using namespace testing::ext;
-}
+
+class LibinputInterfaceMock : public LibinputInterface {
+public:
+    LibinputInterfaceMock() = default;
+    ~LibinputInterfaceMock() override = default;
+
+    MOCK_METHOD1(GetEventType, enum libinput_event_type (struct libinput_event *event));
+    MOCK_METHOD1(GetGestureEvent, struct libinput_event_gesture* (struct libinput_event *event));
+    MOCK_METHOD1(GestureEventGetTime, uint32_t (struct libinput_event_gesture *event));
+    MOCK_METHOD1(GestureEventGetFingerCount, int (struct libinput_event_gesture *event));
+    MOCK_METHOD2(GestureEventGetDevCoordsX, int (struct libinput_event_gesture *, uint32_t));
+    MOCK_METHOD2(GestureEventGetDevCoordsY, int (struct libinput_event_gesture *, uint32_t));
+};
+
 class TabletToolTranformProcessorTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
@@ -66,6 +81,63 @@ HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnEven
     libinput_event *event = nullptr;
     std::shared_ptr<PointerEvent> ret = processor.OnEvent(event);
     ASSERT_EQ(ret, nullptr);
+}
+
+/**
+ * @tc.name: TabletToolTranformProcessorTest_OnEvent_002
+ * @tc.desc: Test the funcation OnEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnEvent_002, TestSize.Level1)
+{
+    int32_t deviceId = 2;
+    TabletToolTransformProcessor processor(deviceId);
+    libinput_event_tablet_tool event {};
+
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, GetEventType).WillOnce(Return(LIBINPUT_EVENT_TABLET_TOOL_AXIS));
+
+    auto pointerEvent = processor.OnEvent(&event.base);
+    ASSERT_TRUE(pointerEvent == nullptr);
+}
+
+/**
+ * @tc.name: TabletToolTranformProcessorTest_OnEvent_003
+ * @tc.desc: Test the funcation OnEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnEvent_003, TestSize.Level1)
+{
+    int32_t deviceId = 2;
+    TabletToolTransformProcessor processor(deviceId);
+    libinput_event_tablet_tool event {};
+
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, GetEventType).WillOnce(Return(LIBINPUT_EVENT_TABLET_TOOL_PROXIMITY));
+
+    auto pointerEvent = processor.OnEvent(&event.base);
+    ASSERT_TRUE(pointerEvent == nullptr);
+}
+
+/**
+ * @tc.name: TabletToolTranformProcessorTest_OnEvent_004
+ * @tc.desc: Test the funcation OnEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TabletToolTranformProcessorTest, TabletToolTranformProcessorTest_OnEvent_004, TestSize.Level1)
+{
+    int32_t deviceId = 2;
+    TabletToolTransformProcessor processor(deviceId);
+    libinput_event_tablet_tool event {};
+
+    NiceMock<LibinputInterfaceMock> libinputMock;
+    EXPECT_CALL(libinputMock, GetEventType).WillOnce(Return(LIBINPUT_EVENT_TABLET_TOOL_TIP));
+
+    auto pointerEvent = processor.OnEvent(&event.base);
+    ASSERT_TRUE(pointerEvent == nullptr);
 }
 
 /**
