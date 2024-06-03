@@ -48,6 +48,7 @@ public:
     void Dump(int32_t fd, const std::vector<std::string> &args);
     bool HandleKeyEventFilter(std::shared_ptr<KeyEvent> event);
     bool HandlePointerEventFilter(std::shared_ptr<PointerEvent> event);
+    bool FilterGestureEvent(std::shared_ptr<PointerEvent> event);
 private:
     std::mutex lockFilter_;
     struct FilterInfo {
@@ -60,6 +61,8 @@ private:
         bool IsSameClient(int32_t id, int32_t pid) const { return ((filterId == id) && (clientPid == pid)); }
     };
     std::list<FilterInfo> filters_;
+    bool isStartPinch_ { false };
+    bool isStartRotate_ { false };
 };
 } // namespace MMI
 } // namespace OHOS

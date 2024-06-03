@@ -183,6 +183,9 @@ bool EventFilterHandler::HandlePointerEventFilter(std::shared_ptr<PointerEvent> 
     CALL_DEBUG_ENTER;
     CHKPF(event);
     std::lock_guard<std::mutex> guard(lockFilter_);
+    if (FilterGestureEvent(event)) {
+        return true;
+    }
     if (filters_.empty()) {
         return false;
     }
@@ -203,6 +206,35 @@ bool EventFilterHandler::HandlePointerEventFilter(std::shared_ptr<PointerEvent> 
             return true;
         }
     }
+    return false;
+}
+
+bool EventFilterHandler::FilterGestureEvent(std::shared_ptr<PointerEvent> event)
+{
+    CHKPF(event);
+    if (!isStartRotate_ && (event->HasAxis(PointerEvent::AXIS_TYPE_PINCH) &&
+        event->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_BEGIN)) {
+        isStartPinch_ = true;
+    } else if (!isStartRotate_ && (event->HasAxis(PointerEvent::AXIS_TYPE_PINCH) &&
+        event->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_END)) {
+        isStartPinch_ = false;
+    }
+    if (isStartPinch_ && event->HasAxis(PointerEvent::AXIS_TYPE_ROTATE)) {
+        return true;
+    }
+
+    if (!isStartPinch_ && (event->HasAxis(PointerEvent::AXIS_TYPE_ROTATE) &&
+        event->GetPointerAction() == PointerEvent::POINTER_ACTION_ROTATE_BEGIN)) {
+        isStartRotate_ = true;
+    } else if (!isStartPinch_ && (event->HasAxis(PointerEvent::AXIS_TYPE_ROTATE) &&
+        event->GetPointerAction() == PointerEvent::POINTER_ACTION_ROTATE_END)) {
+        isStartRotate_ = false;
+    }
+    if (isStartRotate_ && event->HasAxis(PointerEvent::AXIS_TYPE_PINCH)) {
+        return true;
+    }
+    MMI_HILOGE("Action: %{public}d, hasPinch: %{public}d, hasRotate: %{public}d", event->GetPointerAction(),
+        event->HasAxis(PointerEvent::AXIS_TYPE_PINCH), event->HasAxis(PointerEvent::AXIS_TYPE_ROTATE));
     return false;
 }
 } // namespace MMI
