@@ -477,5 +477,77 @@ HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportKnuckleGestureFromSuccessToF
     ASSERT_NO_FATAL_FAILURE(DfxHisysevent::ReportKnuckleGestureFromSuccessToFailTime(intervalTime));
 }
 
+/**
+ * @tc.name: DfxHisysEventTest_ReportScreenRecorderGesture_001
+ * @tc.desc: ReportScreenRecorderGesture
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportScreenRecorderGesture_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t successTimes = 1;
+    int32_t intervalTime = 1;
+    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::ReportScreenRecorderGesture(successTimes, intervalTime));
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_OnFocusWindowChanged_001
+ * @tc.desc: OnFocusWindowChanged
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_OnFocusWindowChanged_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t oldFocusWindowId = 2;
+    int32_t newFocusWindowId = 3;
+    int32_t oldFocusWindowPid = 2;
+    int32_t newFocusWindowPid = 3;
+    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::OnFocusWindowChanged(oldFocusWindowId, newFocusWindowId, oldFocusWindowPid,
+        newFocusWindowPid));
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_OnZorderWindowChanged_001
+ * @tc.desc: OnZorderWindowChanged
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_OnZorderWindowChanged_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t oldZorderFirstWindowId = 2;
+    int32_t newZorderFirstWindowId = 3;
+    int32_t oldZorderFirstWindowPid = 2;
+    int32_t newZorderFirstWindowPid = 3;
+    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::OnFocusWindowChanged(oldZorderFirstWindowId, newZorderFirstWindowId,
+        oldZorderFirstWindowPid, newZorderFirstWindowPid));
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_CalcComboStartTimes_001
+ * @tc.desc: CalcComboStartTimes
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_CalcComboStartTimes_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t keyDownDuration = 2;
+    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::CalcComboStartTimes(keyDownDuration));
+}
+
+/**
+ * @tc.name: DfxHisysEventTest_ReportComboStartTimes_001
+ * @tc.desc: ReportComboStartTimes
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_ReportComboStartTimes_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ASSERT_NO_FATAL_FAILURE(DfxHisysevent::ReportComboStartTimes());
+}
 } // namespace MMI
 } // namespace OHOS

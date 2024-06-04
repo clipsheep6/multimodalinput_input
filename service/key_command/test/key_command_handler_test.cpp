@@ -1828,8 +1828,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureTouchD
     touchEvent->SetPointerId(1);
     touchEvent->SetActionTime(1);
     touchEvent->AddPointerItem(item);
-    KeyCommandHandler keyCommandHandler;
-    keyCommandHandler.HandleKnuckleGestureTouchDown(touchEvent);
+    handler.HandleKnuckleGestureTouchDown(touchEvent);
 
     ASSERT_TRUE(handler.gestureTimeStamps_.empty());
 }
@@ -2001,6 +2000,94 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_GesturePointsToStr_003, Te
     auto result = handler.GesturePointsToStr();
     ASSERT_TRUE(result.empty());
     ASSERT_EQ(handler.gesturePoints_.size(), 1);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_ReportIfNeed_001
+ * @tc.desc: Test ReportIfNeed function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ReportIfNeed_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    handler.isLastGestureSucceed_ = false;
+
+    ASSERT_NO_FATAL_FAILURE(handler.ReportIfNeed());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_ReportIfNeed_002
+ * @tc.desc: Test ReportIfNeed function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ReportIfNeed_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    handler.isLastGestureSucceed_ = true;
+
+    ASSERT_NO_FATAL_FAILURE(handler.ReportIfNeed());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_ReportRegionGesture_001
+ * @tc.desc: Test ReportRegionGesture function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ReportRegionGesture_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+
+    ASSERT_NO_FATAL_FAILURE(handler.ReportRegionGesture());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_ReportLetterGesture_001
+ * @tc.desc: Test ReportLetterGesture function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ReportLetterGesture_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+
+    ASSERT_NO_FATAL_FAILURE(handler.ReportLetterGesture());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_ReportGestureInfo_001
+ * @tc.desc: Test ReportGestureInfo function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ReportGestureInfo_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    handler.isLastGestureSucceed_ = false;
+
+    ASSERT_NO_FATAL_FAILURE(handler.ReportGestureInfo());
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_ReportGestureInfo_002
+ * @tc.desc: Test ReportGestureInfo function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ReportGestureInfo_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    handler.isLastGestureSucceed_ = true;
+
+    ASSERT_NO_FATAL_FAILURE(handler.ReportGestureInfo());
 }
 #endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
 } // namespace MMI
