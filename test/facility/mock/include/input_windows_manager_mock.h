@@ -23,7 +23,7 @@
 
 namespace OHOS {
 namespace MMI {
-class InputWindowsManagerMock final: public IInputWindowsManager {
+class InputWindowsManagerMock final : public IInputWindowsManager {
 public:
     InputWindowsManagerMock() = default;
     ~InputWindowsManagerMock() = default;
