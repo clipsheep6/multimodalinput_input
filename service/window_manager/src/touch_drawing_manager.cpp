@@ -57,6 +57,7 @@ constexpr int32_t ROTATION_ANGLE_90 = 90;
 constexpr int32_t ROTATION_ANGLE_180 = 180;
 constexpr int32_t ROTATION_ANGLE_270 = 270;
 constexpr uint64_t FOLD_SCREEN_MAIN_ID = 5;
+constexpr uint64_t FOLD_SCREEN_FULL_ID = 0;
 constexpr float TEXT_SIZE = 28.0f;
 constexpr float TEXT_SCALE = 1.0f;
 constexpr float TEXT_SKEW = 0.0f;
@@ -378,6 +379,8 @@ void TouchDrawingManager::CreateTouchWindow()
     uint64_t screenId = static_cast<uint64_t>(pointerEvent_->GetTargetDisplayId());
     if (displayInfo_.displayMode == DisplayMode::MAIN) {
         screenId = FOLD_SCREEN_MAIN_ID;
+    } else if (displayInfo_.displayMode == DisplayMode::FULL) {
+        screenId = FOLD_SCREEN_FULL_ID;
     }
     surfaceNode_->AttachToDisplay(screenId);
     MMI_HILOGI("Setting screen:%{public}" PRIu64 ", displayNode:%{public}" PRIu64, screenId, surfaceNode_->GetId());
