@@ -119,6 +119,7 @@ private:
     int32_t currentPointerCount_ { 0 };
     int32_t rectTopPosition_ { 0 };
     int32_t direction_ { 0 };
+    int32_t scale { 0 };
     int64_t lastActionTime_ { 0 };
     double xVelocity_ { 0.0 };
     double yVelocity_ { 0.0 };
@@ -131,6 +132,7 @@ private:
     bool isFirstDownAction_ { false };
     bool isDownAction_ { false };
     bool isFirstDraw_ { true };
+    bool changedDirection { false };
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
     std::list<PointerEvent::PointerItem> lastPointerItem_;
     PointerEvent::PointerItem firstPointerItem_;
