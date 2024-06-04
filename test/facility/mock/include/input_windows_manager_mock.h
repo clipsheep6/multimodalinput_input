@@ -23,7 +23,7 @@
 
 namespace OHOS {
 namespace MMI {
-class InputWindowsManagerMock final : public IInputWindowsManager {
+class InputWindowsManagerMock : public IInputWindowsManager {
 public:
     InputWindowsManagerMock() = default;
     ~InputWindowsManagerMock() = default;
@@ -48,6 +48,7 @@ public:
     MOCK_METHOD(ExtraData, GetExtraData, (), (const));
     MOCK_METHOD(const std::vector<WindowInfo>&, GetWindowGroupInfoByDisplayId, (int32_t), (const));
     MOCK_METHOD((std::pair<double, double>), TransformWindowXY, (const WindowInfo&, double, double), (const));
+    MOCK_METHOD(int32_t, GetPidAndUpdateTarget, (std::shared_ptr<KeyEvent>));
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     MOCK_METHOD(int32_t, UpdateTarget, (std::shared_ptr<KeyEvent>));
