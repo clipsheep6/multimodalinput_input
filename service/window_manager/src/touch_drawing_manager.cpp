@@ -60,7 +60,6 @@ constexpr uint64_t FOLD_SCREEN_MAIN_ID = 5;
 constexpr float TEXT_SIZE = 28.0f;
 constexpr float TEXT_SCALE = 1.0f;
 constexpr float TEXT_SKEW = 0.0f;
-constexpr float CALCULATE_TEMP = 2.0f;
 
 const std::string showCursorSwitchName = "settings.input.show_touch_hint";
 const std::string pointerPositionSwitchName = "settings.developer.show_touch_track";
@@ -251,7 +250,7 @@ void TouchDrawingManager::UpdateBubbleData()
     if (bubbleMode_.isShow) {
         CreateTouchWindow();
         AddCanvasNode(bubbleCanvasNode_, false);
-    } else{
+    } else {
         RemoveBubble();
     }
     Rosen::RSTransaction::FlushImplicitTransaction();
@@ -548,7 +547,7 @@ void TouchDrawingManager::DrawLabels()
             canvas->Translate(0, displayInfo_.width);
             canvas->Rotate(ROTATION_ANGLE_270, 0, 0);
         } else if (displayInfo_.direction == Direction::DIRECTION180) {
-            canvas->Rotate(ROTATION_ANGLE_180, displayInfo_.width / CALCULATE_TEMP, displayInfo_.height / CALCULATE_TEMP);
+            canvas->Rotate(ROTATION_ANGLE_180, displayInfo_.width / 2, displayInfo_.height / 2);
         } else if (displayInfo_.direction == Direction::DIRECTION270) {
             canvas->Translate(displayInfo_.height, 0);
             canvas->Rotate(ROTATION_ANGLE_90, 0, 0);
@@ -674,8 +673,7 @@ void TouchDrawingManager::RemovePointerPosition()
     CHKPV(labelsCanvasNode_);
     surfaceNode_->RemoveChild(labelsCanvasNode_);
     labelsCanvasNode_.reset();
-
-	isFirstDraw_ = true;
+    isFirstDraw_ = true;
     pressure_ = 0.0;
 }
 
@@ -695,7 +693,7 @@ void TouchDrawingManager::ClearTracker()
     if (lastPointerItem_.empty() && isDownAction_) {
         MMI_HILOGD("ClearTracker isDownAction_ and empty");
         auto canvasNode = static_cast<Rosen::RSCanvasDrawingNode*>(trackerCanvasNode_.get());
-        canvasNode->ResetSurface();
+        canvasNode->ResetSurface(scale_, scale_);
     }
 }
 
