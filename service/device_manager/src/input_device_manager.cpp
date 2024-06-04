@@ -46,6 +46,9 @@ constexpr int32_t INVALID_DEVICE_ID = -1;
 constexpr int32_t SUPPORT_KEY = 1;
 const std::string UNKNOWN_SCREEN_ID = "";
 const std::string INPUT_VIRTUAL_DEVICE_NAME = "DistributedInput ";
+constexpr int32_t MIN_VIRTUAL_INPUT_DEVICE_ID = 100;
+constexpr int32_t MAX_VIRTUAL_INPUT_DEVICE_NUM = 10;
+
 std::unordered_map<int32_t, std::string> axisType{
     { ABS_MT_TOUCH_MAJOR, "TOUCH_MAJOR" }, { ABS_MT_TOUCH_MINOR, "TOUCH_MINOR" }, { ABS_MT_ORIENTATION, "ORIENTATION" },
     { ABS_MT_POSITION_X, "POSITION_X" },   { ABS_MT_POSITION_Y, "POSITION_Y" },   { ABS_MT_PRESSURE, "PRESSURE" },
@@ -687,6 +690,123 @@ int32_t InputDeviceManager::OnEnableInputDevice(bool enable)
             break;
         }
     }
+    return RET_OK;
+}
+
+int32_t InputDeviceManager::AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId)
+{
+    CALL_DEBUG_ENTER;
+    if (!(virtualDeviceNum_ <= MAX_VIRTUAL_INPUT_DEVICE_NUM)) {
+        MMI_HILOGE("Virtual device num exceeds limit:%{public}d", MAX_VIRTUAL_INPUT_DEVICE_NUM);
+        return RET_ERR;
+    }
+    if (GenerateVirtualDeviceId(deviceId) != RET_OK) {
+        MMI_HILOGE("GenerateVirtualDeviceId failed");
+        return RET_ERR;
+    }
+    InputDeviceInfo deviceInfo;
+    if (MakeInputDeviceInfo(device, deviceInfo) != RET_OK) {
+        MMI_HILOGE("MakeInputDeviceInfo failed");
+        return RET_ERR;
+    }
+    if (inputDevice_.find(deviceId) != inputDevice_.end()) {
+        MMI_HILOGE("Invalid deviceId, corrupt");
+        return RET_ERR;
+    }
+    inputDevice_[deviceId] = deviceInfo;
+    virtualDeviceNum_++;
+    for (const auto& item : devListener_) {
+        CHKPR(item, ERROR_NULL_POINTER);
+        NotifyMessage(item, deviceId, "add");
+    }
+    NotifyDevCallback(deviceId, deviceInfo); // 这个是干啥的
+    if (!HasPointerDevice() && deviceInfo.isPointerDevice) {
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+        if (HasTouchDevice()) {
+            IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
+        }
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+        NotifyPointerDevice(true, true, true);
+        OHOS::system::SetParameter(INPUT_POINTER_DEVICES, "true");
+        MMI_HILOGI("Set para input.pointer.device true");
+    }
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+    if (deviceInfo.isPointerDevice && !HasPointerDevice() &&
+        IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
+#ifdef OHOS_BUILD_ENABLE_POINTER
+        WIN_MGR->UpdatePointerChangeAreas();
+        WIN_MGR->DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
+#endif // OHOS_BUILD_ENABLE_POINTER
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+    DfxHisysevent::OnDeviceConnect(deviceId, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
+    return RET_OK;
+}
+
+int32_t InputDeviceManager::RemoveVirtualInputDevice(int32_t deviceId)
+{
+    CALL_DEBUG_ENTER;
+    if (inputDevice_.find(deviceId) == inputDevice_.end()) {
+        MMI_HILOGE("No virtual deviceId:%{public}d existed", deviceId);
+        return RET_ERR;
+    }
+    if (!inputDevice_[deviceId].isVirtual) {
+        MMI_HILOGE("No virtual deviceId:%{public}d existed", deviceId);
+        return RET_ERR;
+    }
+    if (auto sysUid = inputDevice_[deviceId].sysUid; !sysUid.empty()) {
+        devCallbacks_(deviceId, sysUid, "remove");
+        MMI_HILOGI("Send device info to window manager, device id:%{public}d, system uid:%{public}s, status:remove",
+            deviceId, sysUid.c_str());
+    }
+    bool isPointerDevice = inputDevice_[deviceId].isPointerDevice;
+    inputDevice_.erase(deviceId);
+    virtualDeviceNum_--;
+    DfxHisysevent::OnDeviceDisconnect(deviceId, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+    if (isPointerDevice && !HasPointerDevice() &&
+        IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
+#ifdef OHOS_BUILD_ENABLE_POINTER
+        WIN_MGR->DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
+#endif // OHOS_BUILD_ENABLE_POINTER
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+    for (const auto& item : devListener_) {
+        CHKPR(item, ERROR_NULL_POINTER);
+        NotifyMessage(item, deviceId, "remove");
+    }
+    ScanPointerDevice();
+    if (deviceId == INVALID_DEVICE_ID) {
+        DfxHisysevent::OnDeviceDisconnect(INVALID_DEVICE_ID, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+    }
+    return RET_OK;
+}
+
+int32_t InputDeviceManager::MakeInputDeviceInfo(std::shared_ptr<InputDevice> device, InputDeviceInfo &deviceInfo)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(device, ERROR_NULL_POINTER);
+    deviceInfo = {
+        .isRemote = false,
+        .isPointerDevice = device->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER),
+        .isTouchableDevice = device->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_TOUCH),
+        .isVirtual = true,
+        .sysUid = device->GetUniq(),
+    };
+    return RET_OK;
+}
+
+int32_t InputDeviceManager::GenerateVirtualDeviceId(int32_t &deviceId)
+{
+    CALL_DEBUG_ENTER;
+    // TODO 待优化，存在溢出后功能不可用的风险
+    static int32_t virtualDeviceId { MIN_VIRTUAL_INPUT_DEVICE_ID };
+    if (virtualDeviceId == std::numeric_limits<int32_t>::max()) {
+        MMI_HILOGE("Request ID exceeds the maximum");
+        deviceId = MIN_VIRTUAL_INPUT_DEVICE_ID;
+        return RET_ERR;
+    }
+    deviceId = virtualDeviceId++;
     return RET_OK;
 }
 
