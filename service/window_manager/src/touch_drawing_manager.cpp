@@ -550,7 +550,8 @@ void TouchDrawingManager::DrawLabels()
             canvas->Translate(0, displayInfo_.width);
             canvas->Rotate(ROTATION_ANGLE_270, 0, 0);
         } else if (displayInfo_.direction == Direction::DIRECTION180) {
-            canvas->Rotate(ROTATION_ANGLE_180, displayInfo_.width / 2, displayInfo_.height / 2);
+            canvas->Rotate(ROTATION_ANGLE_180, displayInfo_.width / CALCULATE_TEMP,
+                displayInfo_.height / CALCULATE_TEMP);
         } else if (displayInfo_.direction == Direction::DIRECTION270) {
             canvas->Translate(displayInfo_.height, 0);
             canvas->Rotate(ROTATION_ANGLE_90, 0, 0);
