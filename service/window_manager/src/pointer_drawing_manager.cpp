@@ -895,7 +895,7 @@ void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t physi
 #endif
 
     screenId_ = static_cast<uint64_t>(displayId);
-    MMI_HILOGI("ScreenId:%{public}d", screenId_);
+    MMI_HILOGD("ScreenId:%{public}" PRIu64, screenId_);
     AttachToDisplay();
     RotateDegree(direction);
     lastDirection_ = direction;
