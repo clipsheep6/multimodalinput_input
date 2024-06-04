@@ -69,7 +69,7 @@ HWTEST_F(InputWindowsManagerTestWithMock, InputWindowsManagerTestWithMock_Update
     CALL_TEST_DEBUG;
     auto keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
-    NiceMock<InputWindowsManagerMock> inputwindowsMock;
+    InputWindowsManagerMock inputwindowsMock;
     EXPECT_CALL(inputwindowsMock, GetPidAndUpdateTarget).WillRepeatedly(Return(-1));
 
     int32_t ret = WIN_MGR->UpdateTarget(keyEvent);
@@ -88,7 +88,7 @@ HWTEST_F(InputWindowsManagerTestWithMock, InputWindowsManagerTestWithMock_Update
     CALL_TEST_DEBUG;
     auto keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
-    NiceMock<InputWindowsManagerMock> inputwindowsMock;
+    InputWindowsManagerMock inputwindowsMock;
     EXPECT_CALL(inputwindowsMock, GetClientFd).WillRepeatedly(Return(-1));
 
     int32_t ret = WIN_MGR->UpdateTarget(keyEvent);
