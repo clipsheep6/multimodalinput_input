@@ -61,6 +61,7 @@ constexpr uint64_t FOLD_SCREEN_FULL_ID = 0;
 constexpr float TEXT_SIZE = 28.0f;
 constexpr float TEXT_SCALE = 1.0f;
 constexpr float TEXT_SKEW = 0.0f;
+constexpr float CALCULATE_TEMP = 2.0f;
 
 const std::string showCursorSwitchName = "settings.input.show_touch_hint";
 const std::string pointerPositionSwitchName = "settings.developer.show_touch_track";
