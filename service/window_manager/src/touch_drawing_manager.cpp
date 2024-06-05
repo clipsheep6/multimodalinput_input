@@ -417,12 +417,12 @@ void TouchDrawingManager::DrawBubble()
         canvas->AttachBrush(bubbleBrush_);
         canvas->DrawCircle(centerPt, bubble_.innerCircleRadius);
         canvas->DetachBrush();
-        // if (pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN &&
-        //     pointerEvent_->GetPointerId() == pointerId) {
-        //     MMI_HILOGI("Bubble is draw success, pointerAction:%{public}d, pointerId:%{public}d, physicalX:%{public}d,"
-        //         " physicalY:%{public}d", pointerEvent_->GetPointerAction(), pointerEvent_->GetPointerId(),
-        //         physicalX, physicalY);
-        // }
+        if (pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN &&
+            pointerEvent_->GetPointerId() == pointerId) {
+            MMI_HILOGI("Bubble is draw success, pointerAction:%{public}d, pointerId:%{public}d, physicalX:%{public}d,"
+                " physicalY:%{public}d", pointerEvent_->GetPointerAction(), pointerEvent_->GetPointerId(),
+                physicalX, physicalY);
+        }
     }
     bubbleCanvasNode_->FinishRecording();
 }
