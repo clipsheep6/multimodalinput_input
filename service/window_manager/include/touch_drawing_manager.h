@@ -44,6 +44,7 @@ struct Bubble {
     int32_t outerCircleRadius { 0 };
     float outerCircleWidth { 0 };
 };
+
 struct DevMode {
     std::string SwitchName;
     bool isShow { false };
@@ -64,16 +65,16 @@ public:
         int32_t &physicalX, int32_t &physicalY);
     void SetPointerPositionState(bool state);
     void UpdateBubbleData();
-    void ClearBubbleData();
     void Dump(int32_t fd, const std::vector<std::string> &args);
+
 private:
     void CreateObserver();
-    void InitCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& canvasNode);
+    void AddCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& canvasNode, bool isTrackerNode);
     void ConvertPointerEvent(const std::shared_ptr<PointerEvent>& pointerEvent);
     void CreateTouchWindow();
     void DrawBubbleHandler();
     void DrawBubble();
-    void DrawPointerPositionHandler();
+    void DrawPointerPositionHandler(std::shared_ptr<PointerEvent> pointerEvent);
     void DrawTracker(int32_t x, int32_t y, int32_t pointerId);
     void DrawCrosshairs(RosenCanvas *canvas, int32_t x, int32_t y);
     void DrawLabels();
@@ -81,9 +82,10 @@ private:
         Rosen::Drawing::Rect &rect, const Rosen::Drawing::Color &color);
     void UpdatePointerPosition();
     void RecordLabelsInfo(const std::shared_ptr<PointerEvent>& pointerEvent);
-    void UpdateLastPointerItem(int32_t pointerId, PointerEvent::PointerItem &pointerItem);
+    void UpdateLastPointerItem(PointerEvent::PointerItem &pointerItem);
     void UpdateVelocity();
-    void ClearPointerPosition();
+    void RemovePointerPosition();
+    void RemoveBubble();
     void ClearTracker();
     void ClearLabels();
     template <class T>
@@ -93,6 +95,7 @@ private:
     template <class T>
     std::string FormatNumber(T number, int32_t precision);
     bool IsValidAction(const int32_t action);
+
 private:
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode_ { nullptr };
     std::shared_ptr<Rosen::RSCanvasNode> bubbleCanvasNode_ { nullptr };
@@ -118,7 +121,7 @@ private:
     int32_t maxPointerCount_ { 0 };
     int32_t currentPointerCount_ { 0 };
     int32_t rectTopPosition_ { 0 };
-    int32_t direction_ { 0 };
+    int32_t scale_ { 0 };
     int64_t lastActionTime_ { 0 };
     double xVelocity_ { 0.0 };
     double yVelocity_ { 0.0 };
@@ -132,11 +135,9 @@ private:
     bool isDownAction_ { false };
     bool isFirstDraw_ { true };
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
-    std::list<PointerEvent::PointerItem> lastPointerItem_;
+    std::list<PointerEvent::PointerItem> lastPointerItem_ { };
     PointerEvent::PointerItem firstPointerItem_;
     RosenCanvas *trackerCanvas_ { nullptr };
-    int32_t nodeWidth_ { 0 };
-    int32_t nodeHeight_ { 0 };
 };
 #define TOUCH_DRAWING_MGR ::OHOS::DelayedSingleton<TouchDrawingManager>::GetInstance()
 } // namespace MMI

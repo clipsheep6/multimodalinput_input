@@ -443,7 +443,7 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawBubble_002, TestSi
 HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawPointerPositionHandler_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->DrawPointerPositionHandler());
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->DrawPointerPositionHandler(TOUCH_DRAWING_MGR->pointerEvent_));
 }
 
 /**
@@ -456,7 +456,7 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawPointerPositionHan
 {
     CALL_TEST_DEBUG;
     TOUCH_DRAWING_MGR->pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
-    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->DrawPointerPositionHandler());
+    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->DrawPointerPositionHandler(TOUCH_DRAWING_MGR->pointerEvent_));
 }
 
 /**
