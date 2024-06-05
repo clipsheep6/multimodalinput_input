@@ -203,6 +203,8 @@ public:
     int32_t SetCurrentUser(int32_t userId);
     int32_t SetMoveEventFilters(bool flag);
     int32_t GetWinSyncBatchSize(int32_t maxAreasCount, int32_t displayCount);
+    int32_t AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId);
+    int32_t RemoveVirtualInputDevice(int32_t deviceId);
 
 private:
     int32_t PackWindowInfo(NetPacket &pkt);

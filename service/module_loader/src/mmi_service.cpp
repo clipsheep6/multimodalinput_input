@@ -30,7 +30,7 @@
 #include "dfx_hisysevent.h"
 #include "event_dump.h"
 #include "input_device_manager.h"
-#include "input_windows_manager.h"
+#include "i_input_windows_manager.h"
 #include "i_pointer_drawing_manager.h"
 #include "ipc_skeleton.h"
 #include "key_map_manager.h"
@@ -47,11 +47,12 @@
 #include "display_event_monitor.h"
 #include "device_event_monitor.h"
 #include "fingersense_wrapper.h"
+#include "gesturesense_wrapper.h"
 #include "infrared_emitter_controller.h"
 #include "key_auto_repeat.h"
 #include "key_command_handler.h"
 #include "mmi_log.h"
-#include "multimodal_input_preferences_manager.h"
+#include "i_preference_manager.h"
 #include "timer_manager.h"
 #include "touch_event_normalize.h"
 #include "util.h"
@@ -66,14 +67,16 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-const std::string DEF_INPUT_SEAT = "seat0";
-const std::string THREAD_NAME = "mmi-service";
-constexpr int32_t WATCHDOG_INTERVAL_TIME = 30000;
-constexpr int32_t WATCHDOG_DELAY_TIME = 40000;
-constexpr int32_t REMOVE_OBSERVER = -2;
-constexpr int32_t UNSUBSCRIBED = -1;
-constexpr int32_t UNOBSERVED = -1;
-constexpr int32_t SUBSCRIBED = 1;
+const std::string DEF_INPUT_SEAT { "seat0" };
+const std::string THREAD_NAME { "mmi-service" };
+constexpr int32_t WATCHDOG_INTERVAL_TIME { 30000 };
+constexpr int32_t WATCHDOG_DELAY_TIME { 40000 };
+constexpr int32_t RELOAD_DEVICE_TIME { 2000 };
+constexpr int32_t REMOVE_OBSERVER { -2 };
+constexpr int32_t REPEAT_COUNT { 2 };
+constexpr int32_t UNSUBSCRIBED { -1 };
+constexpr int32_t UNOBSERVED { -1 };
+constexpr int32_t SUBSCRIBED { 1 };
 } // namespace
 
 const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(DelayedSingleton<MMIService>::GetInstance().get());
@@ -817,7 +820,7 @@ int32_t MMIService::SetHoverScrollState(bool state)
 {
     CALL_INFO_TRACE;
 #if defined OHOS_BUILD_ENABLE_POINTER
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputWindowsManager::SetHoverScrollState, WIN_MGR, state));
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IInputWindowsManager::SetHoverScrollState, WIN_MGR, state));
     if (ret != RET_OK) {
         MMI_HILOGE("Set mouse hover scroll state failed,return %{public}d", ret);
         return ret;
@@ -1410,7 +1413,7 @@ int32_t MMIService::GetDisplayBindInfo(DisplayBindInfos &infos)
 {
     CALL_INFO_TRACE;
     int32_t ret =
-        delegateTasks_.PostSyncTask(std::bind(&InputWindowsManager::GetDisplayBindInfo, WIN_MGR, std::ref(infos)));
+        delegateTasks_.PostSyncTask(std::bind(&IInputWindowsManager::GetDisplayBindInfo, WIN_MGR, std::ref(infos)));
     if (ret != RET_OK) {
         MMI_HILOGE("GetDisplayBindInfo pid failed, ret:%{public}d", ret);
         return ret;
@@ -1429,7 +1432,7 @@ int32_t MMIService::SetDisplayBind(int32_t deviceId, int32_t displayId, std::str
 {
     CALL_INFO_TRACE;
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&InputWindowsManager::SetDisplayBind, WIN_MGR, deviceId, displayId, std::ref(msg)));
+        std::bind(&IInputWindowsManager::SetDisplayBind, WIN_MGR, deviceId, displayId, std::ref(msg)));
     if (ret != RET_OK) {
         MMI_HILOGE("SetDisplayBind pid failed, ret:%{public}d", ret);
         return ret;
@@ -1610,7 +1613,7 @@ void MMIService::OnSignalEvent(int32_t signalFd)
 void MMIService::AddReloadDeviceTimer()
 {
     CALL_DEBUG_ENTER;
-    TimerMgr->AddTimer(2000, 2, [this]() {
+    TimerMgr->AddTimer(RELOAD_DEVICE_TIME, REPEAT_COUNT, [this]() {
         auto deviceIds = INPUT_DEV_MGR->GetInputDeviceIds();
         if (deviceIds.empty()) {
             libinputAdapter_.ReloadDevice();
@@ -1642,7 +1645,7 @@ int32_t MMIService::SetMouseCaptureMode(int32_t windowId, bool isCaptureMode)
 {
     CALL_INFO_TRACE;
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&InputWindowsManager::SetMouseCaptureMode, WIN_MGR, windowId, isCaptureMode));
+        std::bind(&IInputWindowsManager::SetMouseCaptureMode, WIN_MGR, windowId, isCaptureMode));
     if (ret != RET_OK) {
         MMI_HILOGE("Set capture failed,return %{public}d", ret);
         return ret;
@@ -1679,7 +1682,7 @@ int32_t MMIService::GetWindowPid(int32_t windowId)
 int32_t MMIService::AppendExtraData(const ExtraData &extraData)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputWindowsManager::AppendExtraData, WIN_MGR, extraData));
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IInputWindowsManager::AppendExtraData, WIN_MGR, extraData));
     if (ret != RET_OK) {
         MMI_HILOGE("Append extra data failed:%{public}d", ret);
     }
@@ -1782,13 +1785,13 @@ int32_t MMIService::ReadTouchpadPointerSpeed(int32_t &speed)
 
 int32_t MMIService::ReadTouchpadPinchSwitch(bool &switchFlag)
 {
-    TouchEventHdr->GetTouchpadPinchSwitch(switchFlag);
+    TOUCH_EVENT_HDR->GetTouchpadPinchSwitch(switchFlag);
     return RET_OK;
 }
 
 int32_t MMIService::ReadTouchpadSwipeSwitch(bool &switchFlag)
 {
-    TouchEventHdr->GetTouchpadSwipeSwitch(switchFlag);
+    TOUCH_EVENT_HDR->GetTouchpadSwipeSwitch(switchFlag);
     return RET_OK;
 }
 
@@ -1800,7 +1803,7 @@ int32_t MMIService::ReadTouchpadRightMenuType(int32_t &type)
 
 int32_t MMIService::ReadTouchpadRotateSwitch(bool &rotateSwitch)
 {
-    TouchEventHdr->GetTouchpadRotateSwitch(rotateSwitch);
+    TOUCH_EVENT_HDR->GetTouchpadRotateSwitch(rotateSwitch);
     return RET_OK;
 }
 
@@ -1923,7 +1926,7 @@ int32_t MMIService::SetTouchpadPinchSwitch(bool switchFlag)
     CALL_INFO_TRACE;
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&TouchEventNormalize::SetTouchpadPinchSwitch,
-        TouchEventHdr, switchFlag));
+        TOUCH_EVENT_HDR, switchFlag));
     if (ret != RET_OK) {
         MMI_HILOGE("Set touch pad pinch switch failed, return %{public}d", ret);
         return ret;
@@ -1951,7 +1954,7 @@ int32_t MMIService::SetTouchpadSwipeSwitch(bool switchFlag)
     CALL_INFO_TRACE;
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&TouchEventNormalize::SetTouchpadSwipeSwitch,
-        TouchEventHdr, switchFlag));
+        TOUCH_EVENT_HDR, switchFlag));
     if (ret != RET_OK) {
         MMI_HILOGE("Set touchpad swipe switch failed, return %{public}d", ret);
         return ret;
@@ -2007,7 +2010,7 @@ int32_t MMIService::SetTouchpadRotateSwitch(bool rotateSwitch)
     CALL_INFO_TRACE;
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&TouchEventNormalize::SetTouchpadRotateSwitch,
-        TouchEventHdr, rotateSwitch));
+        TOUCH_EVENT_HDR, rotateSwitch));
     if (ret != RET_OK) {
         MMI_HILOGE("Set touchpad rotate switch failed, ret:%{public}d", ret);
         return ret;
@@ -2210,12 +2213,36 @@ int32_t MMIService::SetMoveEventFilters(bool flag)
 int32_t MMIService::SetCurrentUser(int32_t userId)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputWindowsManager::SetCurrentUser, WIN_MGR, userId));
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IInputWindowsManager::SetCurrentUser, WIN_MGR, userId));
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to set current user, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;
+}
+
+int32_t MMIService::AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(device, ERROR_NULL_POINTER);
+    int32_t ret =
+        delegateTasks_.PostSyncTask(std::bind(&InputDeviceManager::AddVirtualInputDevice, INPUT_DEV_MGR, device,
+            std::ref(deviceId)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("AddVirtualInputDevice failed:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MMIService::RemoveVirtualInputDevice(int32_t deviceId)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret =
+        delegateTasks_.PostSyncTask(std::bind(&InputDeviceManager::RemoveVirtualInputDevice, INPUT_DEV_MGR, deviceId));
+    if (ret != RET_OK) {
+        MMI_HILOGE("RemoveVirtualInputDevice failed:%{public}d", ret);
+    }
+    return ret;
 }
 
 int32_t MMIService::EnableHardwareCursorStats(bool enable)
