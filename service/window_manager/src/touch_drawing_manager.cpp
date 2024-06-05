@@ -237,8 +237,6 @@ void TouchDrawingManager::SetPointerPositionState(bool state)
 void TouchDrawingManager::UpdateLabels()
 {
     if (pointerMode_.isShow) {
-        CreateTouchWindow();
-        AddCanvasNode(labelsCanvasNode_, false);
         DrawLabels();
     } else {
         RemovePointerPosition();
@@ -248,13 +246,10 @@ void TouchDrawingManager::UpdateLabels()
 
 void TouchDrawingManager::UpdateBubbleData()
 {
-    if (bubbleMode_.isShow) {
-        CreateTouchWindow();
-        AddCanvasNode(bubbleCanvasNode_, false);
-    } else {
+    if (!bubbleMode_.isShow) {
         RemoveBubble();
+        Rosen::RSTransaction::FlushImplicitTransaction();
     }
-    Rosen::RSTransaction::FlushImplicitTransaction();
 }
 
 void TouchDrawingManager::CreateObserver()
@@ -481,7 +476,7 @@ void TouchDrawingManager::DrawTracker(int32_t x, int32_t y, int32_t pointerId)
             break;
         }
     }
-    if(currentPt == lastPt) {
+    if (currentPt == lastPt) {
         return;
     }
     CHKPV(trackerCanvasNode_);
