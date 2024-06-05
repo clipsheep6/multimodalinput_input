@@ -15,6 +15,8 @@
 
 #include "event_normalize_handler.h"
 
+#include "display_manager.h"
+
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
 #include "dfx_hisysevent.h"
@@ -50,8 +52,8 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t FINGER_NUM = 2;
-constexpr int32_t MT_TOOL_PALM = 2;
+constexpr int32_t FINGER_NUM { 2 };
+constexpr int32_t MT_TOOL_PALM { 2 };
 }
 
 void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime)
@@ -388,13 +390,9 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
     CHKPR(touchpad, ERROR_NULL_POINTER);
     auto type = libinput_event_get_type(event);
     int32_t seatSlot = libinput_event_touchpad_get_seat_slot(touchpad);
-    int32_t gesture = GestureIdentify(event);
-    if (gesture != RET_OK) {
-        MMI_HILOGD("GestureIdentify failed");
-        return RET_ERR;
-    }
+    GestureIdentify(event);
     MULTI_FINGERTAP_HDR->HandleMulFingersTap(touchpad, type);
-    auto pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH_PAD);
+    auto pointerEvent = TOUCH_EVENT_HDR->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH_PAD);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     if (MULTI_FINGERTAP_HDR->GetMultiFingersState() == MulFingersTap::TRIPLETAP) {
@@ -448,7 +446,7 @@ int32_t EventNormalizeHandler::GestureIdentify(libinput_event* event)
         return RET_ERR;
     }
     bool tpRotateSwitch = true;
-    TouchEventHdr->GetTouchpadRotateSwitch(tpRotateSwitch);
+    TOUCH_EVENT_HDR->GetTouchpadRotateSwitch(tpRotateSwitch);
     if (!tpRotateSwitch) {
         MMI_HILOGD("touchpad rotate switch is false");
         return RET_ERR;
@@ -479,7 +477,7 @@ int32_t EventNormalizeHandler::HandleGestureEvent(libinput_event* event)
     CHKPR(nextHandler_, ERROR_UNSUPPORT);
 #ifdef OHOS_BUILD_ENABLE_POINTER
     CHKPR(event, ERROR_NULL_POINTER);
-    auto pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH_PAD);
+    auto pointerEvent = TOUCH_EVENT_HDR->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH_PAD);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     nextHandler_->HandlePointerEvent(pointerEvent);
@@ -506,7 +504,7 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
     std::shared_ptr<PointerEvent> pointerEvent = nullptr;
     LogTracer lt;
     if (event != nullptr) {
-        pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH);
+        pointerEvent = TOUCH_EVENT_HDR->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH);
         CHKPR(pointerEvent, ERROR_NULL_POINTER);
         lt = LogTracer(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
     }
@@ -567,7 +565,7 @@ int32_t EventNormalizeHandler::HandleTableToolEvent(libinput_event* event)
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     CHKPR(event, ERROR_NULL_POINTER);
     BytraceAdapter::StartPackageEvent("package penEvent");
-    auto pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::TABLET_TOOL);
+    auto pointerEvent = TOUCH_EVENT_HDR->OnLibInput(event, TouchEventNormalize::DeviceType::TABLET_TOOL);
     BytraceAdapter::StopPackageEvent();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
@@ -588,7 +586,7 @@ int32_t EventNormalizeHandler::HandleJoystickEvent(libinput_event* event)
 #ifdef OHOS_BUILD_ENABLE_JOYSTICK
     CHKPR(event, ERROR_NULL_POINTER);
     BytraceAdapter::StartPackageEvent("package joystickEvent");
-    auto pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::JOYSTICK);
+    auto pointerEvent = TOUCH_EVENT_HDR->OnLibInput(event, TouchEventNormalize::DeviceType::JOYSTICK);
     BytraceAdapter::StopPackageEvent();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
@@ -665,7 +663,7 @@ void EventNormalizeHandler::RestoreTouchPadStatus()
     auto ids = INPUT_DEV_MGR->GetTouchPadIds();
     for (auto id : ids) {
         MMI_HILOGI("Restore touchpad, deviceId:%{public}d", id);
-        auto mouseEvent = TouchEventHdr->GetPointerEvent(id);
+        auto mouseEvent = TOUCH_EVENT_HDR->GetPointerEvent(id);
         if (mouseEvent != nullptr) {
             mouseEvent->Reset();
         }

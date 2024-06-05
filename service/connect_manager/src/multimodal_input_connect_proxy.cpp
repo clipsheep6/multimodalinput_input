@@ -38,7 +38,7 @@ constexpr int32_t SPECIAL_KEY_SIZE = 3;
 constexpr int32_t SPECIAL_ARRAY_INDEX0 = 0;
 constexpr int32_t SPECIAL_ARRAY_INDEX1 = 1;
 constexpr int32_t SPECIAL_ARRAY_INDEX2 = 2;
-constexpr size_t MAX_N_ENHANCE_DATA_SIZE { 64 };
+constexpr int32_t MAX_AXIS_INFO { 64 };
 
 int32_t ParseInputDevice(MessageParcel &reply, std::shared_ptr<InputDevice> &inputDevice)
 {
@@ -657,6 +657,7 @@ int32_t MultimodalInputConnectProxy::NotifyNapOnline()
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::NOTIFY_NAP_ONLINE),
         data, reply, option);
     if (ret != RET_OK) {
@@ -676,6 +677,7 @@ int32_t MultimodalInputConnectProxy::RemoveInputEventObserver()
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
         RMV_INPUT_EVENT_OBSERVER), data, reply, option);
     if (ret != RET_OK) {
@@ -1278,10 +1280,6 @@ int32_t MultimodalInputConnectProxy::GetDisplayBindInfo(DisplayBindInfos &infos)
     }
     int32_t size = 0;
     READINT32(reply, size, ERR_INVALID_VALUE);
-    if (size > static_cast<int32_t>(MAX_N_ENHANCE_DATA_SIZE) || size < 0) {
-        MMI_HILOGE("infos size is invalid");
-        return RET_ERR;
-    }
     infos.reserve(size);
     for (int32_t i = 0; i < size; ++i) {
         DisplayBindInfo info;
@@ -1315,10 +1313,6 @@ int32_t MultimodalInputConnectProxy::GetAllMmiSubscribedEvents(std::map<std::tup
     }
     int32_t size = 0;
     READINT32(reply, size, ERR_INVALID_VALUE);
-    if (size > static_cast<int32_t>(MAX_N_ENHANCE_DATA_SIZE) || size < 0) {
-        MMI_HILOGE("datas size is invalid");
-        return RET_ERR;
-    }
     for (int32_t i = 0; i < size; ++i) {
         NapProcess::NapStatusData data;
         int32_t syncState = 0;
@@ -2009,6 +2003,122 @@ int32_t MultimodalInputConnectProxy::SetCurrentUser(int32_t userId)
     if (ret != RET_OK) {
         MMI_HILOGE("Send request fail, ret:%{public}d", ret);
     }
+    return ret;
+}
+
+int32_t MultimodalInputConnectProxy::EnableHardwareCursorStats(bool enable)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+
+    WRITEBOOL(data, enable, ERR_INVALID_VALUE);
+
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ENABLE_HARDWARE_CURSOR_STATS), data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectProxy::GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_HARDWARE_CURSOR_STATS), data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+        return ret;
+    }
+    MMI_HILOGD("GetHardwareCursorStats, frameCount:%{public}d, vsyncCount:%{public}d", frameCount, vsyncCount);
+    READUINT32(reply, frameCount, IPC_PROXY_DEAD_OBJECT_ERR);
+    READUINT32(reply, vsyncCount, IPC_PROXY_DEAD_OBJECT_ERR);
+    return ret;
+}
+
+int32_t MultimodalInputConnectProxy::AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(device, ERROR_NULL_POINTER);
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    auto axisInfo = device->GetAxisInfo();
+    if (axisInfo.size() > MAX_AXIS_INFO) {
+        return RET_ERR;
+    }
+    WRITEINT32(data, device->GetId(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITEINT32(data, device->GetType(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITESTRING(data, device->GetName(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITEINT32(data, device->GetBus(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITEINT32(data, device->GetVersion(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITEINT32(data, device->GetProduct(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITEINT32(data, device->GetVendor(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITESTRING(data, device->GetPhys(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITESTRING(data, device->GetUniq(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITEUINT64(data, static_cast<uint64_t>(device->GetCapabilities()), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITEUINT32(data, static_cast<uint32_t>(axisInfo.size()), IPC_STUB_WRITE_PARCEL_ERR);
+    for (const auto &item : axisInfo) {
+        WRITEINT32(data, item.GetMinimum(), IPC_STUB_WRITE_PARCEL_ERR);
+        WRITEINT32(data, item.GetMaximum(), IPC_STUB_WRITE_PARCEL_ERR);
+        WRITEINT32(data, item.GetAxisType(), IPC_STUB_WRITE_PARCEL_ERR);
+        WRITEINT32(data, item.GetFuzz(), IPC_STUB_WRITE_PARCEL_ERR);
+        WRITEINT32(data, item.GetFlat(), IPC_STUB_WRITE_PARCEL_ERR);
+        WRITEINT32(data, item.GetResolution(), IPC_STUB_WRITE_PARCEL_ERR);
+    }
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    MessageParcel reply;
+    MessageOption option;
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ADD_VIRTUAL_INPUT_DEVICE), data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    READINT32(reply, deviceId, IPC_PROXY_DEAD_OBJECT_ERR);
+    return ret;
+}
+
+int32_t MultimodalInputConnectProxy::RemoveVirtualInputDevice(int32_t deviceId)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEINT32(data, deviceId, ERR_INVALID_VALUE);
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(
+        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::REMOVE_VIRTUAL_INPUT_DEVICE), data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
+        return ret;
+    }
+    READINT32(reply, ret, IPC_PROXY_DEAD_OBJECT_ERR);
     return ret;
 }
 } // namespace MMI

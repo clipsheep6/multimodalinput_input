@@ -35,36 +35,37 @@ const static Rosen::Drawing::Color LABELS_RED_COLOR = Rosen::Drawing::Color::Col
 const static Rosen::Drawing::Color TRACKER_COLOR = Rosen::Drawing::Color::ColorQuadSetARGB(255, 0, 96, 255);
 const static Rosen::Drawing::Color POINTER_RED_COLOR = Rosen::Drawing::Color::ColorQuadSetARGB(255, 255, 0, 0);
 const static Rosen::Drawing::Color CROSS_HAIR_COLOR = Rosen::Drawing::Color::ColorQuadSetARGB(255, 0, 0, 192);
-constexpr int32_t DENSITY_BASELINE = 160;
-constexpr int32_t INDEPENDENT_INNER_PIXELS = 20;
-constexpr int32_t INDEPENDENT_OUTER_PIXELS = 21;
-constexpr int32_t INDEPENDENT_WIDTH_PIXELS = 2;
-constexpr int32_t MULTIPLE_FACTOR = 10;
-constexpr int32_t CALCULATE_MIDDLE = 2;
-constexpr int32_t DEFAULT_VALUE = -1;
-constexpr int32_t RECT_COUNT = 6;
-constexpr int32_t PHONE_RECT_TOP = 118;
-constexpr int32_t PAD_RECT_TOP = 58;
-constexpr int32_t RECT_HEIGHT = 50;
-constexpr int32_t TEXT_TOP = 40;
-constexpr int32_t PEN_WIDTH = 1;
-constexpr int32_t TOUCH_SLOP = 30;
-constexpr int32_t RECT_SPACEING = 1;
-constexpr int32_t THREE_PRECISION = 3;
-constexpr int32_t TWO_PRECISION = 2;
-constexpr int32_t ONE_PRECISION = 1;
-constexpr int32_t ROTATION_ANGLE_90 = 90;
-constexpr int32_t ROTATION_ANGLE_180 = 180;
-constexpr int32_t ROTATION_ANGLE_270 = 270;
-constexpr float TEXT_SIZE = 40.0f;
-constexpr float TEXT_SCALE = 1.0f;
-constexpr float TEXT_SKEW = 0.0f;
-constexpr float CALCULATE_TEMP = 2.0f;
-
-const std::string showCursorSwitchName = "settings.input.show_touch_hint";
-const std::string pointerPositionSwitchName = "settings.developer.show_touch_track";
+constexpr int32_t DENSITY_BASELINE { 160 };
+constexpr int32_t INDEPENDENT_INNER_PIXELS { 20 };
+constexpr int32_t INDEPENDENT_OUTER_PIXELS { 21 };
+constexpr int32_t INDEPENDENT_WIDTH_PIXELS { 2 };
+constexpr int32_t MULTIPLE_FACTOR { 10 };
+constexpr int32_t CALCULATE_MIDDLE { 2 };
+constexpr int32_t DEFAULT_VALUE { -1 };
+constexpr int32_t RECT_COUNT { 6 };
+constexpr int32_t PHONE_RECT_TOP { 118 };
+constexpr int32_t PAD_RECT_TOP { 58 };
+constexpr int32_t RECT_HEIGHT { 50 };
+constexpr int32_t TEXT_TOP { 40 };
+constexpr int32_t PEN_WIDTH { 1 };
+constexpr int32_t TOUCH_SLOP { 30 };
+constexpr int32_t RECT_SPACEING { 1 };
+constexpr int32_t THREE_PRECISION { 3 };
+constexpr int32_t TWO_PRECISION { 2 };
+constexpr int32_t ONE_PRECISION { 1 };
+constexpr int32_t ROTATION_ANGLE_90 { 90 };
+constexpr int32_t ROTATION_ANGLE_180 { 180 };
+constexpr int32_t ROTATION_ANGLE_270 { 270 };
+constexpr uint64_t FOLD_SCREEN_MAIN_ID { 5 };
+constexpr uint64_t FOLD_SCREEN_FULL_ID { 0 };
+constexpr float TEXT_SIZE { 40.0f };
+constexpr float TEXT_SCALE { 1.0f };
+constexpr float TEXT_SKEW { 0.0f };
+constexpr float CALCULATE_TEMP { 2.0f };
+const std::string showCursorSwitchName { "settings.input.show_touch_hint" };
+const std::string pointerPositionSwitchName { "settings.developer.show_touch_track" };
 const std::string PRODUCT_TYPE = system::GetParameter("const.product.devicetype", "unknown");
-const std::string PRODUCT_PHONE = "phone";
+const std::string PRODUCT_PHONE { "phone" };
 } // namespace
 
 TouchDrawingManager::TouchDrawingManager()
@@ -341,6 +342,8 @@ void TouchDrawingManager::InitCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& c
     CHKPV(canvasNode);
     canvasNode->SetBounds(0, 0, displayInfo_.width, displayInfo_.height);
     canvasNode->SetFrame(0, 0, displayInfo_.width, displayInfo_.height);
+    nodeWidth_ = displayInfo_.width;
+    nodeHeight_ = displayInfo_.height;
 #ifndef USE_ROSEN_DRAWING
     canvasNode->SetBackgroundColor(SK_ColorTRANSPARENT);
 #else
@@ -355,9 +358,10 @@ void TouchDrawingManager::CreateTouchWindow()
 {
     CALL_DEBUG_ENTER;
     if (surfaceNode_ != nullptr) {
-        if ((displayInfo_.displayDirection) != DIRECTION0 && (displayInfo_.direction != DIRECTION90)) {
+        if ((displayInfo_.displayDirection != DIRECTION0) && (displayInfo_.direction != direction_)) {
             surfaceNode_->SetBounds(0, 0, displayInfo_.width, displayInfo_.height);
             surfaceNode_->SetFrame(0, 0, displayInfo_.width, displayInfo_.height);
+            direction_ = displayInfo_.direction;
         }
         return;
     }
@@ -370,6 +374,7 @@ void TouchDrawingManager::CreateTouchWindow()
     surfaceNode_->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
     surfaceNode_->SetBounds(0, 0, displayInfo_.width, displayInfo_.height);
     surfaceNode_->SetFrame(0, 0, displayInfo_.width, displayInfo_.height);
+    direction_ = displayInfo_.direction;
 #ifndef USE_ROSEN_DRAWING
     surfaceNode_->SetBackgroundColor(SK_ColorTRANSPARENT);
 #else
@@ -392,7 +397,14 @@ void TouchDrawingManager::CreateTouchWindow()
         MMI_HILOGD("Add child labels canvas node");
         surfaceNode_->AddChild(labelsCanvasNode_, DEFAULT_VALUE);
     }
-    surfaceNode_->AttachToDisplay(static_cast<uint64_t>(pointerEvent_->GetTargetDisplayId()));
+    uint64_t screenId = static_cast<uint64_t>(pointerEvent_->GetTargetDisplayId());
+    if (displayInfo_.displayMode == DisplayMode::MAIN) {
+        screenId = FOLD_SCREEN_MAIN_ID;
+    } else if (displayInfo_.displayMode == DisplayMode::FULL) {
+        screenId = FOLD_SCREEN_FULL_ID;
+    }
+    surfaceNode_->AttachToDisplay(screenId);
+    MMI_HILOGI("Setting screen:%{public}" PRIu64 ", displayNode:%{public}" PRIu64, screenId, surfaceNode_->GetId());
 }
 
 void TouchDrawingManager::DrawBubbleHandler()
@@ -701,7 +713,7 @@ void TouchDrawingManager::ClearTracker()
     if (lastPointerItem_.empty() && isDownAction_) {
         MMI_HILOGD("ClearTracker isDownAction_ and empty");
         auto canvasNode = static_cast<Rosen::RSCanvasDrawingNode*>(trackerCanvasNode_.get());
-        canvasNode->ResetSurface();
+        canvasNode->ResetSurface(nodeWidth_, nodeHeight_);
     }
 }
 

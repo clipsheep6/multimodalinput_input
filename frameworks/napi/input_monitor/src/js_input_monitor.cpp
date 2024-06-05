@@ -32,31 +32,31 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t AXIS_TYPE_SCROLL_VERTICAL = 0;
-constexpr int32_t AXIS_TYPE_SCROLL_HORIZONTAL = 1;
-constexpr int32_t AXIS_TYPE_PINCH = 2;
-constexpr int32_t NAPI_ERR = 3;
-constexpr int32_t CANCEL = 0;
-constexpr int32_t MOVE = 1;
-constexpr int32_t BUTTON_DOWN = 2;
-constexpr int32_t BUTTON_UP = 3;
-constexpr int32_t AXIS_BEGIN = 4;
-constexpr int32_t AXIS_UPDATE = 5;
-constexpr int32_t AXIS_END = 6;
-constexpr int32_t MIDDLE = 1;
-constexpr int32_t RIGHT = 2;
-constexpr int32_t MOUSE_FLOW = 10;
-constexpr int32_t THREE_FINGERS = 3;
-constexpr int32_t FOUR_FINGERS = 4;
-constexpr int32_t GESTURE_BEGIN = 1;
-constexpr int32_t GESTURE_UPDATE = 2;
-constexpr int32_t GESTURE_END = 3;
+constexpr int32_t AXIS_TYPE_SCROLL_VERTICAL { 0 };
+constexpr int32_t AXIS_TYPE_SCROLL_HORIZONTAL { 1 };
+constexpr int32_t AXIS_TYPE_PINCH { 2 };
+constexpr int32_t NAPI_ERR { 3 };
+constexpr int32_t CANCEL { 0 };
+constexpr int32_t MOVE { 1 };
+constexpr int32_t BUTTON_DOWN { 2 };
+constexpr int32_t BUTTON_UP { 3 };
+constexpr int32_t AXIS_BEGIN { 4 };
+constexpr int32_t AXIS_UPDATE { 5 };
+constexpr int32_t AXIS_END { 6 };
+constexpr int32_t MIDDLE { 1 };
+constexpr int32_t RIGHT { 2 };
+constexpr int32_t MOUSE_FLOW { 10 };
+constexpr int32_t THREE_FINGERS { 3 };
+constexpr int32_t FOUR_FINGERS { 4 };
+constexpr int32_t GESTURE_BEGIN { 1 };
+constexpr int32_t GESTURE_UPDATE { 2 };
+constexpr int32_t GESTURE_END { 3 };
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
-constexpr int32_t FINGERPRINT_DOWN = 0;
-constexpr int32_t FINGERPRINT_UP = 1;
-constexpr int32_t FINGERPRINT_SLIDE = 2;
-constexpr int32_t FINGERPRINT_RETOUCH = 3;
-constexpr int32_t FINGERPRINT_CLICK = 4;
+constexpr int32_t FINGERPRINT_DOWN { 0 };
+constexpr int32_t FINGERPRINT_UP { 1 };
+constexpr int32_t FINGERPRINT_SLIDE { 2 };
+constexpr int32_t FINGERPRINT_RETOUCH { 3 };
+constexpr int32_t FINGERPRINT_CLICK { 4 };
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
 
 enum TypeName : int32_t {
@@ -168,6 +168,16 @@ void InputMonitor::Stop()
     return;
 }
 
+std::string InputMonitor::GetTypeName() const
+{
+    return typeName_;
+}
+
+void InputMonitor::SetTypeName(const std::string &typeName)
+{
+    typeName_ = typeName;
+}
+
 void InputMonitor::SetCallback(std::function<void(std::shared_ptr<PointerEvent>)> callback)
 {
     std::lock_guard<std::mutex> guard(mutex_);
@@ -181,7 +191,6 @@ void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) cons
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE
         && pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE) {
         if (++flowCtrl_ < MOUSE_FLOW) {
-            pointerEvent->MarkProcessed();
             return;
         } else {
             flowCtrl_ = 0;
@@ -197,7 +206,6 @@ void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) cons
         }
         if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
             if (JS_INPUT_MONITOR_MGR.GetMonitor(id_, fingers_)->GetTypeName() != "touch") {
-                pointerEvent->MarkProcessed();
                 return;
             }
             SetConsumeState(pointerEvent);
@@ -316,6 +324,7 @@ JsInputMonitor::JsInputMonitor(napi_env jsEnv, const std::string &typeName, std:
     monitor_->SetCallback([jsId = id, jsFingers = fingers](std::shared_ptr<PointerEvent> pointerEvent) {
         JS_INPUT_MONITOR_MGR.OnPointerEventByMonitorId(jsId, jsFingers, pointerEvent);
     });
+    monitor_->SetTypeName(typeName_);
     monitor_->SetId(monitorId_);
     monitor_->SetFingers(fingers_);
     if (rectTotal != 0) {
@@ -337,6 +346,7 @@ JsInputMonitor::JsInputMonitor(napi_env jsEnv, const std::string &typeName,
     monitor_->SetCallback([jsId = id, jsFingers = fingers](std::shared_ptr<PointerEvent> pointerEvent) {
         JS_INPUT_MONITOR_MGR.OnPointerEventByMonitorId(jsId, jsFingers, pointerEvent);
     });
+    monitor_->SetTypeName(typeName_);
     monitor_->SetId(monitorId_);
     monitor_->SetFingers(fingers_);
 }
@@ -1289,9 +1299,6 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
         std::lock_guard<std::mutex> guard(mutex_);
         if (!evQueue_.empty()) {
             if (IsBeginAndEnd(pointerEvent)) {
-                auto markProcessedEvent = evQueue_.front();
-                CHKPV(markProcessedEvent);
-                markProcessedEvent->MarkProcessed();
                 std::queue<std::shared_ptr<PointerEvent>> tmp;
                 std::swap(evQueue_, tmp);
             }
@@ -1303,7 +1310,8 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
     if (!evQueue_.empty()) {
         uv_work_t *work = new (std::nothrow) uv_work_t;
         CHKPV(work);
-        MonitorInfo *monitorInfo = new MonitorInfo();
+        MonitorInfo *monitorInfo = new (std::nothrow) MonitorInfo();
+        CHKPV(monitorInfo);
         monitorInfo->monitorId = monitorId_;
         monitorInfo->fingers = fingers_;
         work->data = monitorInfo;
@@ -1453,7 +1461,6 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
         }
         bool checkFlag = ret != RET_OK || napiPointer == nullptr;
         if (checkFlag) {
-            pointerEvent->MarkProcessed();
             napi_close_handle_scope(jsEnv_, scope);
             break;
         }
@@ -1473,7 +1480,6 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
         if (typeNameFlag) {
             MMI_HILOGI("pointer:%{public}d,pointerAction:%{public}s", pointerEvent->GetPointerId(),
                 pointerEvent->DumpPointerAction());
-            pointerEvent->MarkProcessed();
             bool retValue = false;
             CHKRV_SCOPE(jsEnv_, napi_get_value_bool(jsEnv_, result, &retValue), GET_VALUE_BOOL, scope);
             CheckConsumed(retValue, pointerEvent);

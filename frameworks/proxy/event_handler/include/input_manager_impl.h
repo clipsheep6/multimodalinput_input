@@ -167,6 +167,8 @@ public:
     int32_t GetTouchpadRightClickType(int32_t &type);
     int32_t SetTouchpadRotateSwitch(bool rotateSwitch);
     int32_t GetTouchpadRotateSwitch(bool &rotateSwitch);
+    int32_t EnableHardwareCursorStats(bool enable);
+    int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount);
 
     void SetAnrObserver(std::shared_ptr<IAnrObserver> observer);
     void OnAnr(int32_t pid);
@@ -200,6 +202,8 @@ public:
     int32_t SetPixelMapData(int32_t infoId, void* pixelMap);
     int32_t SetCurrentUser(int32_t userId);
     int32_t GetWinSyncBatchSize(int32_t maxAreasCount, int32_t displayCount);
+    int32_t AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId);
+    int32_t RemoveVirtualInputDevice(int32_t deviceId);
 
 private:
     int32_t PackWindowInfo(NetPacket &pkt);
