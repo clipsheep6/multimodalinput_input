@@ -74,7 +74,7 @@ private:
     void CreateTouchWindow();
     void DrawBubbleHandler();
     void DrawBubble();
-    void DrawPointerPositionHandler(const std::shared_ptr<PointerEvent>& pointerEvent);
+    void DrawPointerPositionHandler(std::shared_ptr<PointerEvent> pointerEvent);
     void DrawTracker(int32_t x, int32_t y, int32_t pointerId);
     void DrawCrosshairs(RosenCanvas *canvas, int32_t x, int32_t y);
     void DrawLabels();
