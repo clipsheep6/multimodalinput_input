@@ -347,7 +347,6 @@ void TouchDrawingManager::AddCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& ca
     canvasNode->SetRotation(0);
     CHKPV(surfaceNode_);
     surfaceNode_->AddChild(canvasNode, DEFAULT_VALUE);
-    direction_ = displayInfo_.direction;
 }
 
 void TouchDrawingManager::CreateTouchWindow()
@@ -365,7 +364,6 @@ void TouchDrawingManager::CreateTouchWindow()
     surfaceNode_->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
     surfaceNode_->SetBounds(0, 0, scale_, scale_);
     surfaceNode_->SetFrame(0, 0, scale_, scale_);
-    direction_ = displayInfo_.direction;
 #ifndef USE_ROSEN_DRAWING
     surfaceNode_->SetBackgroundColor(SK_ColorTRANSPARENT);
 #else
