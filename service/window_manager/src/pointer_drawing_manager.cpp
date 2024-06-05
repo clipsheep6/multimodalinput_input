@@ -70,7 +70,8 @@ constexpr int32_t DEFAULT_POINTER_STYLE { 0 };
 constexpr int32_t CURSOR_CIRCLE_STYLE { 41 };
 constexpr int32_t MOUSE_ICON_BAIS { 5 };
 constexpr int32_t VISIBLE_LIST_MAX_SIZE { 100 };
-constexpr int32_t WAIT_TIME_FOR_MAGIC_CURSOR { 4000 };
+constexpr int32_t WAIT_TIME_FOR_MAGIC_CURSOR { 1000 };
+constexpr int32_t SLEEP_TIME_FOR_MAGIC_CURSOR { 4 };
 constexpr float ROTATION_ANGLE { 360.f };
 constexpr float LOADING_CENTER_RATIO { 0.5f };
 constexpr float RUNNING_X_RATIO { 0.3f };
@@ -104,6 +105,7 @@ PointerDrawingManager::PointerDrawingManager()
         MMI_HILOGD("Timer callback");
         CreatePointerSwitchObserver(hasMagicCursor_);
     });
+    sleep(SLEEP_TIME_FOR_MAGIC_CURSOR);
 
     MAGIC_CURSOR->InitStyle();
     InitStyle();
