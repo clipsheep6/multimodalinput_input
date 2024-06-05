@@ -44,7 +44,7 @@ constexpr int32_t CALCULATE_MIDDLE { 2 };
 constexpr int32_t DEFAULT_VALUE { -1 };
 constexpr int32_t RECT_COUNT { 6 };
 constexpr int32_t PHONE_RECT_TOP { 118 };
-constexpr int32_t PAD_RECT_TOP { 58 };
+constexpr int32_t PAD_RECT_TOP { 0 };
 constexpr int32_t RECT_HEIGHT { 40 };
 constexpr int32_t TEXT_TOP { 30 };
 constexpr int32_t PEN_WIDTH { 1 };
