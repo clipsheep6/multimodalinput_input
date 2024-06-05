@@ -121,7 +121,6 @@ private:
     int32_t maxPointerCount_ { 0 };
     int32_t currentPointerCount_ { 0 };
     int32_t rectTopPosition_ { 0 };
-    int32_t direction_ { 0 };
     int32_t scale_ { 0 };
     int64_t lastActionTime_ { 0 };
     double xVelocity_ { 0.0 };
