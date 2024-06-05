@@ -512,19 +512,13 @@ void TouchDrawingManager::DrawTracker(int32_t x, int32_t y, int32_t pointerId)
 void TouchDrawingManager::DrawCrosshairs(RosenCanvas *canvas, int32_t x, int32_t y)
 {
     CALL_DEBUG_ENTER;
-    int32_t width = displayInfo_.width;
-    int32_t height = displayInfo_.height;
-    if (displayInfo_.direction == DIRECTION90 || displayInfo_.direction == DIRECTION270) {
-        width = displayInfo_.height;
-        height = displayInfo_.width;
-    }
     crosshairsPen_.SetWidth(PEN_WIDTH);
     canvas->AttachPen(crosshairsPen_);
     Rosen::Drawing::Point left(0, y);
-    Rosen::Drawing::Point right(width, y);
+    Rosen::Drawing::Point right(scale_, y);
     canvas->DrawLine(left, right);
     Rosen::Drawing::Point top(x, 0);
-    Rosen::Drawing::Point bottom(x, height);
+    Rosen::Drawing::Point bottom(x, scale_);
     canvas->DrawLine(top, bottom);
     canvas->DetachPen();
 }
