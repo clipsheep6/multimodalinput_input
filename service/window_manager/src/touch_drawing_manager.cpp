@@ -438,7 +438,7 @@ void TouchDrawingManager::DrawBubble()
     bubbleCanvasNode_->FinishRecording();
 }
 
-void TouchDrawingManager::DrawPointerPositionHandler(const std::shared_ptr<PointerEvent>& pointerEvent)
+void TouchDrawingManager::DrawPointerPositionHandler(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent_);
