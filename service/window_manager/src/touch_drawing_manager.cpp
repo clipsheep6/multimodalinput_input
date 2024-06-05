@@ -340,6 +340,7 @@ void TouchDrawingManager::AddCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& ca
         return;
     }
     canvasNode = isTrackerNode ? Rosen::RSCanvasDrawingNode::Create() : Rosen::RSCanvasNode::Create();
+    CHKPV(canvasNode);
     canvasNode->SetBounds(0, 0, scale_, scale_);
     canvasNode->SetFrame(0, 0, scale_, scale_);
 #ifndef USE_ROSEN_DRAWING
@@ -445,6 +446,7 @@ void TouchDrawingManager::DrawPointerPositionHandler(const std::shared_ptr<Point
     UpdatePointerPosition();
     ClearTracker();
     RecordLabelsInfo(pointerEvent);
+    CHKPV(crosshairCanvasNode_);
     auto canvas = static_cast<RosenCanvas *>(crosshairCanvasNode_->BeginRecording(scale_, scale_));
     CHKPV(canvas);
     auto pointerIdList = pointerEvent_->GetPointerIds();
@@ -482,6 +484,7 @@ void TouchDrawingManager::DrawTracker(int32_t x, int32_t y, int32_t pointerId)
     }
     CHKPV(trackerCanvasNode_);
     auto canvas = static_cast<RosenCanvas *>(trackerCanvasNode_->BeginRecording(scale_, scale_));
+    CHKPV(canvas);
     if (find && currentPt != lastPt) {
         pathPen_.SetWidth(PEN_WIDTH);
         canvas->AttachPen(pathPen_);
@@ -667,15 +670,12 @@ void TouchDrawingManager::UpdateVelocity()
 void TouchDrawingManager::RemovePointerPosition()
 {
     CHKPV(surfaceNode_);
-    CHKPV(trackerCanvasNode_);
     surfaceNode_->RemoveChild(trackerCanvasNode_);
     trackerCanvasNode_.reset();
 
-    CHKPV(crosshairCanvasNode_);
     surfaceNode_->RemoveChild(crosshairCanvasNode_);
     crosshairCanvasNode_.reset();
 
-    CHKPV(labelsCanvasNode_);
     surfaceNode_->RemoveChild(labelsCanvasNode_);
     labelsCanvasNode_.reset();
     isFirstDraw_ = true;
