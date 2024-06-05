@@ -481,20 +481,23 @@ void TouchDrawingManager::DrawTracker(int32_t x, int32_t y, int32_t pointerId)
             break;
         }
     }
+    if(currentPt == lastPt) {
+        return;
+    }
     CHKPV(trackerCanvasNode_);
     auto canvas = static_cast<RosenCanvas *>(trackerCanvasNode_->BeginRecording(scale_, scale_));
     CHKPV(canvas);
-    if (find && currentPt != lastPt) {
+    if (find) {
         pathPen_.SetWidth(PEN_WIDTH);
         canvas->AttachPen(pathPen_);
         canvas->DrawLine(lastPt, currentPt);
         canvas->DetachPen();
         pointPen_.SetWidth(INDEPENDENT_WIDTH_PIXELS);
         canvas->AttachPen(pointPen_);
-        canvas->DrawPoint(lastPt);
+        canvas->DrawPoint(currentPt);
         canvas->DetachPen();
     }
-    if (!isDownAction_ && !find && currentPt != lastPt) {
+    if (!isDownAction_ && !find) {
         int32_t futureX = x + xVelocity_ * MULTIPLE_FACTOR;
         int32_t futureY = y + yVelocity_ * MULTIPLE_FACTOR;
         Rosen::Drawing::Point futurePt(futureX, futureY);
