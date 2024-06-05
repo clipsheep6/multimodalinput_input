@@ -44,8 +44,8 @@ constexpr int32_t CALCULATE_MIDDLE { 2 };
 constexpr int32_t DEFAULT_VALUE { -1 };
 constexpr int32_t RECT_COUNT { 6 };
 constexpr int32_t PHONE_RECT_TOP { 118 };
-constexpr int32_t PAD_RECT_TOP { 58 };
-constexpr int32_t RECT_HEIGHT { 50 };
+constexpr int32_t PAD_RECT_TOP { 0 };
+constexpr int32_t RECT_HEIGHT { 40 };
 constexpr int32_t TEXT_TOP { 40 };
 constexpr int32_t PEN_WIDTH { 1 };
 constexpr int32_t TOUCH_SLOP { 30 };
@@ -156,19 +156,19 @@ void TouchDrawingManager::TouchDrawHandler(const std::shared_ptr<PointerEvent>& 
     CreateObserver();
     if (bubbleCanvasNode_ == nullptr) {
         bubbleCanvasNode_ = Rosen::RSCanvasNode::Create();
-        InitCanvasNode(bubbleCanvasNode_);
+        AddCanvasNode(bubbleCanvasNode_);
     }
     if (trackerCanvasNode_ == nullptr) {
         trackerCanvasNode_ = Rosen::RSCanvasDrawingNode::Create();
-        InitCanvasNode(trackerCanvasNode_);
+        AddCanvasNode(trackerCanvasNode_);
     }
     if (crosshairCanvasNode_ == nullptr) {
         crosshairCanvasNode_ = Rosen::RSCanvasNode::Create();
-        InitCanvasNode(crosshairCanvasNode_);
+        AddCanvasNode(crosshairCanvasNode_);
     }
     if (labelsCanvasNode_ == nullptr) {
         labelsCanvasNode_ = Rosen::RSCanvasNode::Create();
-        InitCanvasNode(labelsCanvasNode_);
+        AddCanvasNode(labelsCanvasNode_);
     }
     CreateTouchWindow();
     if (bubbleMode_.isShow) {
@@ -336,7 +336,7 @@ std::string TouchDrawingManager::FormatNumber(T number, int32_t precision)
     return str.substr(0, str.find(".") + precision + 1);
 }
 
-void TouchDrawingManager::InitCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& canvasNode)
+void TouchDrawingManager::AddCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& canvasNode)
 {
     CALL_DEBUG_ENTER;
     CHKPV(canvasNode);

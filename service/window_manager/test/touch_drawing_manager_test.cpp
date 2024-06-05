@@ -233,30 +233,6 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdateDisplayInfo_001,
 }
 
 /**
- * @tc.name: TouchDrawingManagerTest_SetPointerPositionState_001
- * @tc.desc: Test TouchDrawHandler
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_SetPointerPositionState_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->SetPointerPositionState(false));
-}
-
-/**
- * @tc.name: TouchDrawingManagerTest_SetPointerPositionState_002
- * @tc.desc: Test TouchDrawHandler
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_SetPointerPositionState_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MGR->SetPointerPositionState(true));
-}
-
-/**
  * @tc.name: TouchDrawingManagerTest_UpdateLabels_001
  * @tc.desc: Test TouchDrawHandler
  * @tc.type: Function

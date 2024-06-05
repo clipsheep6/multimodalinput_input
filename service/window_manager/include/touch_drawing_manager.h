@@ -68,7 +68,7 @@ public:
     void Dump(int32_t fd, const std::vector<std::string> &args);
 private:
     void CreateObserver();
-    void InitCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& canvasNode);
+    void AddCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& canvasNode);
     void ConvertPointerEvent(const std::shared_ptr<PointerEvent>& pointerEvent);
     void CreateTouchWindow();
     void DrawBubbleHandler();
