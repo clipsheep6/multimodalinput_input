@@ -402,5 +402,7 @@ HWTEST_F(EventNormalizeHandlerTest, EventNormalizeHandlerTest_TerminateAxis, Tes
     handler.SetNext(handler.nextHandler_);
     EXPECT_NO_FATAL_FAILURE(handler.TerminateAxis(event));
 }
+
+
 } // namespace MMI
 } // namespace OHOS
