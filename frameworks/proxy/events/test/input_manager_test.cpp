@@ -86,7 +86,7 @@ void IEventObserver::SyncBundleName(int32_t pid, int32_t uid, std::string bundle
     int32_t getUid = uid;
     std::string getName = bundleName;
     int32_t getStatus = syncStatus;
-    MMI_HILOGD("SyncBundleName info is : %{public}d, %{public}d, %{public}s, %{public}d",
+    MMI_HILOGD("SyncBundleName info is :%{public}d, %{public}d, %{public}s, %{public}d",
         getPid, getUid, getName.c_str(), getStatus);
 }
 
@@ -116,6 +116,20 @@ void InputManagerTest::TearDown()
 std::string InputManagerTest::GetEventDump()
 {
     return TestUtil->GetEventDump();
+}
+
+/**
+ * @tc.name: InputManagerTest_GetWinSyncBatchSize
+ * @tc.desc: Test GetWinSyncBatchSize
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetWinSyncBatchSize, TestSize.Level1)
+{
+    int32_t maxAreasCount = 1;
+    int32_t displayCount = 2;
+    int32_t ret = InputManager::GetInstance()->GetWinSyncBatchSize(maxAreasCount, displayCount);
+    EXPECT_EQ(ret, 38);
 }
 
 /**
@@ -264,7 +278,7 @@ HWTEST_F(InputManagerTest, AppendExtraData_002, TestSize.Level1)
  * @tc.name: InputManagerTest_SubscribeKeyEvent_001
  * @tc.desc: Verify invalid parameter.
  * @tc.type: FUNC
- * @tc.require:SR000GGQL4  AR000GJNGN
+ * @tc.require:SR000GGQL4 AR000GJNGN
  * @tc.author: yangguang
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_001, TestSize.Level1)
@@ -284,7 +298,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_001, TestSize.Leve
  * @tc.name: InputManagerTest_SubscribeKeyEvent_02
  * @tc.desc: Verify subscribe power key event.
  * @tc.type: FUNC
- * @tc.require:SR000GGQL4  AR000GJNGN
+ * @tc.require:SR000GGQL4 AR000GJNGN
  * @tc.author: zhaoxueyuan
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_02, TestSize.Level1)
@@ -297,7 +311,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_02, TestSize.Level
         InputManagerUtil::InitOption(preKeys, KeyEvent::KEYCODE_POWER, true, FINAL_KEY_DOWN_DURATION_TWO);
     int32_t subscribeId1 = INVAID_VALUE;
     subscribeId1 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, [](std::shared_ptr<KeyEvent> keyEvent) {
-        EventLogHelper::PrintEventData(keyEvent);
+        EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
         MMI_HILOGD("Subscribe key event KEYCODE_POWER down trigger callback");
     });
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -310,7 +324,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_02, TestSize.Level
     std::shared_ptr<KeyOption> keyOption2 = InputManagerUtil::InitOption(preKeys, KeyEvent::KEYCODE_POWER, false, 0);
     int32_t subscribeId2 = INVAID_VALUE;
     subscribeId2 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption2, [](std::shared_ptr<KeyEvent> keyEvent) {
-        EventLogHelper::PrintEventData(keyEvent);
+        EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
         MMI_HILOGD("Subscribe key event KEYCODE_POWER up trigger callback");
     });
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -340,27 +354,27 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_03, TestSize.Level
         InputManagerUtil::InitOption(preKeys, KeyEvent::KEYCODE_VOLUME_UP, true, FINAL_KEY_DOWN_DURATION_ONE);
     int32_t subscribeId1 = INVAID_VALUE;
     subscribeId1 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption1, [](std::shared_ptr<KeyEvent> keyEvent) {
-        EventLogHelper::PrintEventData(keyEvent);
+        EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
         MMI_HILOGD("Subscribe key event KEYCODE_VOLUME_UP down trigger callback");
     });
     std::shared_ptr<KeyOption> keyOption2 =
         InputManagerUtil::InitOption(preKeys, KeyEvent::KEYCODE_VOLUME_UP, false, 0);
     int32_t subscribeId2 = INVAID_VALUE;
     subscribeId2 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption2, [](std::shared_ptr<KeyEvent> keyEvent) {
-        EventLogHelper::PrintEventData(keyEvent);
+        EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
         MMI_HILOGD("Subscribe key event KEYCODE_VOLUME_UP up trigger callback");
     });
     std::shared_ptr<KeyOption> keyOption3 = InputManagerUtil::InitOption(preKeys, KeyEvent::KEYCODE_VOLUME_UP, true, 0);
     int32_t subscribeId3 = INVAID_VALUE;
     subscribeId3 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption3, [](std::shared_ptr<KeyEvent> keyEvent) {
-        EventLogHelper::PrintEventData(keyEvent);
+        EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
         MMI_HILOGD("Subscribe key event KEYCODE_VOLUME_UP down trigger callback");
     });
     std::shared_ptr<KeyOption> keyOption4 =
         InputManagerUtil::InitOption(preKeys, KeyEvent::KEYCODE_VOLUME_UP, false, 0);
     int32_t subscribeId4 = INVAID_VALUE;
     subscribeId4 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption4, [](std::shared_ptr<KeyEvent> keyEvent) {
-        EventLogHelper::PrintEventData(keyEvent);
+        EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
         MMI_HILOGD("Subscribe key event KEYCODE_VOLUME_UP up trigger callback");
     });
 
@@ -390,7 +404,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_04, TestSize.Level
     keyOption->SetFinalKeyDownDuration(INVAID_VALUE);
     int32_t subscribeId = INVAID_VALUE;
     subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, [](std::shared_ptr<KeyEvent> keyEvent) {
-        EventLogHelper::PrintEventData(keyEvent);
+        EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
         MMI_HILOGD("Subscribe key event KEYCODE_POWER down trigger callback");
     });
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -1620,7 +1634,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_UnsubscribeSwitchEvent_001, TestSize
  * @tc.name: InputManagerTest_ClearWindowPointerStyle_001
  * @tc.desc: Verify invalid parameter.
  * @tc.type: FUNC
- * @tc.require:SR000GGQL4  AR000GJNGN
+ * @tc.require:SR000GGQL4 AR000GJNGN
  * @tc.author: yangguang
  */
 HWTEST_F(InputManagerTest, InputManagerTest_ClearWindowPointerStyle_001, TestSize.Level1)
@@ -2456,7 +2470,7 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputKeyEvent_001, TestSize.Leve
  * @tc.name: InputManagerTest_SetWindowPointerStyle_001
  * @tc.desc: Verify valid parameter.
  * @tc.type: FUNC
- * @tc.require:SR000GGQL4  AR000GJNGN
+ * @tc.require:SR000GGQL4 AR000GJNGN
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SetWindowPointerStyle_001, TestSize.Level1)
 {
@@ -2501,7 +2515,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_RemoveInputEventFilter_002, TestSize
     struct KeyFilter : public IInputEventFilter {
         bool OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override
         {
-            MMI_HILOGI("KeyFilter::OnInputEvent enter,pid: %{public}d", getpid());
+            MMI_HILOGI("KeyFilter::OnInputEvent enter,pid:%{public}d", getpid());
             return false;
         }
         bool OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
@@ -2538,7 +2552,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_RemoveInputEventFilter_003, TestSize
     struct KeyFilter : public IInputEventFilter {
         bool OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override
         {
-            MMI_HILOGI("KeyFilter::OnInputEvent enter,pid: %{public}d", getpid());
+            MMI_HILOGI("KeyFilter::OnInputEvent enter,pid:%{public}d", getpid());
             return false;
         }
         bool OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
@@ -2966,53 +2980,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetTouchpadRotateSwitch_001, TestSiz
 }
 
 /**
- * @tc.name: InputManagerTest_HasIrEmitterTest
- * @tc.desc: Get touchpad rotate switch
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_HasIrEmitterTest, TestSize.Level1)
-{
-    bool hasEmmited = false;
-    InputManager::GetInstance()->HasIrEmitter(hasEmmited);
-    EXPECT_EQ(hasEmmited, false);
-}
-
-/**
- * @tc.name: InputManagerTest_GetInfraredFrequenciesTest_001
- * @tc.desc: get infrared frequencies
- * @tc.type: FUNC
- * @tc.require
- */
-HWTEST_F(InputManagerTest, InputManagerTest_GetInfraredFrequenciesTest_001, TestSize.Level1)
-{
-    std::vector<InfraredFrequency> requencys;
-    int32_t ret = InputManager::GetInstance()->GetInfraredFrequencies(requencys);
-    int32_t size = requencys.size();
-    EXPECT_GE(size, 0);
-    for (int32_t i = 0; i < size; i++) {
-        InfraredFrequency fre = requencys[i];
-        MMI_HILOGI("GetInfraredFrequencies i:%{public}d, max_:%{public}" PRId64 ", min_:%{public}" PRId64,
-            i, fre.max_, fre.min_);
-    }
-    ASSERT_TRUE(ret == RET_OK);
-}
-
-/**
- * @tc.name: InputManagerTest_TransmitInfraredTest_001
- * @tc.desc: set transmit infrared
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_TransmitInfraredTest_001, TestSize.Level1)
-{
-    std::vector<int64_t> requencys = {9000, 4500, 5800};
-    int64_t frequency = 3800;
-    int32_t ret = InputManager::GetInstance()->TransmitInfrared(frequency, requencys);
-    ASSERT_TRUE(ret == RET_OK);
-}
-
-/**
  * @tc.name: InputManagerTest_SetCurrentUser_001
  * @tc.desc: set current user id
  * @tc.type: FUNC
@@ -3023,6 +2990,50 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetCurrentUser_001, TestSize.Level1)
     int32_t userId = 10;
     int32_t ret = InputManager::GetInstance()->SetCurrentUser(userId);
     EXPECT_TRUE(ret == RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_HasIrEmitter
+ * @tc.desc: Test HasIrEmitter
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_HasIrEmitter, TestSize.Level1)
+{
+    bool hasIrEmitter = false;
+    int32_t ret = InputManager::GetInstance()->HasIrEmitter(hasIrEmitter);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_GetInfraredFrequencies
+ * @tc.desc: Test GetInfraredFrequencies
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetInfraredFrequencies, TestSize.Level1)
+{
+    InfraredFrequency infraredFrequency;
+    infraredFrequency.max_ = 30;
+    infraredFrequency.min_ = 10;
+    std::vector<InfraredFrequency> requencys;
+    requencys.push_back(infraredFrequency);
+    int32_t ret = InputManager::GetInstance()->GetInfraredFrequencies(requencys);
+    EXPECT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_TransmitInfrared
+ * @tc.desc: Test TransmitInfrared
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_TransmitInfrared, TestSize.Level1)
+{
+    int64_t number = 10;
+    std::vector<int64_t> pattern = { 10, 20, 30 };
+    int32_t ret = InputManager::GetInstance()->TransmitInfrared(number, pattern);
+    EXPECT_EQ(ret, RET_OK);
 }
 } // namespace MMI
 } // namespace OHOS

@@ -17,6 +17,8 @@
 
 #include <cinttypes>
 
+#include <linux/input-event-codes.h>
+
 #include "dfx_hisysevent.h"
 #include "hitrace_meter.h"
 
@@ -26,8 +28,7 @@
 #include "error_multimodal.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
-#include "input_windows_manager.h"
-#include "input-event-codes.h"
+#include "i_input_windows_manager.h"
 #include "mouse_device_state.h"
 #include "napi_constants.h"
 #include "proto.h"
@@ -85,7 +86,7 @@ void EventDispatchHandler::FilterInvalidPointerItem(const std::shared_ptr<Pointe
                 MMI_HILOGW("Can't find this pointerItem");
                 continue;
             }
-            auto itemPid = WinMgr->GetWindowPid(pointeritem.GetTargetWindowId());
+            auto itemPid = WIN_MGR->GetWindowPid(pointeritem.GetTargetWindowId());
             if ((itemPid >= 0) && (itemPid != udsServer->GetClientPid(fd))) {
                 pointerEvent->RemovePointerItem(id);
                 MMI_HILOGD("pointerIdList size:%{public}zu", pointerEvent->GetPointerIds().size());
@@ -100,22 +101,23 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
     CALL_DEBUG_ENTER;
     CHKPV(point);
     std::vector<int32_t> windowIds;
-    WinMgr->GetTargetWindowIds(pointerItem.GetPointerId(), windowIds);
+    WIN_MGR->GetTargetWindowIds(pointerItem.GetPointerId(), windowIds);
     int32_t count = 0;
     for (auto windowId : windowIds) {
         int32_t pointerId = point->GetPointerId();
-        auto windowInfo = WinMgr->GetWindowAndDisplayInfo(windowId, point->GetTargetDisplayId());
+        auto windowInfo = WIN_MGR->GetWindowAndDisplayInfo(windowId, point->GetTargetDisplayId());
         if (windowInfo == std::nullopt) {
             MMI_HILOGE("WindowInfo id nullptr");
+            continue;
         }
-        auto fd = WinMgr->GetClientFd(point, windowInfo->id);
+        auto fd = WIN_MGR->GetClientFd(point, windowInfo->id);
         auto pointerEvent = std::make_shared<PointerEvent>(*point);
         pointerEvent->SetTargetWindowId(windowId);
         pointerEvent->SetAgentWindowId(windowInfo->agentWindowId);
         int32_t windowX = pointerItem.GetDisplayX() - windowInfo->area.x;
         int32_t windowY = pointerItem.GetDisplayY() - windowInfo->area.y;
         if (!windowInfo->transform.empty()) {
-            auto windowXY = WinMgr->TransformWindowXY(*windowInfo, pointerItem.GetDisplayX(),
+            auto windowXY = WIN_MGR->TransformWindowXY(*windowInfo, pointerItem.GetDisplayX(),
                 pointerItem.GetDisplayY());
             windowX = windowXY.first;
             windowY = windowXY.second;
@@ -157,12 +159,12 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
     }
 
     std::vector<int32_t> windowIds;
-    WinMgr->GetTargetWindowIds(pointerItem.GetPointerId(), windowIds);
+    WIN_MGR->GetTargetWindowIds(pointerItem.GetPointerId(), windowIds);
     if (!windowIds.empty()) {
         HandleMultiWindowPointerEvent(point, pointerItem);
         return;
     }
-    auto fd = WinMgr->GetClientFd(point);
+    auto fd = WIN_MGR->GetClientFd(point);
     DispatchPointerEventInner(point, fd);
 }
 
@@ -224,7 +226,7 @@ int32_t EventDispatchHandler::DispatchKeyEventPid(UDSServer& udsServer, std::sha
 {
     CALL_DEBUG_ENTER;
     CHKPR(key, PARAM_INPUT_INVALID);
-    auto fd = WinMgr->UpdateTarget(key);
+    auto fd = WIN_MGR->UpdateTarget(key);
     currentTime_ = key->GetActionTime();
     if (fd < 0 && currentTime_ - eventTime_ > INTERVAL_TIME) {
         eventTime_ = currentTime_;

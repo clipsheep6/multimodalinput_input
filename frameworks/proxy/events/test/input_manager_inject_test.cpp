@@ -596,7 +596,7 @@ HWTEST_F(InputManagerInjectTest, InputManagerTest_SubscribeKeyEvent_004, TestSiz
 {
     CALL_TEST_DEBUG;
     auto keyEventFun = [](std::shared_ptr<KeyEvent> keyEvent) {
-        EventLogHelper::PrintEventData(keyEvent);
+        EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
         MMI_HILOGI("Add monitor SubscribeKeyEvent_004");
     };
     auto monitorId = InputManager::GetInstance()->AddMonitor(keyEventFun);
@@ -634,7 +634,7 @@ HWTEST_F(InputManagerInjectTest, InputManagerTest_SubscribeKeyEvent_005, TestSiz
 {
     CALL_TEST_DEBUG;
     auto keyEventFun = [](std::shared_ptr<KeyEvent> keyEvent) {
-        EventLogHelper::PrintEventData(keyEvent);
+        EventLogHelper::PrintEventData(keyEvent, MMI_LOG_HEADER);
         MMI_HILOGI("Add monitor SubscribeKeyEvent_005");
     };
     auto monitorId = InputManager::GetInstance()->AddMonitor(keyEventFun);
@@ -1843,6 +1843,43 @@ HWTEST_F(InputManagerInjectTest, InputManagerTest_SimulateInputEventZorder_008, 
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetZOrder(20.0);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent, 10.0);
+    InputManager::GetInstance()->RemoveMonitor(monitorId);
+}
+
+/**
+ * @tc.name: InputManager_InjectMouseEvent_020
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerInjectTest, InputManager_InjectMouseEvent_020, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEventFun = [](std::shared_ptr<PointerEvent> event) {
+        MMI_HILOGI("Add monitor InjectMouseEvent_020");
+    };
+    int32_t monitorId = InputManager::GetInstance()->AddMonitor(pointerEventFun);
+    ASSERT_NE(monitorId, ERROR_UNSUPPORT);
+
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDisplayX(200);
+    item.SetDisplayY(200);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+    InputManager::GetInstance()->EnableHardwareCursorStats(true);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    InputManager::GetInstance()->EnableHardwareCursorStats(false);
+    uint32_t frameCount = 1;
+    uint32_t vsyncCount = 1;
+    InputManager::GetInstance()->GetHardwareCursorStats(frameCount, vsyncCount);
+    ASSERT_NE(frameCount, 1);
+    ASSERT_NE(vsyncCount, 1);
     InputManager::GetInstance()->RemoveMonitor(monitorId);
 }
 } // namespace MMI

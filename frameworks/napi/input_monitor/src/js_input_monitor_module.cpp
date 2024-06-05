@@ -35,16 +35,16 @@ const std::set<std::string> ACTION_TYPE = {
     "touch", "mouse", "pinch", "threeFingersSwipe", "fourFingersSwipe", "rotate", "threeFingersTap", "joystick",
     "fingerprint"
 };
-constexpr int32_t TWO_PARAMETERS = 2;
-constexpr int32_t THREE_PARAMETERS = 3;
-constexpr int32_t RECT_LIST_SIZE = 2;
+constexpr int32_t TWO_PARAMETERS { 2 };
+constexpr int32_t THREE_PARAMETERS { 3 };
+constexpr int32_t RECT_LIST_SIZE { 2 };
 } // namespace
 
 static napi_value JsOnApi9(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
     size_t argc = 2;
-    napi_value argv[2];
+    napi_value argv[2] = { 0 };
 
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     napi_valuetype valueType = napi_undefined;
@@ -109,7 +109,7 @@ static napi_value AddMonitor(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
     size_t argc = 3;
-    napi_value argv[3];
+    napi_value argv[3] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     napi_valuetype valueType = napi_undefined;
     CHKRP(napi_typeof(env, argv[0], &valueType), TYPEOF);
@@ -158,7 +158,7 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
     size_t argc = 3;
-    napi_value argv[3];
+    napi_value argv[3] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < TWO_PARAMETERS) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
@@ -176,7 +176,7 @@ static napi_value JsOffApi9(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
     size_t argc = 2;
-    napi_value argv[2];
+    napi_value argv[2] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     napi_valuetype valueType = napi_undefined;
     CHKRP(napi_typeof(env, argv[0], &valueType), TYPEOF);
@@ -218,7 +218,7 @@ static napi_value RemoveMonitor(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
     size_t argc = 3;
-    napi_value argv[3];
+    napi_value argv[3] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     napi_valuetype valueType = napi_undefined;
     CHKRP(napi_typeof(env, argv[0], &valueType), TYPEOF);
@@ -271,7 +271,7 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
     size_t argc = 2;
-    napi_value argv[2];
+    napi_value argv[2] = { 0 };
 
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < 1) {

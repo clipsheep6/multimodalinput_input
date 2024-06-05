@@ -15,7 +15,10 @@
 
 #include <gtest/gtest.h>
 
-#include "input_windows_manager.h"
+#include "ui/rs_canvas_drawing_node.h"
+#include "ui/rs_surface_node.h"
+
+#include "i_input_windows_manager.h"
 #include "mmi_log.h"
 #include "knuckle_glow_point.h"
 
@@ -47,10 +50,10 @@ public:
 HWTEST_F(KnuckleGlowPointTest, KnuckleGlowPoint_KnuckleGlowPoint_001, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    OHOS::Rosen::Drawing::Bitmap bitmap;
+    std::shared_ptr<Rosen::Drawing::Bitmap> bitmap = std::make_shared<Rosen::Drawing::Bitmap>();
     OHOS::Rosen::Drawing::BitmapFormat format { OHOS::Rosen::Drawing::COLORTYPE_RGBA_8888,
         OHOS::Rosen::Drawing::ALPHATYPE_OPAQUE };
-    bitmap.Build(IMAGE_WIDTH, IMAGE_HEIGHT, format);
+    bitmap->Build(IMAGE_WIDTH, IMAGE_HEIGHT, format);
     EXPECT_NO_FATAL_FAILURE(KnuckleGlowPoint knuckleGlowPoint(bitmap));
 }
 
@@ -63,10 +66,10 @@ HWTEST_F(KnuckleGlowPointTest, KnuckleGlowPoint_KnuckleGlowPoint_001, TestSize.L
 HWTEST_F(KnuckleGlowPointTest, KnuckleGlowPointTest_Update_001, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    OHOS::Rosen::Drawing::Bitmap bitmap;
+    std::shared_ptr<Rosen::Drawing::Bitmap> bitmap = std::make_shared<Rosen::Drawing::Bitmap>();
     OHOS::Rosen::Drawing::BitmapFormat format { OHOS::Rosen::Drawing::COLORTYPE_RGBA_8888,
         OHOS::Rosen::Drawing::ALPHATYPE_OPAQUE };
-    bitmap.Build(IMAGE_WIDTH, IMAGE_HEIGHT, format);
+    bitmap->Build(IMAGE_WIDTH, IMAGE_HEIGHT, format);
     auto knuckleGlowPoint = KnuckleGlowPoint(bitmap);
     EXPECT_NO_FATAL_FAILURE(knuckleGlowPoint.Update());
 }
@@ -80,10 +83,10 @@ HWTEST_F(KnuckleGlowPointTest, KnuckleGlowPointTest_Update_001, TestSize.Level1)
 HWTEST_F(KnuckleGlowPointTest, KnuckleGlowPointTest_Draw_001, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    OHOS::Rosen::Drawing::Bitmap bitmap;
+    std::shared_ptr<Rosen::Drawing::Bitmap> bitmap = std::make_shared<Rosen::Drawing::Bitmap>();
     OHOS::Rosen::Drawing::BitmapFormat format { OHOS::Rosen::Drawing::COLORTYPE_RGBA_8888,
         OHOS::Rosen::Drawing::ALPHATYPE_OPAQUE };
-    bitmap.Build(IMAGE_WIDTH, IMAGE_HEIGHT, format);
+    bitmap->Build(IMAGE_WIDTH, IMAGE_HEIGHT, format);
     auto knuckleGlowPoint = KnuckleGlowPoint(bitmap);
     std::shared_ptr<Rosen::RSCanvasDrawingNode> canvasNode = Rosen::RSCanvasDrawingNode::Create();
     auto canvas = static_cast<Rosen::Drawing::RecordingCanvas *>(canvasNode->BeginRecording(0, 0));
@@ -99,10 +102,10 @@ HWTEST_F(KnuckleGlowPointTest, KnuckleGlowPointTest_Draw_001, TestSize.Level1)
 HWTEST_F(KnuckleGlowPointTest, KnuckleGlowPointTest_Reset_001, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    OHOS::Rosen::Drawing::Bitmap bitmap;
+    std::shared_ptr<Rosen::Drawing::Bitmap> bitmap = std::make_shared<Rosen::Drawing::Bitmap>();
     OHOS::Rosen::Drawing::BitmapFormat format { OHOS::Rosen::Drawing::COLORTYPE_RGBA_8888,
         OHOS::Rosen::Drawing::ALPHATYPE_OPAQUE };
-    bitmap.Build(IMAGE_WIDTH, IMAGE_HEIGHT, format);
+    bitmap->Build(IMAGE_WIDTH, IMAGE_HEIGHT, format);
     auto knuckleGlowPoint = KnuckleGlowPoint(bitmap);
     double pointX = 0.1;
     double pointY = 0.1;
@@ -119,10 +122,10 @@ HWTEST_F(KnuckleGlowPointTest, KnuckleGlowPointTest_Reset_001, TestSize.Level1)
 HWTEST_F(KnuckleGlowPointTest, KnuckleGlowPointTest_IsEnded_001, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    OHOS::Rosen::Drawing::Bitmap bitmap;
+    std::shared_ptr<Rosen::Drawing::Bitmap> bitmap = std::make_shared<Rosen::Drawing::Bitmap>();
     OHOS::Rosen::Drawing::BitmapFormat format { OHOS::Rosen::Drawing::COLORTYPE_RGBA_8888,
         OHOS::Rosen::Drawing::ALPHATYPE_OPAQUE };
-    bitmap.Build(IMAGE_WIDTH, IMAGE_HEIGHT, format);
+    bitmap->Build(IMAGE_WIDTH, IMAGE_HEIGHT, format);
     auto knuckleGlowPoint = KnuckleGlowPoint(bitmap);
     double pointX = 0.1;
     double pointY = 0.1;

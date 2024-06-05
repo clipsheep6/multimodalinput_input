@@ -25,11 +25,11 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t FIRST_FINGER = 0;
-constexpr int32_t SECOND_FINGER = 1;
-constexpr int32_t TWO_FINGERS = 2;
-constexpr double EFFECT_ANGLE = 5.0;
-constexpr double FLAT_ANGLE = 180.0;
+constexpr int32_t FIRST_FINGER { 0 };
+constexpr int32_t SECOND_FINGER { 1 };
+constexpr int32_t TWO_FINGERS { 2 };
+constexpr double EFFECT_ANGLE { 5.0 };
+constexpr double FLAT_ANGLE { 180.0 };
 } // namespace
 
 GestureHandler::GestureHandler() {}
@@ -166,6 +166,11 @@ double GestureHandler::AdjustRotateAngle(double currentAngle)
 double GestureHandler::GetRotateAngle()
 {
     return rotateAngle_;
+}
+
+bool GestureHandler::GetRotateStatus()
+{
+    return isStartRotate_;
 }
 } // namespace MMI
 } // namespace OHOS

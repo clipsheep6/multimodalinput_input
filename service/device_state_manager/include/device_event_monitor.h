@@ -38,23 +38,25 @@ enum StateType {
     CALL_STATUS_WAITING = 5,
     CALL_STATUS_DISCONNECTED = 6,
     CALL_STATUS_DISCONNECTING = 7,
-    CALL_STATUS_IDLE = 8
+    CALL_STATUS_IDLE = 8,
+    CALL_STATUS_ANSWERED = 9
 };
 
 class DeviceEventMonitor final {
     DECLARE_DELAYED_SINGLETON(DeviceEventMonitor);
-    public:
-        DISALLOW_COPY_AND_MOVE(DeviceEventMonitor);
+public:
+    DISALLOW_COPY_AND_MOVE(DeviceEventMonitor);
 
-        void InitCommonEventSubscriber();
-        void SetCallState(const EventFwk::CommonEventData &eventData, int32_t callState);
-        int32_t GetCallState();
-        void SetHasHandleRingMute(bool hasHandleRingMute);
-    private:
-        bool hasInit_ { false };
-        int32_t callState_ { -1 };
-        bool hasHandleRingMute_ { false };
-        std::mutex stateMutex_;
+    void InitCommonEventSubscriber();
+    void SetCallState(const EventFwk::CommonEventData &eventData, int32_t callState);
+    int32_t GetCallState();
+    void SetHasHandleRingMute(bool hasHandleRingMute);
+    bool GetHasHandleRingMute();
+private:
+    bool hasInit_ { false };
+    int32_t callState_ { -1 };
+    bool hasHandleRingMute_ { false };
+    std::mutex stateMutex_;
 };
 #define DEVICE_MONITOR ::OHOS::DelayedSingleton<DeviceEventMonitor>::GetInstance()
 } // namespace MMI

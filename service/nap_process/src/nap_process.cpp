@@ -26,10 +26,10 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t REMOVE_OBSERVER = -2;
-constexpr int32_t NAP_EVENT = 0;
-constexpr int32_t SUBSCRIBED = 1;
-constexpr int32_t ACTIVE_EVENT = 2;
+constexpr int32_t REMOVE_OBSERVER { -2 };
+constexpr int32_t NAP_EVENT { 0 };
+constexpr int32_t SUBSCRIBED { 1 };
+constexpr int32_t ACTIVE_EVENT { 2 };
 } // namespace
 
 NapProcess *NapProcess::instance_ = new (std::nothrow) NapProcess();
@@ -48,7 +48,7 @@ int32_t NapProcess::NotifyBundleName(NapStatusData data, int32_t syncState)
 {
     CALL_DEBUG_ENTER;
     if (napClientPid_ < 0) {
-        MMI_HILOGE("Client pid is unavailable!");
+        MMI_HILOGE("Client pid is unavailable");
         return RET_ERR;
     }
     MMI_HILOGD("NotifyBundle info is : %{public}d, %{public}d, %{public}s, %{public}d",
@@ -92,12 +92,12 @@ int32_t NapProcess::SetNapStatus(int32_t pid, int32_t uid, std::string bundleNam
     napData.bundleName = bundleName;
     if (napStatus == ACTIVE_EVENT) {
         RemoveMmiSubscribedEventData(napData);
-        MMI_HILOGD("Remove active event from napMap, pid = %{public}d, uid = %{public}d, bundleName = %{public}s",
+        MMI_HILOGD("Remove active event from napMap, pid:%{public}d, uid:%{public}d, bundleName:%{public}s",
             pid, uid, bundleName.c_str());
     }
     if (napStatus == NAP_EVENT) {
         AddMmiSubscribedEventData(napData, napStatus);
-        MMI_HILOGD("Add nap process to napMap, pid = %{public}d, uid = %{public}d, bundleName = %{public}s",
+        MMI_HILOGD("Add nap process to napMap, pid:%{public}d, uid:%{public}d, bundleName:%{public}s",
             pid, uid, bundleName.c_str());
     }
     return RET_OK;

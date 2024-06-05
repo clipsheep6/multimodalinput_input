@@ -76,7 +76,7 @@ std::optional<int32_t> GetNamedPropertyInt32(const napi_env &env, const napi_val
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, name.c_str(), "number");
         return std::nullopt;
     }
-    int32_t ret;
+    int32_t ret = 0;
     if (napi_get_value_int32(env, napiValue, &ret) != napi_ok) {
         MMI_HILOGE("Call napi_get_value_int32 failed");
         return std::nullopt;
@@ -337,8 +337,13 @@ void EmitAsyncCallbackWork(KeyEventMonitorInfo *reportEvent)
         MMI_HILOGE("%{public}s failed", std::string(REFERENCE_REF).c_str());
         return;
     }
+    dataWorker->keyOption = reportEvent->keyOption;
     auto *work = new (std::nothrow) uv_work_t;
-    CHKPV(work);
+    if (work == nullptr) {
+        MMI_HILOGE("work is nullptr");
+        delete dataWorker;
+        return;
+    }
     work->data = static_cast<void *>(dataWorker);
     int32_t ret = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, UvQueueWorkAsyncCallback,
                                          uv_qos_user_initiated);

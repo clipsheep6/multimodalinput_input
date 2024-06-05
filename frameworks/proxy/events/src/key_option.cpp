@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t PRE_KEYS_MAX_SIZE = 4;
+constexpr int32_t PRE_KEYS_MAX_SIZE { 4 };
 }
 std::set<int32_t> KeyOption::GetPreKeys() const
 {
@@ -76,7 +76,7 @@ void KeyOption::SetFinalKeyUpDelay(int32_t delay)
 
 bool KeyOption::ReadFromParcel(Parcel &in)
 {
-    int32_t preKeysSize;
+    int32_t preKeysSize = 0;
     READINT32(in, preKeysSize);
     if (preKeysSize < 0) {
         return false;
@@ -87,7 +87,7 @@ bool KeyOption::ReadFromParcel(Parcel &in)
         return false;
     }
     for (auto i = 0; i < preKeysSize; ++i) {
-        int32_t keyValue;
+        int32_t keyValue = 0;
         READINT32(in, keyValue);
         preKeys_.insert(keyValue);
     }

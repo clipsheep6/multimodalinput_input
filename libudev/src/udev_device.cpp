@@ -26,9 +26,10 @@
 #include <unordered_map>
 #include <vector>
 
+#include <unistd.h>
+
 #include <libudev.h>
 #include <linux/input.h>
-#include <unistd.h>
 
 #include "mmi_log.h"
 
@@ -90,12 +91,14 @@ std::optional<std::string> GetLinkValue(const std::string &slink, const std::str
     char target[UTIL_PATH_SIZE];
     ssize_t len = readlink(path.c_str(), target, sizeof(target));
     if (len <= 0 || len == static_cast<ssize_t>(sizeof(target))) {
+        MMI_HILOGE("Failed to read link");
         return std::nullopt;
     }
 
     std::string_view result{ target, len };
     auto pos = result.rfind('/');
     if (pos == std::string_view::npos) {
+        MMI_HILOGE("Failed to get link value");
         return std::nullopt;
     }
     return std::string{ result.substr(pos + 1) };
@@ -143,7 +146,6 @@ public:
 
     static udev_device *NewFromSyspath(const std::string &syspathParam)
     {
-        CALL_DEBUG_ENTER;
         // path starts in sys
         if (!StartsWith(syspathParam, "/sys/") || syspathParam.back() == '/') {
             errno = EINVAL;
@@ -171,7 +173,6 @@ public:
 
     static udev_device *NewFromDevnum(char type, dev_t devnum)
     {
-        CALL_DEBUG_ENTER;
         const char *typeStr = nullptr;
 
         if (type == 'b') {
@@ -179,6 +180,7 @@ public:
         } else if (type == 'c') {
             typeStr = "char";
         } else {
+            MMI_HILOGE("Param invalid");
             errno = EINVAL;
             return nullptr;
         }
@@ -234,7 +236,6 @@ public:
 
     udev_device *GetParentWithSubsystem(const std::string &subsystem)
     {
-        CALL_DEBUG_ENTER;
         udev_device *parent = GetParent();
         while (parent != nullptr) {
             auto parentSubsystem = parent->GetSubsystem();
@@ -278,7 +279,6 @@ private:
 
     static udev_device *NewFromChild(udev_device *child)
     {
-        CALL_DEBUG_ENTER;
         std::string_view path = child->GetSyspath();
 
         while (true) {
@@ -296,7 +296,6 @@ private:
 
     void SetSyspath(std::string newSyspath)
     {
-        CALL_DEBUG_ENTER;
         syspath = std::move(newSyspath);
 
         AddProperty("DEVPATH", syspath.substr(0, "/sys"sv.size()));
@@ -331,17 +330,13 @@ private:
 
     void ReadUeventFile()
     {
-        CALL_DEBUG_ENTER;
         if (ueventLoaded) {
             return;
         }
 
         auto filename = syspath + "/uevent";
         char realPath[PATH_MAX] = {};
-        if (realpath(filename.c_str(), realPath) == nullptr) {
-            MMI_HILOGE("The realpath return nullptr");
-            return;
-        }
+        CHKPV(realpath(filename.c_str(), realPath));
         std::ifstream f(realPath, std::ios_base::in);
         if (!f.is_open()) {
             MMI_HILOGE("ReadUeventFile(): path: %{public}s, error: %{public}s", realPath, std::strerror(errno));
@@ -551,7 +546,6 @@ private:
 
     void CheckInputProperties()
     {
-        CALL_DEBUG_ENTER;
         BitVector ev{ GetProperty("EV") };
         BitVector abs{ GetProperty("ABS") };
         BitVector key{ GetProperty("KEY") };
@@ -584,7 +578,6 @@ private:
 
     std::optional<std::string> GetSubsystem()
     {
-        CALL_DEBUG_ENTER;
         if (!subsystem_.has_value()) {
             auto res = GetLinkValue("subsystem", syspath);
             // read "subsystem" link
@@ -630,27 +623,21 @@ udev *udev_unref([[maybe_unused]] udev *udev)
 
 udev_device *udev_device_ref(udev_device *device)
 {
-    if (device == nullptr) {
-        return nullptr;
-    }
+    CHKPP(device);
     device->Ref();
     return device;
 }
 
 udev_device *udev_device_unref(udev_device *device)
 {
-    if (device == nullptr) {
-        return nullptr;
-    }
+    CHKPP(device);
     device->Unref();
     return nullptr;
 }
 
 udev *udev_device_get_udev(udev_device *device)
 {
-    if (device == nullptr) {
-        return nullptr;
-    }
+    CHKPP(device);
     return udev_new();
 }
 
@@ -684,41 +671,31 @@ udev_device *udev_device_get_parent(udev_device *device)
 udev_device *udev_device_get_parent_with_subsystem_devtype(udev_device *device, const char *subsystem,
     const char *devtype)
 {
-    if (device == nullptr) {
-        return nullptr;
-    }
+    CHKPP(device);
     if (subsystem == nullptr) {
         errno = EINVAL;
         return nullptr;
     }
     // Searching with specific devtype is not supported, since not used by libinput
-    if (devtype != nullptr) {
-        return nullptr;
-    }
+    CHKPP(devtype);
     return device->GetParentWithSubsystem(subsystem);
 }
 
 const char *udev_device_get_syspath(udev_device *device)
 {
-    if (device == nullptr) {
-        return nullptr;
-    }
+    CHKPP(device);
     return device->GetSyspath().c_str();
 }
 
 const char *udev_device_get_sysname(udev_device *device)
 {
-    if (device == nullptr) {
-        return nullptr;
-    }
+    CHKPP(device);
     return device->GetSysname().c_str();
 }
 
 const char *udev_device_get_devnode(udev_device *device)
 {
-    if (device == nullptr) {
-        return nullptr;
-    }
+    CHKPP(device);
     return device->GetDevnode().c_str();
 }
 
@@ -729,9 +706,8 @@ int udev_device_get_is_initialized(udev_device *device)
 
 const char *udev_device_get_property_value(udev_device *device, const char *key)
 {
-    if (device == nullptr || key == nullptr) {
-        return nullptr;
-    }
+    CHKPP(device);
+    CHKPP(key);
     std::string skey{ key };
     if (!device->HasProperty(key)) {
         return nullptr;

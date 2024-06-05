@@ -28,16 +28,18 @@
 namespace OHOS {
 namespace MMI {
 struct PointerInfo {
-    int32_t x { 0 };
-    int32_t y { 0 };
+    float x { 0.0F };
+    float y { 0.0F };
 };
 
 class KnuckleDrawingManager {
 public:
     void KnuckleDrawHandler(std::shared_ptr<PointerEvent> touchEvent);
     void UpdateDisplayInfo(const DisplayInfo& displayInfo);
+    void GetOriginalTouchScreenCoordinates(Direction direction, int32_t width, int32_t height,
+        int32_t &physicalX, int32_t &physicalY);
     KnuckleDrawingManager();
-    ~KnuckleDrawingManager();
+    ~KnuckleDrawingManager() = default;
 private:
     bool IsValidAction(int32_t action);
     void CreateTouchWindow(int32_t displayId);
@@ -46,16 +48,23 @@ private:
     int32_t DrawGraphic(std::shared_ptr<PointerEvent> touchEvent);
     int32_t GetPointerPos(std::shared_ptr<PointerEvent> touchEvent);
     bool IsSingleKnuckle(std::shared_ptr<PointerEvent> touchEvent);
+    bool IsSingleKnuckleDoubleClick(std::shared_ptr<PointerEvent> touchEvent);
 
 private:
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode_ { nullptr };
-    std::shared_ptr<Rosen::RSCanvasDrawingNode> canvasNode_ { nullptr };
+    std::shared_ptr<Rosen::RSCanvasNode> canvasNode_ { nullptr };
     std::vector<PointerInfo> pointerInfos_;
     Rosen::Drawing::Paint paint_;
     Rosen::Drawing::Path path_;
     DisplayInfo displayInfo_ {};
     uint64_t screenId_ { 0 };
     bool isActionUp_ { false };
+    PointerInfo lastDownPointer_ {};
+    int64_t lastUpTime_ { 0 };
+    bool isRotate_ { false };
+    int32_t nodeWidth_ { 0 };
+    int32_t nodeHeight_ { 0 };
+    int64_t firstDownTime_ { 0 };
 };
 } // namespace MMI
 } // namespace OHOS

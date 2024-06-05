@@ -37,31 +37,34 @@ namespace MMI {
 namespace {
 const std::string IMAGE_POINTER_PENTAGRAM_PATH = "/system/etc/multimodalinput/mouse_icon/";
 const std::string PENT_ICON_PATH = IMAGE_POINTER_PENTAGRAM_PATH + "Default.svg";
-constexpr int32_t DENSITY_BASELINE = 160;
-constexpr int32_t INDEPENDENT_INNER_PIXELS = 20;
-constexpr int32_t INDEPENDENT_OUTER_PIXELS = 21;
-constexpr int32_t INDEPENDENT_WIDTH_PIXELS = 2;
-constexpr int32_t CALCULATE_MIDDLE = 2;
-constexpr int32_t DEFAULT_VALUE = -1;
-constexpr int32_t MAX_POINTER_COLOR = 0x00ffff;
-constexpr int32_t TIME_DIMENSION = 1000;
-constexpr int32_t PATH_COLOR = 0xFFCCCCCC;
-constexpr int32_t MIN_POINT_SIZE = 1;
-constexpr float PAINT_STROKE_WIDTH = 10.0f;
-constexpr float DOUBLE = 2.0f;
-constexpr int32_t POINT_TOTAL_SIZE = 5;
-constexpr int32_t POINT_SYSTEM_SIZE = 500;
-constexpr int32_t MAX_DIVERGENCE_NUM = 10;
-constexpr int32_t DEFAULT_POINTER_SIZE = 1;
-constexpr int32_t DESIRED_SIZE = 80;
+constexpr int32_t DENSITY_BASELINE { 160 };
+constexpr int32_t INDEPENDENT_INNER_PIXELS { 20 };
+constexpr int32_t INDEPENDENT_OUTER_PIXELS { 21 };
+constexpr int32_t INDEPENDENT_WIDTH_PIXELS { 2 };
+constexpr int32_t CALCULATE_MIDDLE { 2 };
+constexpr int32_t DEFAULT_VALUE { -1 };
+constexpr int32_t MAX_POINTER_COLOR { 0x00ffff };
+constexpr int32_t TIME_DIMENSION { 1000 };
+constexpr int32_t PATH_COLOR { 0xFFCCCCCC };
+constexpr int32_t MIN_POINT_SIZE { 1 };
+constexpr float PAINT_STROKE_WIDTH { 10.0f };
+constexpr float DOUBLE { 2.0f };
+constexpr int32_t POINT_TOTAL_SIZE { 5 };
+constexpr int32_t POINT_SYSTEM_SIZE { 200 };
+constexpr int32_t MAX_DIVERGENCE_NUM { 10 };
+constexpr int32_t DEFAULT_POINTER_SIZE { 1 };
+constexpr int32_t DESIRED_SIZE { 80 };
+constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_SLOW { 450000 };
+constexpr int64_t WAIT_DOUBLE_CLICK_INTERVAL_TIME { 100000 };
+constexpr float DOUBLE_CLICK_DISTANCE_LONG_CONFIG { 96.0f };
+constexpr float VPR_CONFIG { 3.25f };
+constexpr int32_t POW_SQUARE { 2 };
 } // namespace
 
 KnuckleDynamicDrawingManager::KnuckleDynamicDrawingManager()
 {
     InitPointerPathPaint();
 }
-
-KnuckleDynamicDrawingManager::~KnuckleDynamicDrawingManager() {}
 
 std::shared_ptr<OHOS::Media::PixelMap> KnuckleDynamicDrawingManager::DecodeImageToPixelMap(const std::string &imagePath)
 {
@@ -81,10 +84,7 @@ std::shared_ptr<OHOS::Media::PixelMap> KnuckleDynamicDrawingManager::DecodeImage
     decodeOpts.SVGOpts.strokeColor = {.isValidColor = true, .color = MAX_POINTER_COLOR};
 
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap = imageSource->CreatePixelMap(decodeOpts, ret);
-    if (pixelMap == nullptr) {
-        MMI_HILOGE("The pixelMap is nullptr");
-    }
-    pixelMap_ = pixelMap;
+    CHKPL(pixelMap);
     return pixelMap;
 }
 
@@ -148,14 +148,17 @@ void KnuckleDynamicDrawingManager::InitPointerPathPaint()
     CALL_DEBUG_ENTER;
     for (int32_t i = 0; i < POINT_TOTAL_SIZE; i++) {
         Rosen::Drawing::Point point = Rosen::Drawing::Point();
-        traceControlPoints_.push_back(point);
+        traceControlPoints_.emplace_back(point);
     }
     pixelMap_ = DecodeImageToPixelMap(PENT_ICON_PATH);
     CHKPV(pixelMap_);
     auto bitmap = PixelMapToBitmap(pixelMap_);
     CHKPV(bitmap);
     if (glowTraceSystem_ == nullptr) {
-        glowTraceSystem_ = std::make_shared<KnuckleGlowTraceSystem>(POINT_SYSTEM_SIZE, *bitmap, MAX_DIVERGENCE_NUM);
+        glowTraceSystem_ = std::make_shared<KnuckleGlowTraceSystem>(POINT_SYSTEM_SIZE, bitmap, MAX_DIVERGENCE_NUM);
+    }
+    if (knuckleDrawMgr_ == nullptr) {
+        knuckleDrawMgr_ = std::make_shared<KnuckleDrawingManager>();
     }
     pointerPathPaint_.setStyle(SkPaint::Style::kStroke_Style);
     pointerPathPaint_.setStrokeJoin(SkPaint::Join::kRound_Join);
@@ -174,11 +177,11 @@ void KnuckleDynamicDrawingManager::KnuckleDynamicDrawHandler(std::shared_ptr<Poi
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
+    auto displayId = pointerEvent->GetTargetDisplayId();
+    CreateTouchWindow(displayId);
     if (!IsSingleKnuckle(pointerEvent)) {
         return;
     }
-    auto displayId = pointerEvent->GetTargetDisplayId();
-    CreateTouchWindow(displayId);
     if (CheckPointerAction(pointerEvent)) {
         StartTouchDraw(pointerEvent);
     }
@@ -192,16 +195,31 @@ bool KnuckleDynamicDrawingManager::IsSingleKnuckle(std::shared_ptr<PointerEvent>
     PointerEvent::PointerItem item;
     touchEvent->GetPointerItem(id, item);
     auto itemToolType = item.GetToolType();
-    MMI_HILOGI("item.GetToolType(): %{public}d", itemToolType);
     if (itemToolType != PointerEvent::TOOL_TYPE_KNUCKLE ||
-        touchEvent->GetPointerIds().size() != 1) {
+        touchEvent->GetPointerIds().size() != 1 || isRotate_) {
         if (canvasNode_ != nullptr) {
             isStop_ = true;
+            isDrawing_ = true;
+            glowTraceSystem_->Clear();
+#ifndef USE_ROSEN_DRAWING
+            auto canvas = static_cast<Rosen::RSRecordingCanvas *>(canvasNode_->
+                BeginRecording(displayInfo_.width, displayInfo_.height));
+#else
+            auto canvas = static_cast<Rosen::Drawing::RecordingCanvas *>(canvasNode_->
+                BeginRecording(displayInfo_.width, displayInfo_.height));
+#endif // USE_ROSEN_DRAWING
+            canvas->Clear();
             traceControlPoints_.clear();
             pointerPath_.Reset();
-            canvasNode_->ResetSurface();
+            auto canvasNode = static_cast<Rosen::RSCanvasDrawingNode*>(canvasNode_.get());
+            canvasNode->ResetSurface(nodeWidth_, nodeHeight_);
+            canvasNode_->FinishRecording();
             Rosen::RSTransaction::FlushImplicitTransaction();
+        } else {
+            isRotate_ = false;
+            return true;
         }
+        isRotate_ = false;
         return false;
     }
     return true;
@@ -248,23 +266,34 @@ void KnuckleDynamicDrawingManager::StartTouchDraw(std::shared_ptr<PointerEvent> 
         return;
     }
     Rosen::RSTransaction::FlushImplicitTransaction();
-    MMI_HILOGI("Draw graphic success");
 }
 
 void KnuckleDynamicDrawingManager::ProcessUpAndCancelEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(glowTraceSystem_);
+    CHKPV(knuckleDrawMgr_);
+    CHKPV(pointerEvent);
+    lastUpTime_ = pointerEvent->GetActionTime();
     if (pointerPath_.IsValid()) {
         auto id = pointerEvent->GetPointerId();
         PointerEvent::PointerItem pointerItem;
         pointerEvent->GetPointerItem(id, pointerItem);
-        glowTraceSystem_->ResetDivergentPoints(pointerItem.GetDisplayX(), pointerItem.GetDisplayY());
+        int32_t physicalX = pointerItem.GetDisplayX();
+        int32_t physicalY = pointerItem.GetDisplayY();
+        if (displayInfo_.displayDirection == DIRECTION0) {
+            knuckleDrawMgr_->GetOriginalTouchScreenCoordinates(displayInfo_.direction, displayInfo_.width,
+                displayInfo_.height, physicalX, physicalY);
+        }
+        glowTraceSystem_->ResetDivergentPoints(physicalX, physicalY);
     }
 
+    traceControlPoints_.clear();
     pointerPath_.Reset();
     glowTraceSystem_->Clear();
     CHKPV(canvasNode_);
-    canvasNode_->ResetSurface();
+    auto canvasNode = static_cast<Rosen::RSCanvasDrawingNode*>(canvasNode_.get());
+    canvasNode->ResetSurface(nodeWidth_, nodeHeight_);
     Rosen::RSTransaction::FlushImplicitTransaction();
     isDrawing_ = true;
 }
@@ -273,21 +302,42 @@ void KnuckleDynamicDrawingManager::ProcessDownEvent(std::shared_ptr<PointerEvent
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
+    CHKPV(knuckleDrawMgr_);
+    int64_t intervalTime = pointerEvent->GetActionTime() - lastUpTime_;
+    firstDownTime_ = pointerEvent->GetActionTime();
+    bool isTimeIntervalReady = intervalTime > 0 && intervalTime <= DOUBLE_CLICK_INTERVAL_TIME_SLOW;
+
     UpdateTrackColors();
     lastUpdateTimeMillis_ = pointerEvent->GetActionTime();
     pointCounter_ = 0;
     auto id = pointerEvent->GetPointerId();
     PointerEvent::PointerItem pointerItem;
     pointerEvent->GetPointerItem(id, pointerItem);
-    traceControlPoints_[pointCounter_].Set(pointerItem.GetDisplayX(), pointerItem.GetDisplayY());
-    glowTraceSystem_->ResetDivergentPoints(pointerItem.GetDisplayX(), pointerItem.GetDisplayY());
-    isDrawing_ = false;
+    int32_t physicalX = pointerItem.GetDisplayX();
+    int32_t physicalY = pointerItem.GetDisplayY();
+    float downToPrevDownDistance = static_cast<float>(sqrt(pow(lastDownX_ - physicalX, POW_SQUARE) +
+        pow(lastDownY_ - physicalY, POW_SQUARE)));
+    bool isDistanceReady = downToPrevDownDistance < DOUBLE_CLICK_DISTANCE_LONG_CONFIG * POW_SQUARE;
+    if (isTimeIntervalReady && isDistanceReady) {
+        MMI_HILOGE("Take a screenshot");
+        isDrawing_ = true;
+        isStop_ = true;
+        return;
+    }
+    lastDownX_ = physicalX;
+    lastDownY_ = physicalY;
+    if (displayInfo_.displayDirection == DIRECTION0) {
+        knuckleDrawMgr_->GetOriginalTouchScreenCoordinates(displayInfo_.direction, displayInfo_.width,
+            displayInfo_.height, physicalX, physicalY);
+    }
+    traceControlPoints_[pointCounter_].Set(physicalX, physicalY);
     isStop_ = false;
 }
 
 void KnuckleDynamicDrawingManager::ProcessMoveEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(knuckleDrawMgr_);
     pointCounter_++;
     if (pointCounter_ >= POINT_TOTAL_SIZE) {
         MMI_HILOGE("traceControlPoints_ index out of size");
@@ -296,10 +346,15 @@ void KnuckleDynamicDrawingManager::ProcessMoveEvent(std::shared_ptr<PointerEvent
     auto id = pointerEvent->GetPointerId();
     PointerEvent::PointerItem pointerItem;
     pointerEvent->GetPointerItem(id, pointerItem);
-    traceControlPoints_[pointCounter_].Set(pointerItem.GetDisplayX(), pointerItem.GetDisplayY());
-
+    int32_t physicalX = pointerItem.GetDisplayX();
+    int32_t physicalY = pointerItem.GetDisplayY();
+    if (displayInfo_.displayDirection == DIRECTION0) {
+        knuckleDrawMgr_->GetOriginalTouchScreenCoordinates(displayInfo_.direction, displayInfo_.width,
+            displayInfo_.height, physicalX, physicalY);
+    }
+    traceControlPoints_[pointCounter_].Set(physicalX, physicalY);
     int pointIndex4 = 4;
-
+    bool draw = (pointerEvent->GetActionTime() - firstDownTime_) > WAIT_DOUBLE_CLICK_INTERVAL_TIME;
     if (pointCounter_ == pointIndex4) {
         int pointIndex0 = 0;
         int pointIndex1 = 1;
@@ -309,15 +364,11 @@ void KnuckleDynamicDrawingManager::ProcessMoveEvent(std::shared_ptr<PointerEvent
         traceControlPoints_[pointIndex3].Set(
             (traceControlPoints_[pointIndex2].GetX() + traceControlPoints_[pointIndex4].GetX()) / DOUBLE,
             (traceControlPoints_[pointIndex2].GetY() + traceControlPoints_[pointIndex4].GetY()) / DOUBLE);
-
         // Add a cubic Bezier from pt[0] to pt[3] with control pointspt[1] and pt[2]
         pointerPath_.MoveTo (traceControlPoints_[pointIndex0].GetX(), traceControlPoints_[pointIndex0].GetY());
-        pointerPath_.CubicTo(traceControlPoints_[pointIndex1].GetX(),
-            traceControlPoints_[pointIndex1].GetY(),
-            traceControlPoints_[pointIndex2].GetX(),
-            traceControlPoints_[pointIndex2].GetY(),
-            traceControlPoints_[pointIndex3].GetX(),
-            traceControlPoints_[pointIndex3].GetY());
+        pointerPath_.CubicTo(traceControlPoints_[pointIndex1].GetX(), traceControlPoints_[pointIndex1].GetY(),
+            traceControlPoints_[pointIndex2].GetX(), traceControlPoints_[pointIndex2].GetY(),
+            traceControlPoints_[pointIndex3].GetX(), traceControlPoints_[pointIndex3].GetY());
         traceControlPoints_[pointIndex0].Set(traceControlPoints_[pointIndex3].GetX(),
             traceControlPoints_[pointIndex3].GetY());
         traceControlPoints_[pointIndex1].Set (traceControlPoints_[pointIndex4].GetX(),
@@ -325,17 +376,25 @@ void KnuckleDynamicDrawingManager::ProcessMoveEvent(std::shared_ptr<PointerEvent
         pointCounter_ = 1;
         // Add glowing particles onto the last path segment that was drawn
         int64_t now = pointerEvent->GetActionTime();
-        double len = pointerPath_.GetLength(false);
-        glowTraceSystem_->AddGlowPoints(pointerPath_, (now - lastUpdateTimeMillis_) / TIME_DIMENSION);
+        if (draw) {
+            glowTraceSystem_->AddGlowPoints(pointerPath_, (now - lastUpdateTimeMillis_) / TIME_DIMENSION);
+        }
         pointerPath_.Reset();
         lastUpdateTimeMillis_ = now;
     }
-    glowTraceSystem_->ResetDivergentPoints(pointerItem.GetDisplayX(), pointerItem.GetDisplayY());
+    if (draw) {
+        glowTraceSystem_->ResetDivergentPoints(physicalX, physicalY);
+        isDrawing_ = false;
+    }
 }
 
 void KnuckleDynamicDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
 {
     CALL_DEBUG_ENTER;
+    if (displayInfo_.direction != displayInfo.direction) {
+        MMI_HILOGE("displayInfo direction change");
+        isRotate_ = true;
+    }
     displayInfo_ = displayInfo;
 }
 
@@ -350,17 +409,15 @@ int32_t KnuckleDynamicDrawingManager::DrawGraphic(std::shared_ptr<PointerEvent> 
 #else
     auto canvas = static_cast<Rosen::Drawing::RecordingCanvas *>(canvasNode_->
         BeginRecording(displayInfo_.width, displayInfo_.height));
-#endif
+#endif // USE_ROSEN_DRAWING
 
     CHKPR(canvas, RET_ERR);
     glowTraceSystem_->Update();
-    if (pointerPath_.IsValid()) {
-        return RET_ERR;
-    }
     if (!isDrawing_) {
         glowTraceSystem_->Draw(canvas);
     }
-    canvasNode_->ResetSurface();
+    auto canvasNode = static_cast<Rosen::RSCanvasDrawingNode*>(canvasNode_.get());
+    canvasNode->ResetSurface(nodeWidth_, nodeHeight_);
     canvasNode_->FinishRecording();
     return RET_OK;
 }
@@ -369,7 +426,7 @@ void KnuckleDynamicDrawingManager::CreateTouchWindow(const int32_t displayId)
 {
     CALL_DEBUG_ENTER;
     if (surfaceNode_ != nullptr) {
-        MMI_HILOGD("surfaceNode is already.");
+        MMI_HILOGD("surfaceNode_ is already");
         return;
     }
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
@@ -386,7 +443,7 @@ void KnuckleDynamicDrawingManager::CreateTouchWindow(const int32_t displayId)
     surfaceNode_->SetBackgroundColor(SK_ColorTRANSPARENT);
 #else
     surfaceNode_->SetBackgroundColor(Rosen::Drawing::Color::COLOR_TRANSPARENT);
-#endif
+#endif // USE_ROSEN_DRAWING
 
     screenId_ = static_cast<uint64_t>(displayId);
     std::cout << "ScreenId: " << screenId_ << std::endl;
@@ -405,11 +462,13 @@ void KnuckleDynamicDrawingManager::CreateCanvasNode()
     CHKPV(canvasNode_);
     canvasNode_->SetBounds(0, 0, displayInfo_.width, displayInfo_.height);
     canvasNode_->SetFrame(0, 0, displayInfo_.width, displayInfo_.height);
+    nodeWidth_ = displayInfo_.width;
+    nodeHeight_ = displayInfo_.height;
 #ifndef USE_ROSEN_DRAWING
     canvasNode_->SetBackgroundColor(SK_ColorTRANSPARENT);
 #else
     canvasNode_->SetBackgroundColor(Rosen::Drawing::Color::COLOR_TRANSPARENT);
-#endif
+#endif // USE_ROSEN_DRAWING
     canvasNode_->SetCornerRadius(1);
     canvasNode_->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
     canvasNode_->SetRotation(0);

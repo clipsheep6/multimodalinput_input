@@ -38,7 +38,7 @@ bool MMISceneBoardJudgement::IsResampleEnabled()
     static bool isResampleEnabled = false;
     static bool resampleInited = false;
     if (!resampleInited) {
-        MMI_HILOGD("resample algorithm switch is not inited!");
+        MMI_HILOGD("Resample algorithm switch is not inited");
         isResampleEnabled =
         (std::atoi((OHOS::system::GetParameter("persist.sys.input.resampleEnabled", "0")).c_str()) != 0);
         MMI_HILOGD("isResampleEnabled is set to %{public}d", isResampleEnabled);
@@ -57,7 +57,12 @@ std::ifstream& MMISceneBoardJudgement::SafeGetLine(std::ifstream& configFile, st
 
 void MMISceneBoardJudgement::InitWithConfigFile(const char* filePath, bool& enabled)
 {
-    std::ifstream configFile(filePath);
+    char checkPath[PATH_MAX] = { 0 };
+    if (realpath(filePath, checkPath) == nullptr) {
+        MMI_HILOGE("canonicalize failed. path is %{public}s", filePath);
+        return;
+    }
+    std::ifstream configFile(checkPath);
     std::string line;
     if (configFile.is_open() && SafeGetLine(configFile, line) && line == "ENABLED") {
         enabled = true;

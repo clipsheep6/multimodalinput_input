@@ -15,7 +15,9 @@
 
 #include <gtest/gtest.h>
 
-#include "input_windows_manager.h"
+#include "ui/rs_canvas_drawing_node.h"
+
+#include "i_input_windows_manager.h"
 #include "mmi_log.h"
 #include "knuckle_glow_trace_system.h"
 
@@ -49,10 +51,10 @@ HWTEST_F(KnuckleGlowTraceSystemTest, KnuckleGlowTraceSystemTest_Init_001, TestSi
     CALL_DEBUG_ENTER;
     int32_t pointSize = 0;
     int32_t maxDivergenceNum = 0;
-    OHOS::Rosen::Drawing::Bitmap bitmap;
+    std::shared_ptr<Rosen::Drawing::Bitmap> bitmap = std::make_shared<Rosen::Drawing::Bitmap>();
     OHOS::Rosen::Drawing::BitmapFormat format { OHOS::Rosen::Drawing::COLORTYPE_RGBA_8888,
         OHOS::Rosen::Drawing::ALPHATYPE_OPAQUE };
-    bitmap.Build(IMAGE_WIDTH, IMAGE_HEIGHT, format);
+    bitmap->Build(IMAGE_WIDTH, IMAGE_HEIGHT, format);
     EXPECT_NO_FATAL_FAILURE(KnuckleGlowTraceSystem(pointSize, bitmap, maxDivergenceNum));
 }
 
@@ -67,10 +69,10 @@ HWTEST_F(KnuckleGlowTraceSystemTest, KnuckleGlowTraceSystemTest_Update_001, Test
     CALL_DEBUG_ENTER;
     int32_t pointSize = 0;
     int32_t maxDivergenceNum = 0;
-    OHOS::Rosen::Drawing::Bitmap bitmap;
+    std::shared_ptr<Rosen::Drawing::Bitmap> bitmap = std::make_shared<Rosen::Drawing::Bitmap>();
     OHOS::Rosen::Drawing::BitmapFormat format { OHOS::Rosen::Drawing::COLORTYPE_RGBA_8888,
         OHOS::Rosen::Drawing::ALPHATYPE_OPAQUE };
-    bitmap.Build(IMAGE_WIDTH, IMAGE_HEIGHT, format);
+    bitmap->Build(IMAGE_WIDTH, IMAGE_HEIGHT, format);
     auto knuckleGlowTraceSystem = KnuckleGlowTraceSystem(pointSize, bitmap, maxDivergenceNum);
     EXPECT_NO_FATAL_FAILURE(knuckleGlowTraceSystem.Update());
 }
@@ -86,10 +88,10 @@ HWTEST_F(KnuckleGlowTraceSystemTest, KnuckleGlowTraceSystemTest_Draw_001, TestSi
     CALL_DEBUG_ENTER;
     int32_t pointSize = 0;
     int32_t maxDivergenceNum = 0;
-    OHOS::Rosen::Drawing::Bitmap bitmap;
+    std::shared_ptr<Rosen::Drawing::Bitmap> bitmap = std::make_shared<Rosen::Drawing::Bitmap>();
     OHOS::Rosen::Drawing::BitmapFormat format { OHOS::Rosen::Drawing::COLORTYPE_RGBA_8888,
         OHOS::Rosen::Drawing::ALPHATYPE_OPAQUE };
-    bitmap.Build(IMAGE_WIDTH, IMAGE_HEIGHT, format);
+    bitmap->Build(IMAGE_WIDTH, IMAGE_HEIGHT, format);
     auto knuckleGlowTraceSystem = KnuckleGlowTraceSystem(pointSize, bitmap, maxDivergenceNum);
     std::shared_ptr<Rosen::RSCanvasDrawingNode> canvasNode = Rosen::RSCanvasDrawingNode::Create();
     auto canvas = static_cast<Rosen::Drawing::RecordingCanvas *>(canvasNode->
@@ -108,10 +110,10 @@ HWTEST_F(KnuckleGlowTraceSystemTest, KnuckleGlowTraceSystemTest_ResetDivergentPo
     CALL_DEBUG_ENTER;
     int32_t pointSize = 0;
     int32_t maxDivergenceNum = 0;
-    OHOS::Rosen::Drawing::Bitmap bitmap;
+    std::shared_ptr<Rosen::Drawing::Bitmap> bitmap = std::make_shared<Rosen::Drawing::Bitmap>();
     OHOS::Rosen::Drawing::BitmapFormat format { OHOS::Rosen::Drawing::COLORTYPE_RGBA_8888,
         OHOS::Rosen::Drawing::ALPHATYPE_OPAQUE };
-    bitmap.Build(IMAGE_WIDTH, IMAGE_HEIGHT, format);
+    bitmap->Build(IMAGE_WIDTH, IMAGE_HEIGHT, format);
     auto knuckleGlowTraceSystem = KnuckleGlowTraceSystem(pointSize, bitmap, maxDivergenceNum);
     double pointX = 0.1;
     double pointY = 0.1;
@@ -129,10 +131,10 @@ HWTEST_F(KnuckleGlowTraceSystemTest, KnuckleGlowTraceSystemTest_AddGlowPoints_00
     CALL_DEBUG_ENTER;
     int32_t pointSize = 0;
     int32_t maxDivergenceNum = 0;
-    OHOS::Rosen::Drawing::Bitmap bitmap;
+    std::shared_ptr<Rosen::Drawing::Bitmap> bitmap = std::make_shared<Rosen::Drawing::Bitmap>();
     OHOS::Rosen::Drawing::BitmapFormat format { OHOS::Rosen::Drawing::COLORTYPE_RGBA_8888,
         OHOS::Rosen::Drawing::ALPHATYPE_OPAQUE };
-    bitmap.Build(IMAGE_WIDTH, IMAGE_HEIGHT, format);
+    bitmap->Build(IMAGE_WIDTH, IMAGE_HEIGHT, format);
     auto knuckleGlowTraceSystem = KnuckleGlowTraceSystem(pointSize, bitmap, maxDivergenceNum);
     Rosen::Drawing::Path path;
     int64_t timeInterval = 100;

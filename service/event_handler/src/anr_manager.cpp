@@ -19,7 +19,7 @@
 
 #include "dfx_hisysevent.h"
 #include "input_event_handler.h"
-#include "input_windows_manager.h"
+#include "i_input_windows_manager.h"
 #include "mmi_log.h"
 #include "napi_constants.h"
 #include "proto.h"
@@ -33,9 +33,9 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-const std::string FOUNDATION = "foundation";
-constexpr int32_t MAX_ANR_TIMER_COUNT = 50;
-constexpr int32_t TIME_CONVERT_RATIO = 1000;
+const std::string FOUNDATION { "foundation" };
+constexpr int32_t MAX_TIMER_COUNT { 50 };
+constexpr int32_t TIME_CONVERT_RATIO { 1000 };
 } // namespace
 
 ANRManager::ANRManager() {}
@@ -54,10 +54,7 @@ int32_t ANRManager::MarkProcessed(int32_t pid, int32_t eventType, int32_t eventI
     CALL_DEBUG_ENTER;
     MMI_HILOGD("pid:%{public}d, eventType:%{public}d, eventId:%{public}d", pid, eventType, eventId);
     SessionPtr sess = udsServer_->GetSessionByPid(pid);
-    if (sess == nullptr) {
-        MMI_HILOGD("sess is nullptr");
-        return RET_ERR;
-    }
+    CHKPR(sess, RET_ERR);
     std::list<int32_t> timerIds = sess->DelEvents(eventType, eventId);
     for (int32_t item : timerIds) {
         if (item != -1) {
@@ -112,13 +109,13 @@ void ANRManager::AddTimer(int32_t type, int32_t id, int64_t currentTime, Session
         MMI_HILOGD("Not application event, skip. pid:%{public}d, anr type:%{public}d", sess->GetPid(), type);
         return;
     }
-    if (anrTimerCount_ >= MAX_ANR_TIMER_COUNT) {
-        MMI_HILOGD("Add anr timer failed, anrtimer count reached the maximum number:%{public}d", MAX_ANR_TIMER_COUNT);
+    if (anrTimerCount_ >= MAX_TIMER_COUNT) {
+        MMI_HILOGD("Add timer failed, timer count reached the maximum number:%{public}d", MAX_TIMER_COUNT);
         return;
     }
     int32_t timerId = TimerMgr->AddTimer(INPUT_UI_TIMEOUT_TIME / TIME_CONVERT_RATIO, 1, [this, id, type, sess]() {
         CHKPV(sess);
-        if (type == ANR_MONITOR || WinMgr->IsWindowVisible(sess->GetPid())) {
+        if (type == ANR_MONITOR || WIN_MGR->IsWindowVisible(sess->GetPid())) {
             sess->SetAnrStatus(type, true);
             DfxHisysevent::ApplicationBlockInput(sess);
             MMI_HILOGE("Application not responding. pid:%{public}d, anr type:%{public}d, eventId:%{public}d",

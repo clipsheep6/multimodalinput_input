@@ -30,10 +30,10 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr size_t EVENT_NAME_LEN = 64;
-constexpr size_t PRE_KEYS_SIZE = 4;
-constexpr size_t INPUT_PARAMETER_MIDDLE = 2;
-constexpr size_t INPUT_PARAMETER_MAX = 3;
+constexpr size_t EVENT_NAME_LEN { 64 };
+constexpr size_t PRE_KEYS_SIZE { 4 };
+constexpr size_t INPUT_PARAMETER_MIDDLE { 2 };
+constexpr size_t INPUT_PARAMETER_MAX { 3 };
 } // namespace
 
 static Callbacks callbacks = {};
@@ -357,7 +357,7 @@ static napi_value SetShieldStatus(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
     size_t argc = 2;
-    napi_value argv[2];
+    napi_value argv[2] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < INPUT_PARAMETER_MIDDLE) {
         MMI_HILOGE("At least two parameters is required");
@@ -399,9 +399,9 @@ static napi_value GetShieldStatus(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
     size_t argc = 1;
-    napi_value argv[1];
+    napi_value argv[1] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc == 0) {
+    if (argc < 1) {
         MMI_HILOGE("At least 1 parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "shieldMode", "number");
         return nullptr;

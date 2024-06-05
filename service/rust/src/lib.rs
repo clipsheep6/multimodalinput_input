@@ -14,7 +14,7 @@
  */
 
 //!
-use hilog_rust::{error, hilog, info, HiLogLabel, LogType};
+use hilog_rust::{error, hilog, info, debug, HiLogLabel, LogType};
 use std::ffi::{c_char, CString};
 use std::sync::Once;
 
@@ -40,20 +40,49 @@ struct CurveItemTouchpad {
     pub slopes: Vec<f64>,
     pub diff_nums: Vec<f64>,
 }
+struct AxisCurveItemTouchpad {
+    pub speeds: Vec<f64>,
+    pub slopes: Vec<f64>,
+    pub diff_nums: Vec<f64>,
+}
 struct AccelerateCurves {
     data: Vec<CurveItem>,
 }
-struct AccelerateCurvesTouchpad {
+struct AccelerateCurvesKLV {
     data: Vec<CurveItemTouchpad>,
+}
+struct AccelerateCurvesSoftHarden {
+    data: Vec<CurveItemTouchpad>,
+}
+struct AccelerateCurvesHardHarden {
+    data: Vec<CurveItemTouchpad>,
+}
+struct AxisAccelerateCurvesTouchpad {
+    data: Vec<AxisCurveItemTouchpad>,
 }
 impl AccelerateCurves {
     fn get_curve_by_speed(&self, speed: usize) -> &CurveItem {
         &self.data[speed - 1]
     }
 }
-impl AccelerateCurvesTouchpad {
-    fn get_curve_by_speed_touchpad(&self, speed: usize) -> &CurveItemTouchpad {
+impl AccelerateCurvesKLV {
+    fn get_curve_by_speed_klv(&self, speed: usize) -> &CurveItemTouchpad {
         &self.data[speed - 1]
+    }
+}
+impl AccelerateCurvesSoftHarden {
+    fn get_curve_by_speed_soft_harden(&self, speed: usize) -> &CurveItemTouchpad {
+        &self.data[speed - 1]
+    }
+}
+impl AccelerateCurvesHardHarden {
+    fn get_curve_by_speed_hard_harden(&self, speed: usize) -> &CurveItemTouchpad {
+        &self.data[speed - 1]
+    }
+}
+impl AxisAccelerateCurvesTouchpad {
+    fn get_axis_curve_by_speed_touchpad(&self, device_type: usize) -> &AxisCurveItemTouchpad {
+        &self.data[device_type - 1]
     }
 }
 impl AccelerateCurves {
@@ -126,13 +155,13 @@ impl AccelerateCurves {
     }
 }
 
-impl AccelerateCurvesTouchpad {
-    fn get_instance() -> &'static AccelerateCurvesTouchpad {
-        static mut GLOBAL_CURVES: Option<AccelerateCurvesTouchpad> = None;
+impl AccelerateCurvesKLV {
+    fn get_instance() -> &'static AccelerateCurvesKLV {
+        static mut GLOBAL_CURVES: Option<AccelerateCurvesKLV> = None;
         static ONCE: Once = Once::new();
 
         ONCE.call_once(|| unsafe {
-            GLOBAL_CURVES = Some(AccelerateCurvesTouchpad {
+            GLOBAL_CURVES = Some(AccelerateCurvesKLV {
                 data: vec![
                     CurveItemTouchpad {
                         speeds: vec![1.27, 12.73, 19.09, 81.46],
@@ -196,6 +225,171 @@ impl AccelerateCurvesTouchpad {
     }
 }
 
+impl AccelerateCurvesSoftHarden {
+    fn get_instance() -> &'static AccelerateCurvesSoftHarden {
+        static mut GLOBAL_CURVES: Option<AccelerateCurvesSoftHarden> = None;
+        static ONCE: Once = Once::new();
+
+        ONCE.call_once(|| unsafe {
+            GLOBAL_CURVES = Some(AccelerateCurvesSoftHarden {
+                data: vec![
+                    CurveItemTouchpad {
+                        speeds: vec![2.45, 24.51, 36.77, 156.87],
+                        slopes: vec![0.10, 0.18, 0.39, 0.75],
+                        diff_nums: vec![0.0, -0.19, -5.25, -18.52]
+                    },
+                    CurveItemTouchpad {
+                        speeds: vec![2.45, 24.51, 36.77, 156.87],
+                        slopes: vec![0.14, 0.24, 0.52, 1.00],
+                        diff_nums: vec![0.0, -0.25, -6.99, -24.69],
+                    },
+                    CurveItemTouchpad {
+                        speeds: vec![2.45, 24.51, 36.77, 156.87],
+                        slopes: vec![0.17, 0.30, 0.64, 1.25],
+                        diff_nums: vec![0.0, -0.32, -8.74, -30.86],
+                    },
+                    CurveItemTouchpad {
+                        speeds: vec![2.45, 24.51, 36.77, 156.87],
+                        slopes: vec![0.21, 0.36, 0.77, 1.50],
+                        diff_nums: vec![0.0, -0.38, -10.49, -37.03],
+                    },
+                    CurveItemTouchpad {
+                        speeds: vec![2.45, 24.51, 36.77, 156.87],
+                        slopes: vec![0.28, 0.48, 1.03, 1.99],
+                        diff_nums: vec![0.0, -0.51, -13.99, -49.38],
+                    },
+                    CurveItemTouchpad {
+                        speeds: vec![2.45, 24.51, 36.77, 156.87],
+                        slopes: vec![0.34, 0.60, 1.29, 2.49],
+                        diff_nums: vec![0.0, -0.63, -17.48, -61.72],
+                    },
+                    CurveItemTouchpad {
+                        speeds: vec![2.45, 24.51, 36.77, 156.87],
+                        slopes: vec![0.41, 0.72, 1.55, 2.99],
+                        diff_nums: vec![0.0, -0.76, -20.98, -74.06],
+                    },
+                    CurveItemTouchpad {
+                        speeds: vec![2.45, 24.51, 36.77, 156.87],
+                        slopes: vec![0.52, 0.90, 1.93, 3.74],
+                        diff_nums: vec![0.0, -0.95, -26.23, -92.58],
+                    },
+                    CurveItemTouchpad {
+                        speeds: vec![2.45, 24.51, 36.77, 156.87],
+                        slopes: vec![0.65, 1.14, 2.45, 4.74],
+                        diff_nums: vec![0.0, -0.86, -23.66, -83.51],
+                    },
+                    CurveItemTouchpad {
+                        speeds: vec![2.45, 24.51, 36.77, 156.87],
+                        slopes: vec![0.79, 1.38, 2.96, 5.73],
+                        diff_nums: vec![0.0, -1.45, -40.21, -141.96],
+                    },
+                    CurveItemTouchpad {
+                        speeds: vec![2.45, 24.51, 36.77, 156.87],
+                        slopes: vec![0.93, 1.62, 3.48, 6.73],
+                        diff_nums: vec![0.0, -1.71, -47.21, -166.64],
+                    },
+                ],
+            });
+        });
+        unsafe { GLOBAL_CURVES.as_ref().unwrap() }
+    }
+}
+
+impl AccelerateCurvesHardHarden {
+    fn get_instance() -> &'static AccelerateCurvesHardHarden {
+        static mut GLOBAL_CURVES: Option<AccelerateCurvesHardHarden> = None;
+        static ONCE: Once = Once::new();
+
+        ONCE.call_once(|| unsafe {
+            GLOBAL_CURVES = Some(AccelerateCurvesHardHarden {
+                data: vec![
+                    CurveItemTouchpad {
+                        speeds: vec![2.45, 24.51, 36.77, 156.87],
+                        slopes: vec![0.10, 0.17, 0.36, 0.69],
+                        diff_nums: vec![0.0, -0.18, -4.84, -17.09]
+                    },
+                    CurveItemTouchpad {
+                        speeds: vec![2.45, 24.51, 36.77, 156.87],
+                        slopes: vec![0.13, 0.22, 0.48, 0.92],
+                        diff_nums: vec![0.0, -0.23, -6.46, -22.79],
+                    },
+                    CurveItemTouchpad {
+                        speeds: vec![2.45, 24.51, 36.77, 156.87],
+                        slopes: vec![0.16, 0.28, 0.59, 1.15],
+                        diff_nums: vec![0.0, -0.29, -8.07, -28.49],
+                    },
+                    CurveItemTouchpad {
+                        speeds: vec![2.45, 24.51, 36.77, 156.87],
+                        slopes: vec![0.19, 0.33, 0.71, 1.38],
+                        diff_nums: vec![0.0, -0.35, -9.68, -34.18],
+                    },
+                    CurveItemTouchpad {
+                        speeds: vec![2.45, 24.51, 36.77, 156.87],
+                        slopes: vec![0.25, 0.44, 0.95, 1.84],
+                        diff_nums: vec![0.0, -0.47, -12.91, -45.58],
+                    },
+                    CurveItemTouchpad {
+                        speeds: vec![2.45, 24.51, 36.77, 156.87],
+                        slopes: vec![0.32, 0.56, 1.19, 2.30],
+                        diff_nums: vec![0.0, -0.58, -16.14, -56.97],
+                    },
+                    CurveItemTouchpad {
+                        speeds: vec![2.45, 24.51, 36.77, 156.87],
+                        slopes: vec![0.38, 0.67, 1.43, 2.76],
+                        diff_nums: vec![0.0, -0.70, -19.37, -68.37],
+                    },
+                    CurveItemTouchpad {
+                        speeds: vec![2.45, 24.51, 36.77, 156.87],
+                        slopes: vec![0.48, 0.83, 1.78, 3.45],
+                        diff_nums: vec![0.0, -0.88, -24.21, -85.46],
+                    },
+                    CurveItemTouchpad {
+                        speeds: vec![2.45, 24.51, 36.77, 156.87],
+                        slopes: vec![0.60, 1.06, 2.26, 4.37],
+                        diff_nums: vec![0.0, -1.11, -30.66, -108.25],
+                    },
+                    CurveItemTouchpad {
+                        speeds: vec![2.45, 24.51, 36.77, 156.87],
+                        slopes: vec![0.73, 1.28, 2.74, 5.29],
+                        diff_nums: vec![0.0, -1.34, -37.12, -131.04],
+                    },
+                    CurveItemTouchpad {
+                        speeds: vec![2.45, 24.51, 36.77, 156.87],
+                        slopes: vec![0.86, 1.50, 3.21, 6.21],
+                        diff_nums: vec![0.0, -1.58, -43.58, -153.83],
+                    },
+                ],
+            });
+        });
+        unsafe { GLOBAL_CURVES.as_ref().unwrap() }
+    }
+}
+
+impl AxisAccelerateCurvesTouchpad {
+    fn get_instance() -> &'static AxisAccelerateCurvesTouchpad {
+        static mut GLOBAL_CURVES: Option<AxisAccelerateCurvesTouchpad> = None;
+        static ONCE: Once = Once::new();
+ 
+        ONCE.call_once(|| unsafe {
+            GLOBAL_CURVES = Some(AxisAccelerateCurvesTouchpad {
+                data: vec![
+                    AxisCurveItemTouchpad {
+                        speeds: vec![3.0, 5.0, 6.0, 8.0, 10.0, 41.0],
+                        slopes: vec![1.07, 0.80, 0.65, 0.55, 0.52, 0.81],
+                        diff_nums: vec![0.0, 0.81, 1.56, 2.16, 2.4, -0.5]
+                    },
+                    AxisCurveItemTouchpad {
+                        speeds: vec![3.0, 5.0, 7.0, 9.0, 11.0, 41.0],
+                        slopes: vec![1.0, 0.75, 0.61, 0.51, 0.48, 0.75],
+                        diff_nums: vec![0.0, 0.75, 1.45, 2.15, 2.42, -0.55]
+                    },
+                ],
+            });
+        });
+        unsafe { GLOBAL_CURVES.as_ref().unwrap() }
+    }
+}
+
 // 这个 extern 代码块链接到 libm 库
 #[link(name = "m")]
 extern {
@@ -206,7 +400,7 @@ extern {
 }
 
 fn get_speed_gain(vin: f64, gain: *mut f64, speed: i32) -> bool {
-    info!(LOG_LABEL, "get_speed_gain enter vin is set to {} speed {} ", @public(vin), @public(speed));
+    debug!(LOG_LABEL, "get_speed_gain enter vin is set to {} speed {} ", @public(vin), @public(speed));
     unsafe {
         if fabs(vin) < DOUBLE_ZERO {
             error!(LOG_LABEL, "{} less that the limit", DOUBLE_ZERO);
@@ -223,20 +417,21 @@ fn get_speed_gain(vin: f64, gain: *mut f64, speed: i32) -> bool {
         for i in 0..3 {
             if num <= item.speeds[i] {
                 *gain = (item.slopes[i] * vin + item.diff_nums[i]) / vin;
-                info!(LOG_LABEL, "gain is set to {}", @public(*gain));
+                debug!(LOG_LABEL, "gain is set to {}", @public((*gain * vin - item.diff_nums[i])/ vin));
                 return true;
             }
         }
         *gain = (item.slopes[2] * vin + item.diff_nums[2]) / vin;
-        info!(LOG_LABEL, "gain is set to {}", @public(*gain));
+        debug!(LOG_LABEL, "gain is set to {}", @public((*gain * vin - item.diff_nums[2])/ vin));
     }
-    info!(LOG_LABEL, "get_speed_gain leave");
+    debug!(LOG_LABEL, "get_speed_gain leave");
     true
 }
 
 
-fn get_speed_gain_touchpad(vin: f64, gain: *mut f64, speed: i32) -> bool {
-    info!(LOG_LABEL, "get_speed_gain_touchpad enter vin is set to {} speed {} ", @public(vin), @public(speed));
+fn get_speed_gain_touchpad(vin: f64, gain: *mut f64, speed: i32, device_type: i32) -> bool {
+    debug!(LOG_LABEL, "get_speed_gain_touchpad enter vin is set to {}, speed {}, device_type {}",
+        @public(vin), @public(speed), @public(device_type));
     unsafe {
         if fabs(vin) < DOUBLE_ZERO {
             error!(LOG_LABEL, "{} less that the limit", DOUBLE_ZERO);
@@ -247,20 +442,49 @@ fn get_speed_gain_touchpad(vin: f64, gain: *mut f64, speed: i32) -> bool {
         error!(LOG_LABEL, "{} The speed value can't be less than 1", @public(speed));
         return false;
     }
-    let item = AccelerateCurvesTouchpad::get_instance().get_curve_by_speed_touchpad(speed as usize);
+    let item = match device_type {  
+        1 => AccelerateCurvesKLV::get_instance().get_curve_by_speed_klv(speed as usize),  
+        2 => AccelerateCurvesSoftHarden::get_instance().get_curve_by_speed_soft_harden(speed as usize),  
+        3 => AccelerateCurvesHardHarden::get_instance().get_curve_by_speed_hard_harden(speed as usize),  
+        _ => AccelerateCurvesKLV::get_instance().get_curve_by_speed_klv(speed as usize),
+    };
     unsafe {
         let num: f64 = fabs(vin);
         for i in 0..4 {
             if num <= item.speeds[i] {
                 *gain = (item.slopes[i] * vin + item.diff_nums[i]) / vin;
-                info!(LOG_LABEL, "gain is set to {}", @public((*gain * vin - item.diff_nums[i])/ vin));
+                debug!(LOG_LABEL, "gain is set to {}", @public((*gain * vin - item.diff_nums[i])/ vin));
                 return true;
             }
         }
         *gain = (item.slopes[3] * vin + item.diff_nums[3]) / vin;
-        info!(LOG_LABEL, "gain is set to {}", @public((*gain * vin - item.diff_nums[3])/ vin));
+        debug!(LOG_LABEL, "gain is set to {}", @public((*gain * vin - item.diff_nums[3])/ vin));
     }
-    info!(LOG_LABEL, "get_speed_gain_touchpad leave");
+    debug!(LOG_LABEL, "get_speed_gain_touchpad leave");
+    true
+}
+
+fn get_axis_gain_touchpad(gain: *mut f64, axis_speed: f64, device_type: i32) -> bool {
+    debug!(LOG_LABEL, "get_axis_gain_touchpad enter axis_speed is set to {}, device_type {}",
+        @public(axis_speed), @public(device_type));
+    let valid_device_type = match device_type {
+        1..=2 => device_type,
+        _ => 1,
+    };
+    let item = AxisAccelerateCurvesTouchpad::get_instance().get_axis_curve_by_speed_touchpad(valid_device_type as usize);
+    unsafe {
+        let num: f64 = fabs(axis_speed);
+        for i in 0..6 {
+            if num <= item.speeds[i] {
+                *gain = item.slopes[i] * num + item.diff_nums[i];
+                debug!(LOG_LABEL, "gain is set to {}, i is {}", @public(*gain), @public(i));
+                return true;
+            }
+        }
+        *gain = item.slopes[5] * num + item.diff_nums[5];
+        debug!(LOG_LABEL, "gain is set to {}", @public(*gain));
+    }
+    debug!(LOG_LABEL, "get_axis_gain_touchpad leave");
     true
 }
 
@@ -292,7 +516,7 @@ pub unsafe extern "C" fn HandleMotionAccelerate (
         dx = (*offset).dx;
         dy = (*offset).dy;
         vin = (fmax(fabs(dx), fabs(dy)) + fmin(fabs(dx), fabs(dy))) / 2.0;
-        info!(
+        debug!(
             LOG_LABEL,
             "output the abs_x {} and abs_y {} captureMode {} dx {} dy {} gain {}",
             @public(*abs_x),
@@ -312,7 +536,7 @@ pub unsafe extern "C" fn HandleMotionAccelerate (
         }
         info!(
             LOG_LABEL,
-            "output the abs_x {} and abs_y {}", @public(*abs_x), @public(*abs_y)
+            "abs_x {} and abs_y {}", @public(*abs_x), @public(*abs_y)
         );
     }
     RET_OK
@@ -328,6 +552,7 @@ pub unsafe extern "C" fn HandleMotionAccelerateTouchpad (
     abs_x: *mut f64,
     abs_y: *mut f64,
     speed: i32,
+    device_type: i32
 ) -> i32 {
     let mut gain = 0.0;
     let vin: f64;
@@ -339,7 +564,7 @@ pub unsafe extern "C" fn HandleMotionAccelerateTouchpad (
         dx = (*offset).dx;
         dy = (*offset).dy;
         vin = (fmax(fabs(dx), fabs(dy))) + (fmin(fabs(dx), fabs(dy))) / 2.0;
-        info!(
+        debug!(
             LOG_LABEL,
             "output the abs_x {} and abs_y {} captureMode {} dx {} dy {} gain {}",
             @public(*abs_x),
@@ -349,7 +574,7 @@ pub unsafe extern "C" fn HandleMotionAccelerateTouchpad (
             @public(dy),
             @public(gain)
         );
-        if !get_speed_gain_touchpad(vin, &mut gain as *mut f64, speed) {
+        if !get_speed_gain_touchpad(vin, &mut gain as *mut f64, speed, device_type) {
             error!(LOG_LABEL, "{} getSpeedGgain failed!", @public(speed));
             return RET_ERR;
         }
@@ -370,6 +595,39 @@ pub unsafe extern "C" fn HandleMotionAccelerateTouchpad (
         info!(
             LOG_LABEL,
             "output the abs_x {} and abs_y {}", @public(*abs_x), @public(*abs_y)
+        );
+    }
+    RET_OK
+}
+
+/// # Safety
+/// HandleAxisAccelerateTouchpad is the origin C++ function name
+/// C++ will call for rust realization using this name
+#[no_mangle]
+pub unsafe extern "C" fn HandleAxisAccelerateTouchpad (
+    mode: bool,
+    abs_axis: *mut f64,
+    device_type: i32
+) -> i32 {
+    let mut gain = 0.0;
+    unsafe {
+        debug!(
+            LOG_LABEL,
+            "input the abs_axis {} and captureMode {} gain {}",
+            @public(*abs_axis),
+            @public(mode),
+            @public(gain)
+        );
+        if !get_axis_gain_touchpad(&mut gain as *mut f64, *abs_axis, device_type) {
+            error!(LOG_LABEL, "{} getAxisGain failed!", @public(*abs_axis));
+            return RET_ERR;
+        }
+        if !mode {
+            *abs_axis = if *abs_axis >= 0.0 { gain } else { -gain };
+        }
+        info!(
+            LOG_LABEL,
+            "output the abs_axis {}", @public(*abs_axis)
         );
     }
     RET_OK
@@ -425,7 +683,7 @@ fn test_handle_motion_accelerate_normal_touchpad()
     let mut abs_y: f64 = 0.0;
     let ret: i32;
     unsafe {
-        ret = HandleMotionAccelerateTouchpad(&offset, false, &mut abs_x as *mut f64, &mut abs_y as *mut f64, 2);
+        ret = HandleMotionAccelerateTouchpad(&offset, false, &mut abs_x as *mut f64, &mut abs_y as *mut f64, 2, 0);
     }
     assert_eq!(ret, RET_OK);
 }
@@ -438,7 +696,7 @@ fn test_handle_motion_accelerate_mini_limit_touchpad()
     let mut abs_y: f64 = 0.0;
     let ret: i32;
     unsafe {
-        ret = HandleMotionAccelerateTouchpad(&offset, false, &mut abs_x as *mut f64, &mut abs_y as *mut f64, 2);
+        ret = HandleMotionAccelerateTouchpad(&offset, false, &mut abs_x as *mut f64, &mut abs_y as *mut f64, 2, 0);
     }
     assert_eq!(ret, RET_ERR);
 }
@@ -451,9 +709,32 @@ fn test_handle_motion_accelerate_capture_mode_false_touchpad()
     let mut abs_y: f64 = 0.0;
     let ret: i32;
     unsafe {
-        ret = HandleMotionAccelerateTouchpad(&offset, true, &mut abs_x as *mut f64, &mut abs_y as *mut f64, 2);
+        ret = HandleMotionAccelerateTouchpad(&offset, true, &mut abs_x as *mut f64, &mut abs_y as *mut f64, 2, 0);
     }
     assert_eq!(ret, RET_OK);
     assert_eq!(abs_x, 0.0);
     assert_eq!(abs_y, 0.0);
+}
+
+/* test touchpad axis */
+#[test]
+fn test_handle_axis_accelerate_normal_touchpad()
+{
+    let mut abs_axis: f64 = 19.29931034482759;
+    let ret: i32;
+    unsafe {
+        ret = HandleAxisAccelerateTouchpad(false, &mut abs_axis as *mut f64, 1);
+    }
+    assert_eq!(ret, RET_OK);
+}
+ 
+#[test]
+fn test_handle_axis_accelerate_capture_mode_false_touchpad()
+{
+    let mut abs_axis: f64 = 19.29931034482759;
+    let ret: i32;
+    unsafe {
+        ret = HandleAxisAccelerateTouchpad(true, &mut abs_axis as *mut f64, 1);
+    }
+    assert_eq!(ret, RET_OK);
 }

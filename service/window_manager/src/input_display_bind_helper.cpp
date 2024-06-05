@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -43,8 +43,8 @@ const std::string SUFFIX = "0000:0000";
 const std::string INPUT = "input";
 const std::string EVENT = "event";
 const std::string NAME = "name";
-const int32_t DISPLAY_ID_MAIN = 0;
-const int32_t DISPLAY_ID_SUB = 5;
+const int32_t DISPLAY_ID_MAIN { 0 };
+const int32_t DISPLAY_ID_SUB { 5 };
 }
 
 namespace fs = std::filesystem;
@@ -54,77 +54,40 @@ static bool IsDualDisplayFoldDevice()
     return (!FOLD_SCREEN_FLAG.empty() && FOLD_SCREEN_FLAG[0] == '2');
 }
 
-class BindInfo {
-public:
-    int32_t GetInputDeviceId() const
-    {
-        return inputDeviceId_;
-    }
-    std::string GetInputDeviceName() const
-    {
-        return inputDeviceName_;
-    }
-    int32_t GetDisplayId() const
-    {
-        return displayId_;
-    }
-    std::string GetDisplayName() const
-    {
-        return displayName_;
-    }
-    bool IsUnbind() const
-    {
-        return ((inputDeviceId_ == -1) || (displayId_ == -1));
-    }
-    bool InputDeviceNotBind() const
-    {
-        return (inputDeviceId_ == -1);
-    }
-    bool DisplayNotBind() const
-    {
-        return (displayId_ == -1);
-    }
-    bool AddInputDevice(int32_t deviceId, const std::string &deviceName);
-    void RemoveInputDevice();
-    bool AddDisplay(int32_t id, const std::string &name);
-    void RemoveDisplay();
-    std::string GetDesc() const;
-    friend bool operator < (const BindInfo &l, const BindInfo &r);
-    friend std::ostream &operator << (std::ostream &os, const BindInfo &r);
-    friend std::istream &operator >> (std::istream &is, BindInfo &r);
+int32_t BindInfo::GetInputDeviceId() const
+{
+    return inputDeviceId_;
+}
 
-private:
-    int32_t inputDeviceId_ { -1 };
-    std::string inputDeviceName_;
-    int32_t displayId_ { -1 };
-    std::string displayName_;
-};
+std::string BindInfo::GetInputDeviceName() const
+{
+    return inputDeviceName_;
+}
 
-class BindInfos {
-public:
-    bool Add(const BindInfo &info);
-    void UnbindInputDevice(int32_t deviceId);
-    void UnbindDisplay(int32_t displayId);
-    BindInfo GetUnbindInputDevice(const std::string &displayName);
-    BindInfo GetUnbindDisplay(const std::string &inputDeviceName);
-    std::string GetDisplayNameByInputDevice(const std::string &name) const;
-    int32_t GetBindDisplayIdByInputDevice(int32_t inputDeviceId) const;
-    std::string GetBindDisplayNameByInputDevice(int32_t inputDeviceId) const;
-    std::string GetInputDeviceByDisplayName(const std::string &name) const;
-    std::string GetDesc() const;
-    const std::list<BindInfo> &GetInfos() const
-    {
-        return infos_;
-    }
-    friend std::ostream &operator << (std::ostream &os, const BindInfos &r);
-    friend std::istream &operator >> (std::istream &is, BindInfos &r);
+int32_t BindInfo::GetDisplayId() const
+{
+    return displayId_;
+}
 
-private:
-    BindInfo GetUnbindInputDevice();
-    BindInfo GetUnbindInfo();
-    BindInfo GetUnbindDisplay();
-    std::list<BindInfo> infos_;
-};
+std::string BindInfo::GetDisplayName() const
+{
+    return displayName_;
+}
+
+bool BindInfo::IsUnbind() const
+{
+    return ((inputDeviceId_ == -1) || (displayId_ == -1));
+}
+
+bool BindInfo::InputDeviceNotBind() const
+{
+    return (inputDeviceId_ == -1);
+}
+
+bool BindInfo::DisplayNotBind() const
+{
+    return (displayId_ == -1);
+}
 
 bool BindInfo::AddInputDevice(int32_t deviceId, const std::string &deviceName)
 {
@@ -141,6 +104,7 @@ void BindInfo::RemoveInputDevice()
     inputDeviceId_ = -1;
     inputDeviceName_.clear();
 }
+
 bool BindInfo::AddDisplay(int32_t id, const std::string &name)
 {
     if ((displayId_ != -1) || !displayName_.empty()) {
@@ -150,11 +114,13 @@ bool BindInfo::AddDisplay(int32_t id, const std::string &name)
     displayName_ = name;
     return true;
 }
+
 void BindInfo::RemoveDisplay()
 {
     displayId_ = -1;
     displayName_.clear();
 }
+
 std::string BindInfo::GetDesc() const
 {
     std::ostringstream oss;
@@ -201,6 +167,11 @@ std::string BindInfos::GetDesc() const
         oss << "index:" << index << "," << info.GetDesc() << std::endl;
     }
     return oss.str();
+}
+
+const std::list<BindInfo> &BindInfos::GetInfos() const
+{
+    return infos_;
 }
 
 int32_t BindInfos::GetBindDisplayIdByInputDevice(int32_t inputDeviceId) const
@@ -268,9 +239,7 @@ void BindInfos::UnbindInputDevice(int32_t deviceId)
     for (; it != infos_.end(); ++it) {
         if (it->GetInputDeviceId() == deviceId) {
             it->RemoveInputDevice();
-            if (it->IsUnbind()) {
-                infos_.erase(it);
-            }
+            infos_.erase(it);
             return;
         }
     }
@@ -282,26 +251,10 @@ void BindInfos::UnbindDisplay(int32_t displayId)
     for (; it != infos_.end(); ++it) {
         if (it->GetDisplayId() == displayId) {
             it->RemoveDisplay();
-            if (it->IsUnbind()) {
-                infos_.erase(it);
-            }
+            infos_.erase(it);
             return;
         }
     }
-}
-
-BindInfo BindInfos::GetUnbindInfo()
-{
-    auto it = infos_.begin();
-    while (it != infos_.end()) {
-        if (it->IsUnbind()) {
-            auto info = std::move(*it);
-            infos_.erase(it);
-            return info;
-        }
-        ++it;
-    }
-    return BindInfo();
 }
 
 BindInfo BindInfos::GetUnbindInputDevice(const std::string &displayName)
@@ -381,9 +334,7 @@ InputDisplayBindHelper::InputDisplayBindHelper(const std::string bindCfgFile)
 std::string InputDisplayBindHelper::GetBindDisplayNameByInputDevice(int32_t inputDeviceId) const
 {
     CALL_DEBUG_ENTER;
-    if (infos_ == nullptr) {
-        return {};
-    }
+    CHKPO(infos_);
     return infos_->GetBindDisplayNameByInputDevice(inputDeviceId);
 }
 
@@ -444,6 +395,42 @@ void InputDisplayBindHelper::AddDisplay(int32_t id, const std::string &name)
     info.AddDisplay(id, name);
     infos_->Add(info);
     Store();
+}
+
+void InputDisplayBindHelper::AddLocalDisplay(int32_t id, const std::string &name)
+{
+    CALL_DEBUG_ENTER;
+    MMI_HILOGD("Param: id:%{public}d, name:%{public}s", id, name.c_str());
+    CHKPV(infos_);
+
+    const auto &infos = infos_->GetInfos();
+    std::vector<std::string> unbindDevices;
+    for (const auto &info : infos) {
+        if (info.DisplayNotBind()) {
+            unbindDevices.push_back(info.GetInputDeviceName());
+            MMI_HILOGI("Unbind InputDevice, id:%{public}d, inputDevice:%{public}s",
+                info.GetInputDeviceId(), info.GetInputDeviceName().c_str());
+        }
+    }
+    
+    bool IsStore = false;
+    for (auto &item : unbindDevices) {
+        auto inputDeviceName = item;
+        if (IsDualDisplayFoldDevice()) {
+            std::string deviceName = GetInputDeviceById(id);
+            if (!deviceName.empty()) {
+                inputDeviceName = deviceName;
+            }
+        }
+        BindInfo info = infos_->GetUnbindDisplay(inputDeviceName);
+        info.AddDisplay(id, name);
+        infos_->Add(info);
+        IsStore = true;
+    }
+    if (IsStore) {
+        Store();
+    }
+    unbindDevices.clear();
 }
 
 std::string InputDisplayBindHelper::GetInputDeviceById(int32_t id)
@@ -558,14 +545,9 @@ void InputDisplayBindHelper::RemoveDisplay(int32_t id)
 void InputDisplayBindHelper::Store()
 {
     CALL_DEBUG_ENTER;
-    if (infos_ == nullptr) {
-        return;
-    }
+    CHKPV(infos_);
     char realPath[PATH_MAX] = {};
-    if (realpath(fileName_.c_str(), realPath) == nullptr) {
-        MMI_HILOGE("file name is empty");
-        return;
-    }
+    CHKPV(realpath(fileName_.c_str(), realPath));
     if (!IsValidJsonPath(realPath)) {
         MMI_HILOGE("file path is invalid");
         return;
@@ -582,10 +564,7 @@ void InputDisplayBindHelper::Store()
 int32_t InputDisplayBindHelper::GetDisplayBindInfo(DisplayBindInfos &infos)
 {
     CALL_DEBUG_ENTER;
-    if (infos_ == nullptr) {
-        MMI_HILOGE("Infos_ is nullptr");
-        return RET_ERR;
-    }
+    CHKPR(infos_, RET_ERR);
     for (const auto &item : infos_->GetInfos()) {
         infos.push_back({
             .inputDeviceId = item.GetInputDeviceId(),
@@ -678,10 +657,7 @@ void InputDisplayBindHelper::Load()
 {
     CALL_DEBUG_ENTER;
     char realPath[PATH_MAX] = {};
-    if (realpath(fileName_.c_str(), realPath) == nullptr) {
-        MMI_HILOGE("file name is empty");
-        return;
-    }
+    CHKPV(realpath(fileName_.c_str(), realPath));
     if (!IsValidJsonPath(realPath)) {
         MMI_HILOGE("file path is invalid");
         return;
@@ -699,9 +675,7 @@ void InputDisplayBindHelper::Load()
 std::string InputDisplayBindHelper::Dumps() const
 {
     CALL_DEBUG_ENTER;
-    if (infos_ == nullptr) {
-        return {};
-    }
+    CHKPO(infos_);
     std::ostringstream oss;
     oss << *infos_;
     return oss.str();

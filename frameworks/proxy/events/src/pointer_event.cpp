@@ -29,6 +29,7 @@ namespace {
 constexpr double MAX_PRESSURE { 1.0 };
 constexpr size_t MAX_N_PRESSED_BUTTONS { 10 };
 constexpr size_t MAX_N_POINTER_ITEMS { 10 };
+constexpr int32_t SIMULATE_EVENT_START_ID { 10000 };
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 constexpr size_t MAX_N_ENHANCE_DATA_SIZE { 64 };
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
@@ -263,8 +264,10 @@ void PointerEvent::PointerItem::SetPressure(double pressure)
 {
     if (pressure < 0.0) {
         pressure_ = 0.0;
-    } else {
+    } else if (TOOL_TYPE_PEN == GetToolType()) {
         pressure_ = pressure >= MAX_PRESSURE ? MAX_PRESSURE : pressure;
+    } else {
+        pressure_ = pressure;
     }
 }
 
@@ -426,7 +429,7 @@ PointerEvent::PointerEvent(const PointerEvent& other)
     : InputEvent(other), pointerId_(other.pointerId_), pointers_(other.pointers_),
       pressedButtons_(other.pressedButtons_), sourceType_(other.sourceType_),
       pointerAction_(other.pointerAction_), buttonId_(other.buttonId_), fingerCount_(other.fingerCount_),
-      zOrder_(other.zOrder_), axes_(other.axes_), axisValues_(other.axisValues_),
+      zOrder_(other.zOrder_), axes_(other.axes_), axisValues_(other.axisValues_), velocity_(other.velocity_),
       pressedKeys_(other.pressedKeys_), buffer_(other.buffer_),
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
       fingerprintDistanceX_(other.fingerprintDistanceX_), fingerprintDistanceY_(other.fingerprintDistanceY_),
@@ -457,6 +460,7 @@ void PointerEvent::Reset()
     dispatchTimes_ = 0;
     axes_ = 0U;
     axisValues_.fill(0.0);
+    velocity_ = 0.0;
     pressedKeys_.clear();
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
     fingerprintDistanceX_ = 0.0;
@@ -573,7 +577,7 @@ void PointerEvent::AddPointerItem(PointerItem &pointerItem)
 void PointerEvent::UpdatePointerItem(int32_t pointerId, PointerItem &pointerItem)
 {
     for (auto &item : pointers_) {
-        if (item.GetPointerId() == pointerId) {
+        if ((item.GetPointerId() % SIMULATE_EVENT_START_ID) == pointerId) {
             item = pointerItem;
             return;
         }
@@ -663,6 +667,9 @@ const char* PointerEvent::DumpSourceType() const
         case PointerEvent::SOURCE_TYPE_FINGERPRINT: {
             return "fingerprint";
         }
+        case PointerEvent::SOURCE_TYPE_CROWN: {
+            return "crown";
+        }
         default: {
             break;
         }
@@ -730,6 +737,16 @@ bool PointerEvent::HasAxis(uint32_t axes, AxisType axis)
         ret = static_cast<bool>(static_cast<uint32_t>(axes) & (1 << static_cast<uint32_t>(axis)));
     }
     return ret;
+}
+
+double PointerEvent::GetVelocity() const
+{
+    return velocity_;
+}
+
+void PointerEvent::SetVelocity(double velocity)
+{
+    velocity_ = velocity;
 }
 
 void PointerEvent::SetPressedKeys(const std::vector<int32_t> pressedKeys)
@@ -801,6 +818,7 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
             WRITEDOUBLE(out, GetAxisValue(axis));
         }
     }
+    WRITEDOUBLE(out, velocity_);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     WRITEINT32(out, static_cast<int32_t>(enhanceData_.size()));
     for (uint32_t i = 0; i < enhanceData_.size(); i++) {
@@ -848,7 +866,7 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
     }
 
     for (int32_t i = 0; i < nPressedButtons; ++i) {
-        int32_t buttonId;
+        int32_t buttonId = 0;
         READINT32(in, buttonId);
         SetButtonPressed(buttonId);
     }
@@ -862,6 +880,8 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
     if (!ReadAxisFromParcel(in)) {
         return false;
     }
+
+    READDOUBLE(in, velocity_);
 
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     if (!ReadEnhanceDataFromParcel(in)) {
@@ -878,7 +898,7 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
 
 bool PointerEvent::ReadAxisFromParcel(Parcel &in)
 {
-    uint32_t axes;
+    uint32_t axes = 0;
     READUINT32(in, axes);
 
     for (int32_t i = AXIS_TYPE_UNKNOWN; i < AXIS_TYPE_MAX; ++i) {
@@ -925,7 +945,7 @@ bool PointerEvent::ReadEnhanceDataFromParcel(Parcel &in)
     }
 
     for (int32_t i = 0; i < size; i++) {
-        uint32_t val;
+        uint32_t val = 0;
         READUINT32(in, val);
         enhanceData_.emplace_back(val);
     }
@@ -935,7 +955,7 @@ bool PointerEvent::ReadEnhanceDataFromParcel(Parcel &in)
 
 bool PointerEvent::ReadBufferFromParcel(Parcel &in)
 {
-    int32_t bufflen;
+    int32_t bufflen = 0;
     READINT32(in, bufflen);
     if (bufflen > static_cast<int32_t>(MAX_N_BUFFER_SIZE)) {
         return false;
@@ -1158,6 +1178,16 @@ int32_t PointerEvent::GetDispatchTimes() const
 void PointerEvent::SetDispatchTimes(int32_t dispatchTimes)
 {
     dispatchTimes_ = dispatchTimes;
+}
+
+void PointerEvent::SetHandlerEventType(HandleEventType eventType)
+{
+    handleEventType_ = eventType;
+}
+
+HandleEventType PointerEvent::GetHandlerEventType() const
+{
+    return handleEventType_;
 }
 
 std::string_view PointerEvent::ActionToShortStr(int32_t action)

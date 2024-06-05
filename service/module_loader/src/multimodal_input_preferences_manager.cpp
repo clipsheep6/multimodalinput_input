@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #include "multimodal_input_preferences_manager.h"
 
 #include "mmi_log.h"
@@ -25,29 +25,41 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t KEYBOARD_REPEATRATE = 50;
-constexpr int32_t KEYBOARD_REPEATDELAY = 500;
-constexpr int32_t MOUSE_SCROLL_ROWS = 3;
-constexpr int32_t PRIMARY_BUTTON = 0;
-constexpr int32_t POINTER_SPEED = 7;
-constexpr int32_t TOUCHPAD_POINTER_SPEED = 9;
-constexpr int32_t RIGHT_CLICK_TYPE = 1;
-constexpr int32_t POINTER_COLOR = -1;
-constexpr int32_t POINTER_SIZE = 1;
-constexpr int32_t MAGIC_POINTER_SIZE = 3;
-constexpr int32_t POINTER_STYLE = 0;
-constexpr int32_t ERROR_DELAY_VALUE = -1000;
-constexpr bool BOOL_DEFAULT = true;
-const std::string path = "/data/service/el1/public/multimodalinput/";
-const std::string shortKeyFileName = "Settings.xml";
-const std::string mouseFileName = "mouse_settings.xml";
-const std::string keyboarFileName = "keyboard_settings.xml";
-const std::string touchpadFileName = "touchpad_settings.xml";
+constexpr int32_t KEYBOARD_REPEATRATE { 50 };
+constexpr int32_t KEYBOARD_REPEATDELAY { 500 };
+constexpr int32_t MOUSE_SCROLL_ROWS { 3 };
+constexpr int32_t PRIMARY_BUTTON { 0 };
+constexpr int32_t POINTER_SPEED { 7 };
+constexpr int32_t TOUCHPAD_POINTER_SPEED { 6 };
+constexpr int32_t RIGHT_CLICK_TYPE { 1 };
+constexpr int32_t POINTER_COLOR { -1 };
+constexpr int32_t POINTER_SIZE { 1 };
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+constexpr int32_t MAGIC_POINTER_SIZE { 3 };
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+constexpr int32_t POINTER_STYLE { 0 };
+constexpr int32_t ERROR_DELAY_VALUE { -1000 };
+constexpr bool BOOL_DEFAULT { true };
+const std::string path { "/data/service/el1/public/multimodalinput/" };
+const std::string shortKeyFileName { "Settings.xml" };
+const std::string mouseFileName { "mouse_settings.xml" };
+const std::string keyboarFileName { "keyboard_settings.xml" };
+const std::string touchpadFileName { "touchpad_settings.xml" };
 } // namespace
 
-MultiModalInputPreferencesManager::MultiModalInputPreferencesManager() {}
+std::shared_ptr<IPreferenceManager> IPreferenceManager::instance_;
+std::mutex IPreferenceManager::mutex_;
 
-MultiModalInputPreferencesManager::~MultiModalInputPreferencesManager() {}
+std::shared_ptr<IPreferenceManager> IPreferenceManager::GetInstance()
+{
+    if (instance_ == nullptr) {
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (instance_ == nullptr) {
+            instance_ = std::make_shared<MultiModalInputPreferencesManager>();
+        }
+    }
+    return instance_;
+}
 
 int32_t MultiModalInputPreferencesManager::InitPreferences()
 {

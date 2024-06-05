@@ -38,7 +38,7 @@ void DelegateTasks::Task::ProcessTask()
     }
     int32_t ret = fun_();
     std::string taskType = ((promise_ == nullptr) ? "Async" : "Sync");
-    MMI_HILOGD("process %{public}s task id:%{public}d,ret:%{public}d", taskType.c_str(), id_, ret);
+    MMI_HILOGD("Process taskType:%{public}s, taskId:%{public}d, ret:%{public}d", taskType.c_str(), id_, ret);
     if (!hasWaited_ && promise_ != nullptr) {
         promise_->set_value(ret);
     }
@@ -97,10 +97,7 @@ int32_t DelegateTasks::PostSyncTask(DTaskCallback callback)
     Promise promise;
     Future future = promise.get_future();
     auto task = PostTask(callback, &promise);
-    if (task == nullptr) {
-        MMI_HILOGE("Post sync task failed");
-        return ETASKS_POST_SYNCTASK_FAIL;
-    }
+    CHKPR(task, ETASKS_POST_SYNCTASK_FAIL);
 
     static constexpr int32_t timeout = 3000;
     std::chrono::milliseconds span(timeout);
@@ -123,10 +120,7 @@ int32_t DelegateTasks::PostAsyncTask(DTaskCallback callback)
         return callback();
     }
     auto task = PostTask(callback);
-    if (task == nullptr) {
-        MMI_HILOGE("Post async task failed");
-        return ETASKS_POST_ASYNCTASK_FAIL;
-    }
+    CHKPR(task, ETASKS_POST_ASYNCTASK_FAIL);
     return RET_OK;
 }
 
@@ -149,7 +143,7 @@ void DelegateTasks::PopPendingTaskList(std::vector<TaskPtr> &tasks)
 DelegateTasks::TaskPtr DelegateTasks::PostTask(DTaskCallback callback, Promise *promise)
 {
     if (IsCallFromWorkerThread()) {
-        MMI_HILOGE("This interface cannot be called from a worker thread.");
+        MMI_HILOGE("This interface cannot be called from a worker thread");
         return nullptr;
     }
     std::lock_guard<std::mutex> guard(mux_);
