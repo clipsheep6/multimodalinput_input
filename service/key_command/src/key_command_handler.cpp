@@ -33,10 +33,10 @@
 #include "gesturesense_wrapper.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
-#include "input_windows_manager.h"
+#include "i_input_windows_manager.h"
 #include "key_command_handler_util.h"
 #include "mmi_log.h"
-#include "multimodal_input_preferences_manager.h"
+#include "i_preference_manager.h"
 #include "nap_process.h"
 #include "net_packet.h"
 #include "proto.h"
@@ -482,10 +482,10 @@ void KeyCommandHandler::StartTwoFingerGesture()
         if (!CheckTwoFingerGestureAction()) {
             return;
         }
-        twoFingerGesture_.ability.params.emplace("displayX1", std::to_string(twoFingerGesture_.touches[0].x));
-        twoFingerGesture_.ability.params.emplace("displayY1", std::to_string(twoFingerGesture_.touches[0].y));
-        twoFingerGesture_.ability.params.emplace("displayX2", std::to_string(twoFingerGesture_.touches[1].x));
-        twoFingerGesture_.ability.params.emplace("displayY2", std::to_string(twoFingerGesture_.touches[1].y));
+        twoFingerGesture_.ability.params["displayX1"] = std::to_string(twoFingerGesture_.touches[0].x);
+        twoFingerGesture_.ability.params["displayY1"] = std::to_string(twoFingerGesture_.touches[0].y);
+        twoFingerGesture_.ability.params["displayX2"] = std::to_string(twoFingerGesture_.touches[1].x);
+        twoFingerGesture_.ability.params["displayY2"] = std::to_string(twoFingerGesture_.touches[1].y);
         MMI_HILOGI("Start launch ability immediately");
         BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_MULTI_FINGERS, twoFingerGesture_.ability.bundleName);
         LaunchAbility(twoFingerGesture_.ability, twoFingerGesture_.abilityStartDelay);
