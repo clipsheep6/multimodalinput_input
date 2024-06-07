@@ -3079,5 +3079,21 @@ HWTEST_F(InputManagerTest, InputManagerTest_TransmitInfrared, TestSize.Level1)
     int32_t ret = InputManager::GetInstance()->TransmitInfrared(number, pattern);
     EXPECT_EQ(ret, RET_OK);
 }
+
+/**
+ * @tc.name: PointerEventTest_SetHandlerEventType_001
+ * @tc.desc: Verify SetHandlerEventType
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.author:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetHandlerEventType_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetHandlerEventType(0);
+    ASSERT_EQ(pointerEvent->GetHandlerEventType(), 0);
+}
 } // namespace MMI
 } // namespace OHOS
