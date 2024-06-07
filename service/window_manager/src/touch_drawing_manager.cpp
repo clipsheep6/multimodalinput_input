@@ -53,6 +53,7 @@ constexpr int32_t RECT_SPACEING { 1 };
 constexpr int32_t THREE_PRECISION { 3 };
 constexpr int32_t TWO_PRECISION { 2 };
 constexpr int32_t ONE_PRECISION { 1 };
+constexpr int32_t ROTATION_ANGLE_0 { 0 };
 constexpr int32_t ROTATION_ANGLE_90 { 90 };
 constexpr int32_t ROTATION_ANGLE_180 { 180 };
 constexpr int32_t ROTATION_ANGLE_270 { 270 };
@@ -88,31 +89,6 @@ TouchDrawingManager::TouchDrawingManager()
 }
 
 TouchDrawingManager::~TouchDrawingManager() {}
-
-void TouchDrawingManager::ConvertPointerEvent(const std::shared_ptr<PointerEvent>& pointerEvent)
-{
-    CHKPV(pointerEvent);
-    if (pointerEvent_ == nullptr) {
-        pointerEvent_ = PointerEvent::Create();
-    }
-    CHKPV(pointerEvent_);
-    pointerEvent_->Reset();
-    pointerEvent_->SetTargetDisplayId(pointerEvent->GetTargetDisplayId());
-    pointerEvent_->SetPointerAction(pointerEvent->GetPointerAction());
-    pointerEvent_->SetPointerId(pointerEvent->GetPointerId());
-    std::list<PointerEvent::PointerItem> items = pointerEvent->GetAllPointerItems();
-    for (auto item : items) {
-        int32_t displayX = item.GetDisplayX();
-        int32_t displayY = item.GetDisplayY();
-        if (displayInfo_.displayDirection == DIRECTION0) {
-            GetOriginalTouchScreenCoordinates(displayInfo_.direction, displayInfo_.width,
-                displayInfo_.height, displayX, displayY);
-        }
-        item.SetDisplayX(displayX);
-        item.SetDisplayY(displayY);
-        pointerEvent_->AddPointerItem(item);
-    }
-}
 
 void TouchDrawingManager::RecordLabelsInfo(const std::shared_ptr<PointerEvent>& pointerEvent)
 {
@@ -152,7 +128,7 @@ void TouchDrawingManager::TouchDrawHandler(const std::shared_ptr<PointerEvent>& 
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
-    ConvertPointerEvent(pointerEvent);
+    pointerEvent_ = pointerEvent;
     CreateObserver();
     if (bubbleMode_.isShow) {
         CreateTouchWindow();
@@ -164,7 +140,7 @@ void TouchDrawingManager::TouchDrawHandler(const std::shared_ptr<PointerEvent>& 
         AddCanvasNode(trackerCanvasNode_, true);
         AddCanvasNode(crosshairCanvasNode_, false);
         AddCanvasNode(labelsCanvasNode_, false);
-        DrawPointerPositionHandler(pointerEvent);
+        DrawPointerPositionHandler();
         lastPt_ = currentPt_;
     }
     Rosen::RSTransaction::FlushImplicitTransaction();
@@ -173,8 +149,10 @@ void TouchDrawingManager::TouchDrawHandler(const std::shared_ptr<PointerEvent>& 
 void TouchDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
 {
     CALL_DEBUG_ENTER;
+    isChangedRotation_ = displayInfo.direction == displayInfo_.direction ? false : true;
     scaleW_ = displayInfo.width > displayInfo.height ? displayInfo.width : displayInfo.height;
     scaleH_ = displayInfo.width > displayInfo.height ? displayInfo.width : displayInfo.height;
+    isChangedDeriction_ = displayInfo.direction == displayInfo_.direction ? true : false;
     displayInfo_ = displayInfo;
     bubble_.innerCircleRadius = displayInfo.dpi * INDEPENDENT_INNER_PIXELS / DENSITY_BASELINE / CALCULATE_MIDDLE;
     bubble_.outerCircleRadius = displayInfo.dpi * INDEPENDENT_OUTER_PIXELS / DENSITY_BASELINE / CALCULATE_MIDDLE;
@@ -195,6 +173,7 @@ void TouchDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
 void TouchDrawingManager::GetOriginalTouchScreenCoordinates(Direction direction, int32_t width, int32_t height,
     int32_t &physicalX, int32_t &physicalY)
 {
+    MMI_HILOGI("ZXH::444444444444444444444444444");
     switch (direction) {
         case DIRECTION0: {
             MMI_HILOGD("direction is DIRECTION0");
@@ -204,14 +183,14 @@ void TouchDrawingManager::GetOriginalTouchScreenCoordinates(Direction direction,
             int32_t temp = physicalY;
             physicalY = width - physicalX;
             physicalX = temp;
-            MMI_HILOGD("direction is DIRECTION90, Original touch screen physicalX:%{public}d, physicalY:%{public}d",
+            MMI_HILOGI("direction is DIRECTION90, Original touch screen physicalX:%{public}d, physicalY:%{public}d",
                 physicalX, physicalY);
             break;
         }
         case DIRECTION180: {
             physicalX = width - physicalX;
             physicalY = height - physicalY;
-            MMI_HILOGD("direction is DIRECTION180, Original touch screen physicalX:%{public}d, physicalY:%{public}d",
+            MMI_HILOGI("direction is DIRECTION180, Original touch screen physicalX:%{public}d, physicalY:%{public}d",
                 physicalX, physicalY);
             break;
         }
@@ -219,7 +198,7 @@ void TouchDrawingManager::GetOriginalTouchScreenCoordinates(Direction direction,
             int32_t temp = physicalX;
             physicalX = height - physicalY;
             physicalY = temp;
-            MMI_HILOGD("direction is DIRECTION270, Original touch screen physicalX:%{public}d, physicalY:%{public}d",
+            MMI_HILOGI("direction is DIRECTION270, Original touch screen physicalX:%{public}d, physicalY:%{public}d",
                 physicalX, physicalY);
             break;
         }
@@ -228,10 +207,12 @@ void TouchDrawingManager::GetOriginalTouchScreenCoordinates(Direction direction,
             break;
         }
     }
+    MMI_HILOGI("direction is %{public}d", direction);
 }
 
 void TouchDrawingManager::UpdateLabels()
 {
+    CALL_DEBUG_ENTER;
     if (pointerMode_.isShow) {
         DrawLabels();
     } else {
@@ -244,6 +225,24 @@ void TouchDrawingManager::UpdateBubbleData()
 {
     if (!bubbleMode_.isShow) {
         RemoveBubble();
+        Rosen::RSTransaction::FlushImplicitTransaction();
+    }
+}
+
+void TouchDrawingManager::RotationScreen()
+{
+    if (isChangedRotation_ && displayInfo_.displayDirection == DIRECTION0) {
+        MMI_HILOGI("ZXH::1935 pointerMode_ is %{public}d, bubbleMode_ is %{public}d", pointerMode_.isShow, bubbleMode_.isShow);
+        if (pointerMode_.isShow) {
+            MMI_HILOGI("ZXH::pointerMode_.isShow");
+            RotationCanvasNode(trackerCanvasNode_);
+            RotationCanvasNode(crosshairCanvasNode_);
+            UpdateLabels();
+        }
+        if (bubbleMode_.isShow) {
+            MMI_HILOGI("ZXH::bubbleMode_.isShow");
+            RotationCanvasNode(bubbleCanvasNode_);
+        }
         Rosen::RSTransaction::FlushImplicitTransaction();
     }
 }
@@ -345,6 +344,27 @@ void TouchDrawingManager::AddCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& ca
     surfaceNode_->AddChild(canvasNode, DEFAULT_VALUE);
 }
 
+void TouchDrawingManager::RotationCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& canvasNode)
+{
+    CALL_DEBUG_ENTER;
+    MMI_HILOGE("ZXH165 : %{public}d, width : %{public}d, height: %{public}d", displayInfo_.direction, displayInfo_.width, displayInfo_.height);
+    CHKPV(canvasNode);
+    if (displayInfo_.direction == Direction::DIRECTION90) {
+        canvasNode->SetRotation(ROTATION_ANGLE_270);
+        canvasNode->SetTranslateX(0);
+    } else if (displayInfo_.direction == Direction::DIRECTION270) {
+        canvasNode->SetRotation(ROTATION_ANGLE_90);
+        canvasNode->SetTranslateX(-std::fabs(displayInfo_.width - displayInfo_.height));
+    } else if (displayInfo_.direction == Direction::DIRECTION180) {
+        canvasNode->SetRotation(ROTATION_ANGLE_180);
+        canvasNode->SetTranslateX(-std::fabs(displayInfo_.width - displayInfo_.height));
+    } else {
+        canvasNode->SetRotation(ROTATION_ANGLE_0);
+        canvasNode->SetTranslateX(0);
+    }
+    canvasNode->SetTranslateY(0);
+}
+
 void TouchDrawingManager::CreateTouchWindow()
 {
     CALL_DEBUG_ENTER;
@@ -417,17 +437,17 @@ void TouchDrawingManager::DrawBubble()
         canvas->AttachBrush(bubbleBrush_);
         canvas->DrawCircle(centerPt, bubble_.innerCircleRadius);
         canvas->DetachBrush();
-        if (pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN &&
-            pointerEvent_->GetPointerId() == pointerId) {
-            MMI_HILOGI("Bubble is draw success, pointerAction:%{public}d, pointerId:%{public}d, physicalX:%{public}d,"
-                " physicalY:%{public}d", pointerEvent_->GetPointerAction(), pointerEvent_->GetPointerId(),
-                physicalX, physicalY);
-        }
+        // if (pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN &&
+        //     pointerEvent_->GetPointerId() == pointerId) {
+        //     MMI_HILOGI("Bubble is draw success, pointerAction:%{public}d, pointerId:%{public}d, physicalX:%{public}d,"
+        //         " physicalY:%{public}d", pointerEvent_->GetPointerAction(), pointerEvent_->GetPointerId(),
+        //         physicalX, physicalY);
+        // }
     }
     bubbleCanvasNode_->FinishRecording();
 }
 
-void TouchDrawingManager::DrawPointerPositionHandler(const std::shared_ptr<PointerEvent>& pointerEvent)
+void TouchDrawingManager::DrawPointerPositionHandler()
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent_);
@@ -707,6 +727,11 @@ bool TouchDrawingManager::IsValidAction(const int32_t action)
         return true;
     }
     return false;
+}
+
+void TouchDrawingManager::TranslateCoordinates(float rotation)
+{
+
 }
 
 void TouchDrawingManager::Dump(int32_t fd, const std::vector<std::string> &args)
