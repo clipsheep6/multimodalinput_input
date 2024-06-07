@@ -3081,13 +3081,13 @@ HWTEST_F(InputManagerTest, InputManagerTest_TransmitInfrared, TestSize.Level1)
 }
 
 /**
- * @tc.name: PointerEventTest_SetHandlerEventType_001
+ * @tc.name: InputManagerTest_SetHandlerEventType_001
  * @tc.desc: Verify SetHandlerEventType
  * @tc.type: FUNC
  * @tc.require:
  * @tc.author:
  */
-HWTEST_F(PointerEventTest, PointerEventTest_SetHandlerEventType_001, TestSize.Level1)
+HWTEST_F(InputManagerTest, InputManagerTest_SetHandlerEventType_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto pointerEvent = PointerEvent::Create();
