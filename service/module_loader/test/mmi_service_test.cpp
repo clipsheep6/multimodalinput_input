@@ -303,7 +303,7 @@ HWTEST_F(MMIServerTest, MarkProcessed_001, TestSize.Level1)
 HWTEST_F(MMIServerTest, ReadPointerColor_001, TestSize.Level1)
 {
     MMIService mmiService;
-    int32_t color = 1;
+    uint32_t color = 0x00000001;
     int32_t ret = mmiService.ReadPointerColor(color);
     EXPECT_EQ(ret, RET_OK);
 }

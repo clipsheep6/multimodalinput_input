@@ -132,7 +132,7 @@ private:
     int32_t preTouchpadPointerSpeed_ { 9 };
     int32_t preRightClickType_ { 1 };
     int32_t prePointerSize_ { 1 };
-    int32_t prePointerColor_ { -1 };
+    uint32_t prePointerColor_ { 0xffffffff };
     bool preHoverScrollState_ { true };
     bool preScrollSwitch_ { true };
     bool preScrollDirection_ { true };
@@ -173,8 +173,8 @@ void InputManagerPointerTest::SetUp()
 void InputManagerPointerTest::TearDown()
 {
     TestUtil->AddEventDump("");
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     InputManager::GetInstance()->SetPointerSpeed(prePointerSpeed_);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     InputManager::GetInstance()->SetMousePrimaryButton(prePrimaryButton_);
     InputManager::GetInstance()->SetHoverScrollState(preHoverScrollState_);
     InputManager::GetInstance()->SetMouseScrollRows(preScrollRows_);
@@ -1661,9 +1661,9 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetPointerColor_001, T
         ASSERT_EQ(InputManager::GetInstance()->GetDevice(devicedId, tmpcallback), RET_OK);
         ASSERT_TRUE(device != nullptr);
         if (device->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER)) {
-            int32_t setColor = 0xA946F1;
+            uint32_t setColor = 0x00A946F1;
             ASSERT_TRUE(InputManager::GetInstance()->SetPointerColor(setColor) == RET_OK);
-            setColor = 0x000000;
+            setColor = 0x00000000;
             InputManager::GetInstance()->SetPointerColor(setColor);
             break;
         }
@@ -1693,9 +1693,9 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetPointerColor_001, T
         ASSERT_EQ(InputManager::GetInstance()->GetDevice(devicedId, tmpcallback), RET_OK);
         ASSERT_TRUE(device != nullptr);
         if (device->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER)) {
-            int32_t setColor = 0x000000;
+            uint32_t setColor = 0x00000000;
             ASSERT_TRUE(InputManager::GetInstance()->SetPointerColor(setColor) == RET_OK);
-            int32_t getColor = 3;
+            uint32_t getColor = 0x00000003;
             ASSERT_TRUE(InputManager::GetInstance()->GetPointerColor(getColor) == RET_OK);
             ASSERT_TRUE(setColor == getColor);
             break;

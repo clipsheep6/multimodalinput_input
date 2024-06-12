@@ -1141,7 +1141,7 @@ bool InputManagerImpl::IsPointerVisible()
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 
-int32_t InputManagerImpl::SetPointerColor(int32_t color)
+int32_t InputManagerImpl::SetPointerColor(uint32_t color)
 {
     CALL_INFO_TRACE;
 #if defined OHOS_BUILD_ENABLE_POINTER
@@ -1157,7 +1157,7 @@ int32_t InputManagerImpl::SetPointerColor(int32_t color)
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
-int32_t InputManagerImpl::GetPointerColor(int32_t &color)
+int32_t InputManagerImpl::GetPointerColor(uint32_t &color)
 {
     CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_POINTER

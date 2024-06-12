@@ -95,7 +95,7 @@ int32_t g_parseInputDevice(MessageParcel &data, std::shared_ptr<InputDevice> &in
 const int32_t TUPLE_PID = 0;
 const int32_t TUPLE_UID = 1;
 const int32_t TUPLE_NAME = 2;
-const int32_t DEFAULT_POINTER_COLOR = 0x000000;
+const uint32_t DEFAULT_POINTER_COLOR = 0x00000000;
 constexpr int32_t MAX_N_TRANSMIT_INFRARED_PATTERN { 500 };
 
 int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel& data,
@@ -814,14 +814,14 @@ int32_t MultimodalInputConnectStub::StubSetPointerColor(MessageParcel& data, Mes
         return ERROR_NOT_SYSAPI;
     }
 
-    int32_t color = DEFAULT_POINTER_COLOR;
+    uint32_t color = DEFAULT_POINTER_COLOR;
     READINT32(data, color, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = SetPointerColor(color);
     if (ret != RET_OK) {
         MMI_HILOGE("Call SetPointerColor failed ret:%{public}d", ret);
         return ret;
     }
-    MMI_HILOGD("Success color:%{public}d, pid:%{public}d", color, GetCallingPid());
+    MMI_HILOGD("Success color:%{public}x, pid:%{public}d", color, GetCallingPid());
     return RET_OK;
 }
 
@@ -838,14 +838,14 @@ int32_t MultimodalInputConnectStub::StubGetPointerColor(MessageParcel& data, Mes
         return ERROR_NOT_SYSAPI;
     }
 
-    int32_t color = DEFAULT_POINTER_COLOR;
+    uint32_t color = DEFAULT_POINTER_COLOR;
     int32_t ret = GetPointerColor(color);
     if (ret != RET_OK) {
         MMI_HILOGE("Call GetPointerColor failed ret:%{public}d", ret);
         return ret;
     }
     WRITEINT32(reply, color, IPC_STUB_WRITE_PARCEL_ERR);
-    MMI_HILOGD("Pointer color:%{public}d, ret:%{public}d", color, ret);
+    MMI_HILOGD("Pointer color:%{public}x, ret:%{public}d", color, ret);
     return RET_OK;
 }
 

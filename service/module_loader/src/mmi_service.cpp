@@ -685,7 +685,7 @@ int32_t MMIService::MarkProcessed(int32_t eventType, int32_t eventId)
     return RET_OK;
 }
 
-int32_t MMIService::SetPointerColor(int32_t color)
+int32_t MMIService::SetPointerColor(uint32_t color)
 {
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
@@ -700,14 +700,14 @@ int32_t MMIService::SetPointerColor(int32_t color)
 }
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-int32_t MMIService::ReadPointerColor(int32_t &color)
+int32_t MMIService::ReadPointerColor(uint32_t &color)
 {
     color = IPointerDrawingManager::GetInstance()->GetPointerColor();
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
-int32_t MMIService::GetPointerColor(int32_t &color)
+int32_t MMIService::GetPointerColor(u_char &color)
 {
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)

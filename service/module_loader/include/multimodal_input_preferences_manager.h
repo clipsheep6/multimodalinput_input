@@ -57,7 +57,7 @@ private:
     bool g_touchpadPinchSwitch { true };
     bool g_touchpadSwipeSwitch { true };
     bool g_hoverScrollState { true };
-    int32_t g_pointerColor { -1 };
+    uint32_t g_pointerColor { 0xffffffff };
     int32_t g_pointerSize { 1 };
     int32_t g_pointerStyle { 0 };
     const std::string keyboardRepeatRate = "keyboardRepeatRate";
@@ -77,7 +77,7 @@ private:
     const std::string pointerSize = "pointerSize";
     const std::string pointerStyle = "pointerStyle";
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-    int32_t g_magicPointerColor { -1 };
+    uint32_t g_magicPointerColor { 0xffffffff };
     int32_t g_magicPointerSize { 3 };
     const std::string magicPointerColor = "magicPointerColor";
     const std::string magicPointerSize = "magicPointerSize";

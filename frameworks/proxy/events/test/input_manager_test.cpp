@@ -2299,9 +2299,9 @@ HWTEST_F(InputManagerTest, InputManager_InjectEvent_002, TestSize.Level1)
 HWTEST_F(InputManagerTest, InputManagerTest_GetPointerColor_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    int32_t setColor = 0x000000;
+    uint32_t setColor = 0x00000000;
     InputManager::GetInstance()->SetPointerColor(setColor);
-    int32_t getColor = 3;
+    uint32_t getColor = 0x00000003;
     ASSERT_TRUE(InputManager::GetInstance()->GetPointerColor(getColor) == RET_OK);
 }
 

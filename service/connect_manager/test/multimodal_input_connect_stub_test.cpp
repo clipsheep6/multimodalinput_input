@@ -236,7 +236,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetP
     MessageParcel reply;
     EXPECT_NE(stub->StubSetPointerColor(data, reply), RET_OK);
 
-    int32_t color = 123456;
+    uint32_t color = 123456;
     data.WriteInt32(color);
     service->state_ = ServiceRunningState::STATE_RUNNING;
     EXPECT_NE(stub->StubSetPointerColor(data, reply), RET_OK);

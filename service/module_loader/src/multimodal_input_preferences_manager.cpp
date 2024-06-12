@@ -32,7 +32,7 @@ constexpr int32_t PRIMARY_BUTTON { 0 };
 constexpr int32_t POINTER_SPEED { 7 };
 constexpr int32_t TOUCHPAD_POINTER_SPEED { 6 };
 constexpr int32_t RIGHT_CLICK_TYPE { 1 };
-constexpr int32_t POINTER_COLOR { -1 };
+constexpr uint32_t POINTER_COLOR { 0xffffffff };
 constexpr int32_t POINTER_SIZE { 1 };
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 constexpr int32_t MAGIC_POINTER_SIZE { 3 };

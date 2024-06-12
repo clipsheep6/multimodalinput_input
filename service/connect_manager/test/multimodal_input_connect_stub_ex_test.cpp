@@ -94,12 +94,12 @@ public:
     }
     int32_t IsPointerVisible(bool &visible) override { return static_cast<int32_t>(visible_); }
     int32_t MarkProcessed(int32_t eventType, int32_t eventId) override { return eventType; }
-    int32_t SetPointerColor(int32_t color) override
+    int32_t SetPointerColor(uint32_t color) override
     {
         color_ = color;
         return color_;
     }
-    int32_t GetPointerColor(int32_t &color) override { return color_; }
+    uint32_t GetPointerColor(uint32_t &color) override { return color_; }
     int32_t EnableCombineKey(bool enable) override { return static_cast<int32_t>(enable); }
     int32_t SetPointerSpeed(int32_t speed) override
     {
@@ -209,7 +209,7 @@ public:
     int32_t primaryButton_ = 0;
     bool scrollState_ = false;
     bool visible_ = false;
-    int32_t color_ = 0;
+    uint32_t color_ = 0;
     int32_t speed_ = 0;
     int32_t retIds_ = 0;
     int32_t retObserver_ = 0;

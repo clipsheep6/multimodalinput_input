@@ -33,7 +33,7 @@ constexpr double BASIC_GRAVITY_Y { 0.5f };
 constexpr int32_t BASIC_LIFESPAN { 15 };
 constexpr float DOUBLE { 2.0f };
 constexpr float DYNAMIC_EFFECT_SIZE { 0.8f };
-constexpr int32_t ARGB_COLOR_ARRAY { 0x20c8ffff };
+constexpr uint32_t ARGB_COLOR_ARRAY { 0x20c8ffff };
 } // namespace
 
 KnuckleDivergentPoint::KnuckleDivergentPoint(std::shared_ptr<Rosen::Drawing::Bitmap> bitmap)

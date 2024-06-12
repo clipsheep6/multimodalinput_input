@@ -88,9 +88,9 @@ void SetHoverScrollStateFuzzTest(const uint8_t* data, size_t size)
 
 void PointerColorFuzzTest(const uint8_t* data, size_t size)
 {
-    int32_t firstColor = 0xA946F1;
+    uint32_t firstColor = 0xA946F1;
     InputManager::GetInstance()->SetPointerColor(firstColor);
-    int32_t getColor = 3;
+    uint32_t getColor = 3;
     InputManager::GetInstance()->GetPointerColor(getColor);
 }
 

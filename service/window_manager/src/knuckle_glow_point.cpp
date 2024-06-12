@@ -33,7 +33,7 @@ constexpr int32_t ARGB_RGB { 255 };
 constexpr double BASIC_LIFESPAN { 200.0f };
 constexpr int32_t TRACE_COLOR { 255 };
 constexpr float BASIC_SIZE { 100.0f };
-constexpr int32_t ARGB_COLOR_ARRAY { 0x11c8ffff };
+constexpr uint32_t ARGB_COLOR_ARRAY { 0x11c8ffff };
 constexpr double HALF { 2.0 };
 } // namespace
 

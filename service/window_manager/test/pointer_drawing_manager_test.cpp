@@ -553,7 +553,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerColor_001,
     std::shared_ptr<PointerDrawingManager> pointerDrawingManager =
         std::static_pointer_cast<PointerDrawingManager>(IPointerDrawingManager::GetInstance());
     pointerDrawingManager->SetPointerColor(-1);
-    int32_t color = pointerDrawingManager->GetPointerColor();
+    uint32_t color = pointerDrawingManager->GetPointerColor();
     EXPECT_EQ(color, 0);
     pointerDrawingManager->SetPointerColor(16777216);
     color = pointerDrawingManager->GetPointerColor();

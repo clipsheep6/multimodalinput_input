@@ -43,7 +43,7 @@ constexpr int32_t INDEPENDENT_OUTER_PIXELS { 21 };
 constexpr int32_t INDEPENDENT_WIDTH_PIXELS { 2 };
 constexpr int32_t CALCULATE_MIDDLE { 2 };
 constexpr int32_t DEFAULT_VALUE { -1 };
-constexpr int32_t MAX_POINTER_COLOR { 0x00ffff };
+constexpr uint32_t MAX_POINTER_COLOR { 0x0000ffff };
 constexpr int32_t TIME_DIMENSION { 1000 };
 constexpr int32_t PATH_COLOR { 0xFFCCCCCC };
 constexpr int32_t MIN_POINT_SIZE { 1 };

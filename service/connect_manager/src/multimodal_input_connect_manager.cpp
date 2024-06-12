@@ -237,14 +237,14 @@ int32_t MultimodalInputConnectManager::MarkProcessed(int32_t eventType, int32_t 
     return multimodalInputConnectService_->MarkProcessed(eventType, eventId);
 }
 
-int32_t MultimodalInputConnectManager::SetPointerColor(int32_t color)
+int32_t MultimodalInputConnectManager::SetPointerColor(uint32_t color)
 {
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetPointerColor(color);
 }
 
-int32_t MultimodalInputConnectManager::GetPointerColor(int32_t &color)
+int32_t MultimodalInputConnectManager::GetPointerColor(uint32_t &color)
 {
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);

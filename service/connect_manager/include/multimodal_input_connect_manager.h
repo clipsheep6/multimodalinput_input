@@ -62,8 +62,8 @@ public:
     int32_t SetPointerVisible(bool visible, int32_t priority);
     int32_t IsPointerVisible(bool &visible);
     int32_t MarkProcessed(int32_t eventType, int32_t eventId);
-    int32_t SetPointerColor(int32_t color);
-    int32_t GetPointerColor(int32_t &color);
+    int32_t SetPointerColor(uint32_t color);
+    int32_t GetPointerColor(uint32_t &color);
     int32_t EnableCombineKey(bool enable);
     int32_t SetPointerSpeed(int32_t speed);
     int32_t GetPointerSpeed(int32_t &speed);

@@ -213,7 +213,7 @@ napi_value JsPointerManager::IsPointerVisibleSync(napi_env env)
     return result;
 }
 
-napi_value JsPointerManager::SetPointerColor(napi_env env, int32_t color, napi_value handle)
+napi_value JsPointerManager::SetPointerColor(napi_env env, uint32_t color, napi_value handle)
 {
     CALL_DEBUG_ENTER;
     sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
@@ -244,7 +244,7 @@ napi_value JsPointerManager::GetPointerColor(napi_env env, napi_value handle)
     CALL_DEBUG_ENTER;
     sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
     CHKPP(asyncContext);
-    int32_t color = 1;
+    uint32_t color = 0x00000001;
     asyncContext->errorCode = InputManager::GetInstance()->GetPointerColor(color);
     if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
@@ -267,7 +267,7 @@ napi_value JsPointerManager::GetPointerColor(napi_env env, napi_value handle)
     return promise;
 }
 
-napi_value JsPointerManager::SetPointerColorSync(napi_env env, int32_t color)
+napi_value JsPointerManager::SetPointerColorSync(napi_env env, uint32_t color)
 {
     CALL_DEBUG_ENTER;
     auto errorCode = InputManager::GetInstance()->SetPointerColor(color);
@@ -288,7 +288,7 @@ napi_value JsPointerManager::SetPointerColorSync(napi_env env, int32_t color)
 napi_value JsPointerManager::GetPointerColorSync(napi_env env)
 {
     CALL_DEBUG_ENTER;
-    int32_t color = 1;
+    uint32_t color = 0x00000001;
     auto errorCode = InputManager::GetInstance()->GetPointerColor(color);
     if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");

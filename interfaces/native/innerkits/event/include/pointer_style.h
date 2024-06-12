@@ -22,7 +22,7 @@ namespace OHOS {
 namespace MMI {
 struct PointerStyle {
     int32_t size { -1 };
-    int32_t color { 0 };
+    uint32_t color { 0x00000000 };
     int32_t id { 0 };
     int32_t options { 0 };
     bool operator==(const PointerStyle &rhs) const

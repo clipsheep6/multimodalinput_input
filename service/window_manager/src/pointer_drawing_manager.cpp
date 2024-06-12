@@ -77,8 +77,8 @@ constexpr float RUNNING_X_RATIO { 0.3f };
 constexpr float RUNNING_Y_RATIO { 0.675f };
 constexpr float INCREASE_RATIO { 1.22f };
 constexpr float ROTATION_ANGLE90 { 90.f };
-constexpr int32_t MIN_POINTER_COLOR { 0x000000 };
-constexpr int32_t MAX_POINTER_COLOR { 0x00ffffff };
+constexpr uint32_t MIN_POINTER_COLOR { 0x00000000 };
+constexpr uint32_t MAX_POINTER_COLOR { 0x00ffffff };
 constexpr int32_t MIN_CURSOR_SIZE { 64 };
 constexpr uint32_t RGB_CHANNEL_BITS_LENGTH { 24 };
 constexpr float MAX_ALPHA_VALUE { 255.f };
@@ -1174,7 +1174,7 @@ std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::DecodeImageToPixel
         .width = imageWidth_,
         .height = imageHeight_
     };
-    int32_t pointerColor = GetPointerColor();
+    uint32_t pointerColor = GetPointerColor();
     if (tempPointerColor_ != DEFAULT_VALUE) {
         decodeOpts.SVGOpts.fillColor = {.isValidColor = true, .color = pointerColor};
         if (pointerColor == MAX_POINTER_COLOR) {
@@ -1244,7 +1244,7 @@ int32_t PointerDrawingManager::SetPointerColor(int32_t color)
     return RET_OK;
 }
 
-int32_t PointerDrawingManager::GetPointerColor()
+uint32_t PointerDrawingManager::GetPointerColor()
 {
     CALL_DEBUG_ENTER;
     std::string name = POINTER_COLOR;

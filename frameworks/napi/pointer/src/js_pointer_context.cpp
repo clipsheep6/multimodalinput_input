@@ -33,7 +33,7 @@ constexpr size_t INPUT_PARAMETER { 2 };
 constexpr int32_t DEFAULT_POINTER_SIZE { 1 };
 constexpr int32_t MIN_POINTER_SIZE { 1 };
 constexpr int32_t MAX_POINTER_SIZE { 7 };
-constexpr int32_t MIN_POINTER_COLOR { 0x000000 };
+constexpr uint32_t MIN_POINTER_COLOR { 0x00000000 };
 constexpr int32_t THREE_PARAMETERS { 3 };
 constexpr int32_t INVALID_VALUE { -2 };
 } // namespace
@@ -231,7 +231,7 @@ napi_value JsPointerContext::SetPointerColor(napi_env env, napi_callback_info in
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "color", "number");
         return nullptr;
     }
-    int32_t color = MIN_POINTER_COLOR;
+    uint32_t color = MIN_POINTER_COLOR;
     CHKRP(napi_get_value_int32(env, argv[0], &color), GET_VALUE_INT32);
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
@@ -284,7 +284,7 @@ napi_value JsPointerContext::SetPointerColorSync(napi_env env, napi_callback_inf
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "color", "number");
         return nullptr;
     }
-    int32_t color = MIN_POINTER_COLOR;
+    uint32_t color = MIN_POINTER_COLOR;
     CHKRP(napi_get_value_int32(env, argv[0], &color), GET_VALUE_INT32);
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);

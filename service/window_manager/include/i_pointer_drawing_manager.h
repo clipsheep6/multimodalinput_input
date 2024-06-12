@@ -50,7 +50,7 @@ public:
     {
         return true;
     }
-    virtual int32_t SetPointerColor(int32_t color)
+    virtual int32_t SetPointerColor(uint32_t color)
     {
         return 0;
     }

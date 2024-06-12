@@ -474,7 +474,7 @@ public:
      * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 9
      */
-    int32_t SetPointerColor(int32_t color);
+    int32_t SetPointerColor(uint32_t color);
 
     /**
      * @brief Gets pointer color.
@@ -482,7 +482,7 @@ public:
      * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 9
      */
-    int32_t GetPointerColor(int32_t &color);
+    int32_t GetPointerColor(uint32_t &color);
 
     /**
      * @brief Sets the mouse pointer speed, which ranges from 1 to 11.

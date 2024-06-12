@@ -71,7 +71,7 @@ public:
     void OnWindowInfo(const WinInfo &info) override;
     void UpdatePointerDevice(bool hasPointerDevice, bool isPointerVisible, bool isHotPlug) override;
     bool Init() override;
-    int32_t SetPointerColor(int32_t color) override;
+    int32_t SetPointerColor(uint32_t color) override;
     int32_t GetPointerColor() override;
     void DeletePointerVisible(int32_t pid) override;
     int32_t SetPointerVisible(int32_t pid, bool visible, int32_t priority) override;
@@ -175,7 +175,7 @@ private:
     std::shared_ptr<Rosen::RSCanvasNode> canvasNode_;
     int32_t userIconHotSpotX_ { 0 };
     int32_t userIconHotSpotY_ { 0 };
-    int32_t tempPointerColor_ { -1 };
+    uint32_t tempPointerColor_ { 0xffffffff };
     Direction lastDirection_ { DIRECTION0 };
     Direction currentDirection_ { DIRECTION0 };
     float scale_ { 1.0 };
