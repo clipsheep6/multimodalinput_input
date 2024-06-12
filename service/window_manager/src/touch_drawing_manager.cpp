@@ -27,6 +27,7 @@
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "TouchDrawingManager"
 
+
 namespace OHOS {
 namespace MMI {
 namespace {
