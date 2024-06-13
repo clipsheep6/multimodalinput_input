@@ -104,7 +104,7 @@ public:
     void AttachToDisplay();
     int32_t EnableHardwareCursorStats(int32_t pid, bool enable) override;
     int32_t GetHardwareCursorStats(int32_t pid, uint32_t &frameCount, uint32_t &vsyncCount) override;
-
+    void InitObserver() override;
 
 private:
     IconStyle GetIconType(MOUSE_ICON mouseIcon);
