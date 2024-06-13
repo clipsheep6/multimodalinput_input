@@ -220,6 +220,7 @@ protected:
     int32_t OnAuthorize(bool isAuthorize);
     int32_t OnCancelInjection();
 
+
 private:
     int32_t CheckPidPermission(int32_t pid);
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
