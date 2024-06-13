@@ -74,6 +74,7 @@
         "hilog",
         "common_event_service",
         "data_share",
+		"libevdev",
         "relational_store",
         "faultloggerd",
         "ffrt",
