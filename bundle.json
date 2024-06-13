@@ -81,10 +81,11 @@
         "graphic_2d_ext",
         "hdf_core",
         "bounds_checking_function",
-        "call_manager"
+        "call_manager",
+	"cJSON",
+	"googletest"
       ],
       "third_party": [
-        "cJSON",
         "node",
         "libuv",
         "mtdev",

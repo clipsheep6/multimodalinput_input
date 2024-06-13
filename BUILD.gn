@@ -78,6 +78,7 @@ group("multimodalinput_mmi_service") {
     "service:libmmi-server",
     "tools/inject_event:uinput",
   ]
+  public_external_deps = [ "libevdev:libevdev" ]
 }
 
 group("input_jsapi_group") {
