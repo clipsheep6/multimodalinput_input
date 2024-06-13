@@ -810,11 +810,6 @@ ohos_unittest("KnuckleGlowTraceSystemTest") {
     "window_manager:libdm",
     "window_manager:libwm",
     "window_manager:libwsutils",
-  sources = [
-    "window_manager/test/input_display_bind_helper_test.cpp",
-    "window_manager/test/pointer_drawing_manager_test.cpp",
-    "window_manager/test/touch_drawing_manager_test.cpp",
-  ]
 }
 
 ohos_unittest("PointerDrawingManagerTest") {
