@@ -720,6 +720,7 @@ ohos_unittest("KnuckleGlowTraceSystemTest") {
     "window_manager:libdm",
     "window_manager:libwm",
     "window_manager:libwsutils",
+  ]
 }
 
 ohos_unittest("PointerDrawingManagerTest") {
