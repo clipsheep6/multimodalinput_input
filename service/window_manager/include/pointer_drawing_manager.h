@@ -135,7 +135,7 @@ private:
     void AdjustMouseFocusByDirection180(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
     void AdjustMouseFocusByDirection270(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
     void CreateMagicCursorChangeObserver();
-    void CreatePointerSwitchObserver(isMagicCursor& item);
+    int32_t CreatePointerSwitchObserver(isMagicCursor& item);
     void UpdateStyleOptions();
     int32_t GetIndependentPixels();
     bool CheckPointerStyleParam(int32_t windowId, PointerStyle pointerStyle);
@@ -182,6 +182,7 @@ private:
     Direction currentDirection_ { DIRECTION0 };
     float scale_ { 1.0 };
     isMagicCursor hasMagicCursor_;
+    bool hasInitObserver_ { false };
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     std::shared_ptr<HardwareCursorPointerManager> hardwareCursorPointerManager_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
