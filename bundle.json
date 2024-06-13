@@ -86,7 +86,6 @@
         "cJSON",
         "node",
         "libuv",
-        "libevdev",
         "mtdev",
         "libinput"
       ]
@@ -106,7 +105,6 @@
           "//foundation/multimodalinput/input/sa_profile:multimodalinput_sa_profile",
           "//foundation/multimodalinput/input:multimodalinput.rc",
           "//foundation/multimodalinput/input/patch:patch_packages",
-          "//third_party/libevdev:libevdev",
           "//foundation/multimodalinput/input:uinput_inject",
           "//foundation/multimodalinput/input:mmi_uinput.rc"
         ]
