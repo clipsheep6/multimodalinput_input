@@ -350,7 +350,20 @@ void PointerDrawingManager::UpdateStyleOptions()
     }
 }
 
-void PointerDrawingManager::CreatePointerSwitchObserver(isMagicCursor& item)
+void PointerDrawingManager::InitObserver()
+{
+    if (hasInitObserver_) {
+        MMI_HILOGI("Settingdata observer has init");
+        return;
+    }
+    int32_t ret = CreatePointerSwitchObserver(hasMagicCursor_);
+    if (ret == RET_OK) {
+        hasInitObserver_ = true;
+        MMI_HILOGI("Create pointer switch observer success");
+    }
+}
+
+int32_t PointerDrawingManager::CreatePointerSwitchObserver(isMagicCursor& item)
 {
     CALL_DEBUG_ENTER;
     SettingObserver::UpdateFunc updateFunc = [this, &item](const std::string& key) {
@@ -389,8 +402,10 @@ void PointerDrawingManager::CreatePointerSwitchObserver(isMagicCursor& item)
     if (ret != ERR_OK) {
         MMI_HILOGE("Register setting observer failed, ret:%{public}d", ret);
         statusObserver = nullptr;
+        return RET_ERR;
     }
     CreateMagicCursorChangeObserver();
+    return RET_OK;
 }
 
 bool PointerDrawingManager::HasMagicCursor()
