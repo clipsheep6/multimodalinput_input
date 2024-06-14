@@ -71,6 +71,7 @@ private:
     void RotationCanvasNode(std::shared_ptr<Rosen::RSCanvasNode> canvasNode);
     void RotationCanvas(RosenCanvas *canvas, Direction direction);
     void CreateTouchWindow();
+    void DestoryTouchWindow();
     void DrawBubbleHandler();
     void DrawBubble();
     void DrawPointerPositionHandler();
@@ -124,6 +125,7 @@ private:
     bool isChangedRotation_ { false };
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
     std::list<PointerEvent::PointerItem> lastPointerItem_ { };
+    std::mutex mutex_;
 };
 #define TOUCH_DRAWING_MGR ::OHOS::DelayedSingleton<TouchDrawingManager>::GetInstance()
 } // namespace MMI
