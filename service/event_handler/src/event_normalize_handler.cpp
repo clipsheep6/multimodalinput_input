@@ -479,7 +479,7 @@ int32_t EventNormalizeHandler::GestureIdentify(libinput_event* event)
         actionType = GESTURE_HANDLER->GestureIdentify(originType, seatSlot, logicalX, logicalY);
     }
     if (actionType == PointerEvent::POINTER_ACTION_UNKNOWN) {
-        MMI_HILOGD("Gesture identify failed");
+        MMI_HILOGE("Gesture identify failed");
         return RET_ERR;
     }
     bool tpRotateSwitch = true;
