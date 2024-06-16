@@ -188,10 +188,10 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
             return COMMON_PERMISSION_CHECK_ERROR;
         }
     }
-    return OnInjectPointerEventExt(pointerEvent);
+    return OnInjectPointerEventExt(pointerEvent, pid);
 }
 
-int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerEvent> pointerEvent)
+int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid)
 {
     CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -203,7 +203,7 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
     switch (pointerEvent->GetSourceType()) {
         case PointerEvent::SOURCE_TYPE_TOUCHSCREEN: {
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-            if (!FixTargetWindowId(pointerEvent, pointerEvent->GetPointerAction())) {
+            if (!FixTargetWindowId(pointerEvent, pointerEvent->GetPointerAction(), pid)) {
                 return RET_ERR;
             }
             inputEventNormalizeHandler->HandleTouchEvent(pointerEvent);
@@ -240,7 +240,7 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
             break;
         }
     }
-    return SaveTargetWindowId(pointerEvent);
+    return SaveTargetWindowId(pointerEvent, pid);
 }
 
 int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointerEvent)
@@ -327,7 +327,7 @@ void ServerMsgHandler::UpdatePointerEvent(std::shared_ptr<PointerEvent> pointerE
     pointerEvent->SetTargetDisplayId(mouseInfo.displayId);
 }
 
-int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent)
+int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, int32_ pid)
 {
     if ((pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) &&
         (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN ||
@@ -339,25 +339,53 @@ int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> point
             return RET_ERR;
         }
         int32_t targetWindowId = pointerEvent->GetTargetWindowId();
-        targetWindowIds_[pointerId] = targetWindowId;
+        auto iter = targetWindowIds_.find(pointerId);
+        if (iter != targetWindowIds_.end() && IsSceneboardProcess(pid)) {
+            iter->second.push_back(targetWindowId);
+        } else {
+            std::vector<int32_t> ids;
+            targetWindowIds_[pointerId] = ids;
+            targetWindowIds_[pointerId].push_back(targetWindowId);
+        }
     }
     if ((pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) &&
         (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP ||
         pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_EXIT)) {
         int32_t pointerId = pointerEvent->GetPointerId();
-        targetWindowIds_.erase(pointerId);
+        int32_t targetWindowId = pointerEvent->GetTargetWindowId();
+        auto iter = targetWindowIds_.find(pointerId);
+        if (iter != targetWindowIds_.end() && (!iter->second.empty())) {
+            iter->second.erase(iter->second.begin());
+        }
+        iter = targetWindowIds_.find(pointerId);
+        if (iter != targetWindowIds_.end() && (iter->second.empty())) {
+            targetWindowIds_.erase(pointerId);
+        }
     }
     return RET_OK;
 }
+
+bool ServerMsgHandler::IsSceneboardProcess(int32_t pid)
+{
+    CHKPF(udsServer_);
+    auto session = udsServer_->GetSessionByPid(pid);
+    CHKPF(session);
+    return session->GetProgramName() == "com.ohos.sceneboard";
+}
+
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, int32_t action)
+bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, int32_t action, int32_t pid)
 {
     int32_t targetWindowId = -1;
     auto iter = targetWindowIds_.find(pointerEvent->GetPointerId());
     if (iter != targetWindowIds_.end()) {
-        targetWindowId = iter->second;
+        if (iter->second.size() > 1 && IsSceneboardProcess(pid)) {
+            targetWindowId = iter->second.at(1);
+        } else {
+            targetWindowId = iter->second.front();
+        }
     }
     MMI_HILOGD("TargetWindowId:%{public}d %{public}d", pointerEvent->GetTargetWindowId(), targetWindowId);
     if (action == PointerEvent::POINTER_ACTION_HOVER_ENTER ||
