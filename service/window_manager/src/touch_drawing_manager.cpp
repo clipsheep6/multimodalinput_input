@@ -319,6 +319,9 @@ void TouchDrawingManager::AddCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& ca
         return;
     }
     std::lock_guard<std::mutex> lock(mutex_);
+    if (canvasNode != nullptr) {
+        return;
+    }
     canvasNode = isTrackerNode ? Rosen::RSCanvasDrawingNode::Create() : Rosen::RSCanvasNode::Create();
     CHKPV(canvasNode);
     canvasNode->SetBounds(0, 0, scaleW_, scaleH_);
@@ -377,6 +380,9 @@ void TouchDrawingManager::CreateTouchWindow()
         return;
     }
     std::lock_guard<std::mutex> lock(mutex_);
+    if (surfaceNode_ != nullptr) {
+        return;
+    }
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "touch window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
@@ -556,7 +562,6 @@ void TouchDrawingManager::DrawCrosshairs(RosenCanvas *canvas, int32_t x, int32_t
 void TouchDrawingManager::DrawLabels()
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> lock(mutex_);
     CHKPV(labelsCanvasNode_);
     std::string viewP = "P: " + std::to_string(currentPointerCount_) + " / " + std::to_string(maxPointerCount_);
     std::string viewX = "X: " + FormatNumber(currentPt_.GetX(), ONE_PRECISION);
@@ -569,6 +574,7 @@ void TouchDrawingManager::DrawLabels()
     std::string viewYv = "Yv: " + FormatNumber(yVelocity_, THREE_PRECISION);
     std::string viewPrs = "Prs: " + FormatNumber(pressure_, TWO_PRECISION);
     Rosen::Drawing::Color color = LABELS_DEFAULT_COLOR;
+    std::lock_guard<std::mutex> lock(mutex_);
     auto canvas = static_cast<RosenCanvas *>(labelsCanvasNode_->BeginRecording(scaleW_, scaleH_));
     CHKPV(canvas);
     Rosen::Drawing::Rect rect;
