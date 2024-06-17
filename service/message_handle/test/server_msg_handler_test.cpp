@@ -1375,6 +1375,51 @@ HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_InitInjectNoticeSource_001, 
     manager.connectionCallback_->isConnected_ = true;
     ret = handler.InitInjectNoticeSource();
     EXPECT_TRUE(ret);
+ * @tc.name: ServerMsgHandlerTest_CalculateOffset_01
+ * @tc.desc: Test CalculateOffset
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_CalculateOffset_01, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler servermsghandler;
+    Direction direction;
+    Offset offset;
+    direction = DIRECTION90;
+    ASSERT_NO_FATAL_FAILURE(servermsghandler.CalculateOffset(direction, offset));
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_CalculateOffset_02
+ * @tc.desc: Test CalculateOffset
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_CalculateOffset_02, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler servermsghandler;
+    Direction direction;
+    Offset offset;
+    direction = DIRECTION180;
+    ASSERT_NO_FATAL_FAILURE(servermsghandler.CalculateOffset(direction, offset));
+}
+
+/**
+ * @tc.name: ServerMsgHandlerTest_CalculateOffset_03
+ * @tc.desc: Test CalculateOffset
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(ServerMsgHandlerTest, ServerMsgHandlerTest_CalculateOffset_03, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ServerMsgHandler servermsghandler;
+    Direction direction;
+    Offset offset;
+    direction = DIRECTION270;
+    ASSERT_NO_FATAL_FAILURE(servermsghandler.CalculateOffset(direction, offset));
 }
 } // namespace MMI
 } // namespace OHOS
