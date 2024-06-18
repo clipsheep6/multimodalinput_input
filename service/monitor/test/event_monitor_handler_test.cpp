@@ -38,7 +38,13 @@ class EventMonitorHandlerTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
+
+private:
+    static VirtualTouchpad vTouchpad_;
 };
+
+VirtualMouse EventMonitorHandlerTest::vTouchpad_;
+LibinputWrapper EventMonitorHandlerTest::libinput_;
 
 /**
  * @tc.name: EventMonitorHandlerTest_HandlePointerEvent
@@ -567,6 +573,28 @@ HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_UpdateConsumptionState
 
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_END);
     ASSERT_NO_FATAL_FAILURE(monitorCollection.UpdateConsumptionState(pointerEvent));
+}
+
+/**
+ * @tc.name: EventMonitorHandlerTest_TerminateAxis
+ * @tc.desc: Test TerminateAxis
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventMonitorHandlerTest, EventMonitorHandlerTest_TerminateAxis, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    EventMonitorHandler eventMonitorHandler;
+    vTouchpad_.SendEvent(EV_REL, REL_X, 5);
+    vTouchpad_.SendEvent(EV_REL, REL_Y, -10);
+    vTouchpad_.SendEvent(EV_SYN, SYN_REPORT, 0);
+
+    libinput_event *event = libinput_.Dispatch();
+    ASSERT_TRUE(event != nullptr);
+
+    struct libinput_device *dev = libinput_event_get_device(event);
+    ASSERT_TRUE(dev != nullptr);
+    ASSERT_EQ(eventMonitorHandler.TerminateAxis(), RET_OK);
 }
 } // namespace MMI
 } // namespace OHOS
