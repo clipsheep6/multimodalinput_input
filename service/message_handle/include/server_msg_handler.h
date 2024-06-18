@@ -84,8 +84,8 @@ public:
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t OnInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid, bool isNativeInject);
-    int32_t OnInjectPointerEventExt(const std::shared_ptr<PointerEvent> pointerEvent);
-    int32_t SaveTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent);
+    int32_t OnInjectPointerEventExt(const std::shared_ptr<PointerEvent> pointerEvent, int32_t pid);
+    int32_t SaveTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, int32_t pid);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority, uint32_t deviceTags,
@@ -114,17 +114,18 @@ protected:
 
 private:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    bool FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, int32_t action);
+    bool FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, int32_t action, int32_t pid);
 #endif // OHOS_BUILD_ENABLE_TOUCH
     void LaunchAbility();
     int32_t AccelerateMotion(std::shared_ptr<PointerEvent> pointerEvent);
     void UpdatePointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
     void CalculateOffset(Direction direction, Offset &offset);
     bool CloseInjectNotice(int32_t pid);
+    bool IsSceneboardProcess(int32_t pid);
 
 private:
     UDSServer *udsServer_ { nullptr };
-    std::map<int32_t, int32_t> targetWindowIds_;
+    std::map<int32_t, std::vector<int32_t>> targetWindowIds_;
     std::map<int32_t, AuthorizationStatus> authorizationCollection_;
     int32_t CurrentPID_ { -1 };
     InjectionType InjectionType_ { InjectionType::UNKNOWN };
