@@ -319,9 +319,6 @@ void TouchDrawingManager::AddCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& ca
         return;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    if (canvasNode != nullptr) {
-        return;
-    }
     canvasNode = isTrackerNode ? Rosen::RSCanvasDrawingNode::Create() : Rosen::RSCanvasNode::Create();
     CHKPV(canvasNode);
     canvasNode->SetBounds(0, 0, scaleW_, scaleH_);
