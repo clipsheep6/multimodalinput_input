@@ -2255,6 +2255,7 @@ bool InputWindowsManager::IsNeedDrawPointer(PointerEvent::PointerItem &pointerIt
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 bool InputWindowsManager::SkipAnnotationWindow(uint32_t flag, int32_t toolType)
 {
+    MMI_HILOGD("windowType: %{public}d, toolType: %{public}d", static_cast<int32_t>(flag), toolType);
     return ((flag & WindowInfo::FLAG_BIT_HANDWRITING) == WindowInfo::FLAG_BIT_HANDWRITING &&
             toolType == PointerEvent::TOOL_TYPE_FINGER);
 }

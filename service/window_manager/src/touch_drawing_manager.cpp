@@ -315,12 +315,11 @@ void TouchDrawingManager::AddCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& ca
 {
     CALL_DEBUG_ENTER;
     CHKPV(surfaceNode_);
+    std::lock_guard<std::mutex> lock(mutex_);
     if (canvasNode != nullptr) {
         return;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
     canvasNode = isTrackerNode ? Rosen::RSCanvasDrawingNode::Create() : Rosen::RSCanvasNode::Create();
-    CHKPV(canvasNode);
     canvasNode->SetBounds(0, 0, scaleW_, scaleH_);
     canvasNode->SetFrame(0, 0, scaleW_, scaleH_);
 #ifndef USE_ROSEN_DRAWING
@@ -373,11 +372,8 @@ void TouchDrawingManager::RotationCanvas(RosenCanvas *canvas, Direction directio
 void TouchDrawingManager::CreateTouchWindow()
 {
     CALL_DEBUG_ENTER;
-    if (surfaceNode_ != nullptr || scaleW_ == 0 || scaleH_ == 0) {
-        return;
-    }
     std::lock_guard<std::mutex> lock(mutex_);
-    if (surfaceNode_ != nullptr) {
+    if (surfaceNode_ != nullptr || scaleW_ == 0 || scaleH_ == 0) {
         return;
     }
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
