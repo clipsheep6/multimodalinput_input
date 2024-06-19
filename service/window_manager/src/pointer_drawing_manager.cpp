@@ -99,6 +99,7 @@ namespace MMI {
 void RsRemoteDiedCallback()
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
     g_isRsRemoteDied = true;
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     MAGIC_CURSOR->RsRemoteDiedCallbackForMagicCursor();
@@ -125,10 +126,11 @@ PointerDrawingManager::PointerDrawingManager()
     MMI_HILOGI("Add system ability listener success");
 }
 
-void PointerDrawingManager::OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId){
+void PointerDrawingManager::OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
+{
     if (systemAbilityId == RENDER_SERVICE) {
         MMI_HILOGI("Init RS observer start");
-        std::lock_guardstd::mutex guard(mutex_);
+        std::lock_guard<std::mutex> guard(mutex_);
         g_isRsRemoteDied = false;
         Rosen::OnRemoteDiedCallback callback = RsRemoteDiedCallback;
         Rosen::RSInterfaces::GetInstance().SetOnRemoteDiedCallback(callback);
