@@ -60,8 +60,7 @@ private:
 
 class PointerDrawingManager final : public IPointerDrawingManager,
                                     public IDeviceObserver,
-                                    public std::enable_shared_from_this<PointerDrawingManager>,
-                                    public SystemAbility {
+                                    public std::enable_shared_from_this<PointerDrawingManager> {
     DECLARE_SYSTEM_ABILITY(PointerDrawingManager);
 public:
     PointerDrawingManager();
@@ -149,7 +148,7 @@ private:
     void DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUSE_ICON mouseStyle);
     bool SetHardWareLocation(int32_t displayId, int32_t physicalX, int32_t physicalY);
     void ForceClearPointerVisiableStatus() override;
-    void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
+    void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId);
 
 private:
     struct PidInfo {
