@@ -37,6 +37,7 @@
 #include "mouse_event_normalize.h"
 #include "setting_observer.h"
 #include "struct_multimodal.h"
+#include "system_ability.h"
 
 namespace OHOS {
 namespace MMI {
@@ -59,7 +60,9 @@ private:
 
 class PointerDrawingManager final : public IPointerDrawingManager,
                                     public IDeviceObserver,
+                                    public SystemAbility ,
                                     public std::enable_shared_from_this<PointerDrawingManager> {
+    DECLARE_SYSTEM_ABILITY(PointerDrawingManager);
 public:
     PointerDrawingManager();
     DISALLOW_COPY_AND_MOVE(PointerDrawingManager);

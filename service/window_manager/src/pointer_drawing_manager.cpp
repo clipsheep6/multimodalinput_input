@@ -41,6 +41,7 @@
 #include "setting_datashare.h"
 #include "util.h"
 #include "timer_manager.h"
+#include "system_ability_definition.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_CURSOR
@@ -119,9 +120,19 @@ PointerDrawingManager::PointerDrawingManager()
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     hardwareCursorPointerManager_ = std::make_shared<HardwareCursorPointerManager>();
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    Rosen::OnRemoteDiedCallback callback = RsRemoteDiedCallback;
-    Rosen::RSInterfaces::GetInstance().SetOnRemoteDiedCallback(callback);
-    onSystemAbility();
+    MMI_HILOGI("Add system ability listener start");
+    AddSystemAbilityListener(RENDER_SERVICE);
+    MMI_HILOGI("Add system ability listener success");
+}
+
+void PointerDrawingManager::OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId){
+    if (systemAbilityId == RENDER_SERVICE) {
+        MMI_HILOGI("Init RS observer start");
+        std::lock_guardstd::mutex guard(mutex_);
+        g_isRsRemoteDied = false;
+        Rosen::OnRemoteDiedCallback callback = RsRemoteDiedCallback;
+        Rosen::RSInterfaces::GetInstance().SetOnRemoteDiedCallback(callback);
+    }
 }
 
 PointerStyle PointerDrawingManager::GetLastMouseStyle()
@@ -870,7 +881,6 @@ void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t physi
 {
     CALL_DEBUG_ENTER;
     CALL_INFO_TRACE;
-    g_isRsRemoteDied = false;
     Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
     surfaceNodeConfig.SurfaceNodeName = "pointer window";
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
