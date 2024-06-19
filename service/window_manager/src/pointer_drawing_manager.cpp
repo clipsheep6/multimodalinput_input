@@ -121,6 +121,7 @@ PointerDrawingManager::PointerDrawingManager()
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     Rosen::OnRemoteDiedCallback callback = RsRemoteDiedCallback;
     Rosen::RSInterfaces::GetInstance().SetOnRemoteDiedCallback(callback);
+    onSystemAbility();
 }
 
 PointerStyle PointerDrawingManager::GetLastMouseStyle()
