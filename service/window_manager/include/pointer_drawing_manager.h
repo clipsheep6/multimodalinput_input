@@ -60,7 +60,7 @@ private:
 
 class PointerDrawingManager final : public IPointerDrawingManager,
                                     public IDeviceObserver,
-                                    public std::enable_shared_from_this<PointerDrawingManager> ,
+                                    public std::enable_shared_from_this<PointerDrawingManager>,
                                     public SystemAbility {
     DECLARE_SYSTEM_ABILITY(PointerDrawingManager);
 public:
