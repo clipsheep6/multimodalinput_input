@@ -90,6 +90,7 @@ bool g_isRsRemoteDied { false };
 constexpr uint64_t FOLD_SCREEN_ID { 5 };
 constexpr int32_t CANVAS_SIZE { 256 };
 constexpr float IMAGE_PIXEL { 0.0f };
+std::mutex mutex_;
 } // namespace
 } // namespace MMI
 } // namespace OHOS
