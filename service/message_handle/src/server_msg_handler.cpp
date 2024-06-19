@@ -329,6 +329,9 @@ void ServerMsgHandler::UpdatePointerEvent(std::shared_ptr<PointerEvent> pointerE
 
 int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, bool isShell)
 {
+    if (pointerEvent->GetTargetWindowId() > 0) {
+        return true;
+    }
     if ((pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) &&
         (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN ||
         pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_ENTER)) {
@@ -363,6 +366,9 @@ int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> point
 bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent,
     int32_t action, bool isShell)
 {
+    if (pointerEvent->GetTargetWindowId() > 0) {
+        return true;
+    }
     int32_t targetWindowId = -1;
     if (isShell) {
         auto iter = shellTargetWindowIds_.find(pointerEvent->GetPointerId());
