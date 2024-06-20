@@ -41,7 +41,7 @@ namespace {
 constexpr int32_t MAX_AXIS_INFO { 64 };
 using ConnFunc = int32_t (MultimodalInputConnectStub::*)(MessageParcel& data, MessageParcel& reply);
 
-int32_t g_parseInputDevice(MessageParcel &data, std::shared_ptr<InputDevice> &inputDevice)
+int32_t ParseInputDevice(MessageParcel &data, std::shared_ptr<InputDevice> &inputDevice)
 {
     CHKPR(inputDevice, RET_ERR);
     int32_t value = 0;
@@ -2346,7 +2346,7 @@ int32_t MultimodalInputConnectStub::StubAddVirtualInputDevice(MessageParcel& dat
         return ERROR_NOT_SYSAPI;
     }
     auto device = std::make_shared<InputDevice>();
-    if (g_parseInputDevice(data, device) != RET_OK) {
+    if (ParseInputDevice(data, device) != RET_OK) {
         MMI_HILOGE("ParseInputDevice failed");
         return RET_ERR;
     }
