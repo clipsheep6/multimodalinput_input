@@ -37,7 +37,6 @@
 #include "mouse_event_normalize.h"
 #include "setting_observer.h"
 #include "struct_multimodal.h"
-#include "system_ability.h"
 
 namespace OHOS {
 namespace MMI {
@@ -61,14 +60,10 @@ private:
 class PointerDrawingManager final : public IPointerDrawingManager,
                                     public IDeviceObserver,
                                     public std::enable_shared_from_this<PointerDrawingManager> {
-    DECLARE_SYSTEM_ABILITY(PointerDrawingManager);
 public:
     PointerDrawingManager();
     DISALLOW_COPY_AND_MOVE(PointerDrawingManager);
-    ~PointerDrawingManager()
-    {
-        SystemAbility::~SystemAbility();
-    };
+    ~PointerDrawingManager() override = default;;
     void DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
         const PointerStyle pointerStyle, Direction direction) override;
     void UpdateDisplayInfo(const DisplayInfo& displayInfo) override;
@@ -108,6 +103,7 @@ public:
     void AttachToDisplay();
     int32_t EnableHardwareCursorStats(int32_t pid, bool enable) override;
     int32_t GetHardwareCursorStats(int32_t pid, uint32_t &frameCount, uint32_t &vsyncCount) override;
+    void InitPointerObserver() override;
 
 private:
     IconStyle GetIconType(MOUSE_ICON mouseIcon);
@@ -151,7 +147,6 @@ private:
     void DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUSE_ICON mouseStyle);
     bool SetHardWareLocation(int32_t displayId, int32_t physicalX, int32_t physicalY);
     void ForceClearPointerVisiableStatus() override;
-    void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId);
 
 private:
     struct PidInfo {

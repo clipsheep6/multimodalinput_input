@@ -41,7 +41,6 @@
 #include "setting_datashare.h"
 #include "util.h"
 #include "timer_manager.h"
-#include "system_ability_definition.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_CURSOR
@@ -122,21 +121,17 @@ PointerDrawingManager::PointerDrawingManager()
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     hardwareCursorPointerManager_ = std::make_shared<HardwareCursorPointerManager>();
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    MMI_HILOGI("Add system ability listener start");
-    AddSystemAbilityListener(RENDER_SERVICE);
-    MMI_HILOGI("Add system ability listener success");
 }
 
-void PointerDrawingManager::OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
+void PointerDrawingManager::InitPointerObserver()
 {
-    if (systemAbilityId == RENDER_SERVICE) {
-        MMI_HILOGI("Init RS observer start");
-        std::lock_guard<std::mutex> guard(mutex_);
-        g_isRsRemoteDied = false;
-        Rosen::OnRemoteDiedCallback callback = RsRemoteDiedCallback;
-        Rosen::RSInterfaces::GetInstance().SetOnRemoteDiedCallback(callback);
-    }
+    MMI_HILOGI("Init RS observer start");
+    std::lock_guard<std::mutex> guard(mutex_);
+    g_isRsRemoteDied = false;
+    Rosen::OnRemoteDiedCallback callback = RsRemoteDiedCallback;
+    Rosen::RSInterfaces::GetInstance().SetOnRemoteDiedCallback(callback);
 }
+
 
 PointerStyle PointerDrawingManager::GetLastMouseStyle()
 {
