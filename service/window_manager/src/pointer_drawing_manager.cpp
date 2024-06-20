@@ -132,7 +132,6 @@ void PointerDrawingManager::InitPointerObserver()
     Rosen::RSInterfaces::GetInstance().SetOnRemoteDiedCallback(callback);
 }
 
-
 PointerStyle PointerDrawingManager::GetLastMouseStyle()
 {
     CALL_DEBUG_ENTER;
