@@ -74,22 +74,21 @@ ohos_rust_unittest("rust_mmi_key_config_test") {
 
 ohos_shared_library("libmmi-util") {
   sources = libmmi_util_sources
-  public_configs = [
-    ":libmmi_util_public_config",
-    "${mmi_path}:coverage_flags",
-  ]
-
-  configs = [ ":libmmi_util_config" ]
+  public_configs = [ "${mmi_path}:coverage_flags" ]
+  configs = [ ":libmmi_util_public_config" ]
   branch_protector_ret = "pac_ret"
-  deps = [ ":mmi_rust_key_config" ]
+  deps = [
+    ":mmi_rust_key_config",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
+  ]
 
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
-    "hisysevent:libhisysevent",
     "napi:ace_napi",
+    "hisysevent:libhisysevent",
   ]
-  public_deps = [ "${mmi_path}/frameworks/proxy:libmmi-common" ]
+  public_deps = []
 
   if (security_component_enable) {
     external_deps += [ "security_component_manager:libsecurity_component_sdk" ]
@@ -103,7 +102,6 @@ ohos_unittest("ut-mmi-util-out") {
   configs = [ "${mmi_path}:coverage_flags" ]
   module_out_path = module_output_path
   include_dirs = [
-    "//third_party/googletest/googletest/include",
     "${mmi_path}/frameworks/proxy/event_handler",
     "${mmi_path}/frameworks/proxy/event_handler/include",
     "${mmi_path}/frameworks/proxy/module_loader",
@@ -140,6 +138,7 @@ ohos_unittest("ut-mmi-util-out") {
   ]
   external_deps = [
     "c_utils:utils",
+    "googletest:gtest",
     "hilog:libhilog",
     "image_framework:image_native",
   ]

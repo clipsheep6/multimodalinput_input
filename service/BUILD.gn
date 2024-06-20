@@ -87,9 +87,7 @@ config("libmmi_server_config") {
     "${mmi_path}/util/socket/include",
     "${mmi_path}/util/network/include",
     "${mmi_path}/frameworks/proxy/event_handler/include",
-    "//third_party/cJSON",
     "${preferences_path}/frameworks/native/include",
-    "${graphics_path}/2d_graphics/include",
   ]
 
   if (input_feature_fingerprint) {
@@ -232,11 +230,12 @@ ohos_shared_library("libmmi-server") {
     ":mmi_device_config.ini",
     ":mmi_rust",
     "${mmi_path}/etc/mouse_icon:input_mouse_icon",
+    "${mmi_path}/frameworks/proxy:libmmi-client",
+    "${mmi_path}/libudev:mmi_libudev",
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service/connect_manager:mmi_connect_manager_service",
     "${mmi_path}/service/filter:mmi_event_filter_proxy",
     "${mmi_path}/util:libmmi-util",
-    "//third_party/cJSON:cjson",
   ]
 
   external_deps = [ "c_utils:utils" ]
@@ -269,6 +268,7 @@ ohos_shared_library("libmmi-server") {
     "ability_runtime:dataobs_manager",
     "access_token:libaccesstoken_sdk",
     "access_token:libtokenid_sdk",
+    "audio_framework:audio_client",
     "call_manager:tel_call_manager_api",
     "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
@@ -299,6 +299,8 @@ ohos_shared_library("libmmi-server") {
     "window_manager:libwsutils",
   ]
 
+  public_external_deps = [ "cJSON:cjson" ]
+
   if (defined(use_rosen_drawing) && use_rosen_drawing) {
     defines += [ "USE_ROSEN_DRAWING" ]
   }
@@ -312,10 +314,7 @@ module_output_path = "multimodalinput/mmi_unit_out"
 
 ohos_unittest("event_resample_test") {
   module_out_path = module_output_path
-  include_dirs = [
-    "${mmi_path}/service/event_resample/include",
-    "${graphics_path}/2d_graphics/include",
-  ]
+  include_dirs = [ "${mmi_path}/service/event_resample/include" ]
 
   sources = [
     "event_resample/src/event_resample.cpp",
@@ -333,12 +332,12 @@ ohos_unittest("event_resample_test") {
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
-    "//third_party/cJSON:cjson",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
+    "cJSON:cjson",
     "c_utils:utils",
     "config_policy:configpolicy_util",
     "graphic_2d:2d_graphics",
@@ -347,7 +346,6 @@ ohos_unittest("event_resample_test") {
     "image_framework:image_native",
     "preferences:native_preferences",
     "window_manager:libdm",
-    "window_manager:libwm",
   ]
 }
 
@@ -398,7 +396,6 @@ ohos_unittest("TwoFingerLongTouchTest") {
   include_dirs = [
     "${mmi_path}/service/key_command/include",
     "${mmi_path}/service/key_command/test",
-    "${graphics_path}/2d_graphics/include",
   ]
 
   configs = [ ":libmmi_server_config" ]
@@ -419,12 +416,12 @@ ohos_unittest("TwoFingerLongTouchTest") {
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
-    "//third_party/cJSON:cjson",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
+    "cJSON:cjson",
     "c_utils:utils",
     "config_policy:configpolicy_util",
     "data_share:datashare_consumer",
@@ -456,15 +453,16 @@ ohos_unittest("EventFilterDeathRecipientTest") {
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
-    "//third_party/cJSON:cjson",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
+    "cJSON:cjson",
     "c_utils:utils",
     "config_policy:configpolicy_util",
     "data_share:datashare_consumer",
+    "graphic_2d:2d_graphics",
     "hilog:libhilog",
     "image_framework:image_native",
     "preferences:native_preferences",
@@ -475,10 +473,7 @@ ohos_unittest("EventFilterDeathRecipientTest") {
 ohos_unittest("EventFilterHandlerTest") {
   module_out_path = module_output_path
 
-  include_dirs = [
-    "${mmi_path}/service/filter/include",
-    "${graphics_path}/2d_graphics/include",
-  ]
+  include_dirs = [ "${mmi_path}/service/filter/include" ]
 
   configs = [ ":libmmi_server_config" ]
 
@@ -497,12 +492,12 @@ ohos_unittest("EventFilterHandlerTest") {
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
-    "//third_party/cJSON:cjson",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
+    "cJSON:cjson",
     "c_utils:utils",
     "config_policy:configpolicy_util",
     "data_share:datashare_consumer",
@@ -539,7 +534,6 @@ ohos_unittest("ApplicationStateObserverTest") {
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
-    "//third_party/cJSON:cjson",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
@@ -547,9 +541,11 @@ ohos_unittest("ApplicationStateObserverTest") {
   external_deps = [
     "ability_runtime:ability_manager",
     "ability_runtime:app_manager",
+    "cJSON:cjson",
     "c_utils:utils",
     "config_policy:configpolicy_util",
     "data_share:datashare_consumer",
+    "graphic_2d:2d_graphics",
     "hilog:libhilog",
     "image_framework:image_native",
     "ipc:ipc_single",
@@ -581,13 +577,14 @@ ohos_unittest("TimerManagerTest") {
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
-    "//third_party/cJSON:cjson",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
     "access_token:libaccesstoken_sdk",
+    "cJSON:cjson",
+    "graphic_2d:2d_graphics",
     "hilog:libhilog",
   ]
 }
@@ -859,6 +856,8 @@ ohos_unittest("TouchDrawingManagerTest") {
     "window_manager:libdm",
     "window_manager:libwm",
     "window_manager:libwsutils",
+    "cJSON:cjson",
+    "c_utils:utils",
   ]
 }
 
@@ -965,6 +964,8 @@ ohos_unittest("InputWindowsManagerTest") {
 
   external_deps = [
     "ability_runtime:dataobs_manager",
+    "cJSON:cjson",
+    "c_utils:utils",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
@@ -1083,8 +1084,10 @@ ohos_unittest("SubscriberTest") {
   external_deps = [
     "ability_base:want",
     "ability_runtime:wantagent_innerkits",
+    "cJSON:cjson",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
+    "graphic_2d:2d_graphics",
     "hilog:libhilog",
   ]
 
@@ -1117,7 +1120,12 @@ ohos_unittest("NapProcessTest") {
     "${mmi_path}/util:libmmi-util",
   ]
 
-  external_deps = [ "c_utils:utils" ]
+  external_deps = [
+    "cJSON:cjson",
+    "c_utils:utils",
+    "graphic_2d:2d_graphics",
+  ]
+}
 }
 
 ohos_unittest("MonitorTest") {
@@ -1142,6 +1150,7 @@ ohos_unittest("MonitorTest") {
   ]
 
   external_deps = [
+    "cJSON:cjson",
     "c_utils:utils",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
@@ -1184,6 +1193,7 @@ ohos_unittest("ModuleLoaderTest") {
 
   external_deps = [
     "ability_runtime:app_manager",
+    "cJSON:cjson",
     "c_utils:utils",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
@@ -1219,6 +1229,7 @@ ohos_unittest("KeyEventNormalizeTest") {
   ]
 
   external_deps = [
+    "cJSON:cjson",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
@@ -1257,6 +1268,7 @@ ohos_unittest("KeyCommandTest") {
 
   external_deps = [
     "ability_runtime:app_manager",
+    "cJSON:cjson",
     "c_utils:utils",
     "config_policy:configpolicy_util",
     "data_share:datashare_consumer",
@@ -1343,8 +1355,11 @@ ohos_unittest("InterceptorTest") {
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
   ]
-
-  external_deps = [ "hilog:libhilog" ]
+  external_deps = [
+    "cJSON:cjson",
+    "graphic_2d:2d_graphics",
+    "hilog:libhilog",
+  ]
 }
 
 ohos_unittest("EventHandlerTest") {
@@ -1378,6 +1393,7 @@ ohos_unittest("EventHandlerTest") {
   ]
 
   external_deps = [
+    "cJSON:cjson",
     "c_utils:utils",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
@@ -1404,14 +1420,15 @@ ohos_unittest("EventDispatchTest") {
   sources = [ "event_dispatch/test/event_dispatch_test.cpp" ]
 
   deps = [
-    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
   ]
 
   external_deps = [
     "ability_runtime:dataobs_manager",
+    "cJSON:cjson",
     "c_utils:utils",
+    "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
@@ -1449,6 +1466,7 @@ ohos_unittest("ServerMsgHandlerTest") {
     "ability_runtime:ability_connect_callback_stub",
     "ability_runtime:dataobs_manager",
     "c_utils:utils",
+    "graphic_2d:2d_graphics",
     "ffrt:libffrt",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
@@ -1511,6 +1529,7 @@ ohos_unittest("DisplayStateManagerTest") {
   ]
 
   external_deps = [
+    "cJSON:cjson",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
@@ -1543,7 +1562,11 @@ ohos_unittest("DeviceManagerTest") {
     "//third_party/googletest:gtest_main",
   ]
 
-  external_deps = [ "hilog:libhilog" ]
+  external_deps = [
+    "cJSON:cjson",
+    "graphic_2d:2d_graphics",
+    "hilog:libhilog",
+  ]
 }
 
 ohos_unittest("DeviceConfigTest") {
@@ -1565,6 +1588,11 @@ ohos_unittest("DeviceConfigTest") {
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
     "//third_party/googletest:gmock_main",
+  ]
+
+  external_deps = [
+    "cJSON:cjson",
+    "graphic_2d:2d_graphics",
   ]
 }
 
@@ -1588,7 +1616,11 @@ ohos_unittest("DelegateTaskTest") {
     "${mmi_path}/util:libmmi-util",
   ]
 
-  external_deps = [ "hilog:libhilog" ]
+  external_deps = [
+    "cJSON:cjson",
+    "graphic_2d:2d_graphics",
+    "hilog:libhilog",
+  ]
 }
 
 ohos_unittest("ConnectManagerTest") {
@@ -1612,6 +1644,7 @@ ohos_unittest("ConnectManagerTest") {
   ]
 
   external_deps = [
+    "cJSON:cjson",
     "ability_runtime:app_manager",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",

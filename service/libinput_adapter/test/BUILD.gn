@@ -25,11 +25,11 @@ ohos_unittest("mmi-libadapter-hotplug-test") {
   module_out_path = output_path
   include_dirs = [
     "${mmi_path}/util/common/include",
-    "../include",
+    "${mmi_path}/service/libinput_adapter/include",
   ]
 
   sources = [
-    "../src/hotplug_detector.cpp",
+    "${mmi_path}/service/libinput_adapter/src/hotplug_detector.cpp",
     "hotplug_detector_test.cpp",
   ]
 

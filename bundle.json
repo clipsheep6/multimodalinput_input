@@ -74,19 +74,20 @@
         "hilog",
         "common_event_service",
         "data_share",
+        "libevdev",
         "relational_store",
         "faultloggerd",
         "ffrt",
         "graphic_2d_ext",
         "hdf_core",
         "bounds_checking_function",
-        "call_manager"
+        "call_manager",
+	"cJSON",
+	"googletest"
       ],
       "third_party": [
-        "cJSON",
         "node",
         "libuv",
-        "libevdev",
         "mtdev",
         "libinput"
       ]
@@ -106,7 +107,6 @@
           "//foundation/multimodalinput/input/sa_profile:multimodalinput_sa_profile",
           "//foundation/multimodalinput/input:multimodalinput.rc",
           "//foundation/multimodalinput/input/patch:patch_packages",
-          "//third_party/libevdev:libevdev",
           "//foundation/multimodalinput/input:uinput_inject",
           "//foundation/multimodalinput/input:mmi_uinput.rc"
         ]
