@@ -63,7 +63,7 @@ class PointerDrawingManager final : public IPointerDrawingManager,
 public:
     PointerDrawingManager();
     DISALLOW_COPY_AND_MOVE(PointerDrawingManager);
-    ~PointerDrawingManager() override = default;;
+    ~PointerDrawingManager() override = default;
     void DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
         const PointerStyle pointerStyle, Direction direction) override;
     void UpdateDisplayInfo(const DisplayInfo& displayInfo) override;
