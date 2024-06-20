@@ -125,7 +125,7 @@ PointerDrawingManager::PointerDrawingManager()
 
 void PointerDrawingManager::InitPointerObserver()
 {
-    MMI_HILOGI("Init RS observer start");
+    MMI_HILOGI("Init RS Callback start");
     std::lock_guard<std::mutex> guard(mutex_);
     g_isRsRemoteDied = false;
     Rosen::OnRemoteDiedCallback callback = RsRemoteDiedCallback;
