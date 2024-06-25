@@ -91,7 +91,8 @@ napi_value JsInputDeviceManager::SupportKeysSync(napi_env env, int32_t id, std::
     CALL_DEBUG_ENTER;
     napi_value result = nullptr;
     auto callback = [env, &result] (std::vector<bool> &isSupported) {
-        return SupportKeysSyncCallback(env, &result, isSupported); };
+        return SupportKeysSyncCallback(env, &result, isSupported);
+        };
     int32_t napiCode = InputManager::GetInstance()->SupportKeys(id, keyCodes, callback);
     if (napiCode != OTHER_ERROR && napiCode != RET_OK) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Invalid input device id");
@@ -127,7 +128,8 @@ napi_value JsInputDeviceManager::GetKeyboardTypeSync(napi_env env, int32_t id)
     CALL_DEBUG_ENTER;
     napi_value result = nullptr;
     auto callback = [env, &result] (int32_t keyboardType) {
-        return GetKeyboardTypeSyncCallback(env, &result, keyboardType); };
+        return GetKeyboardTypeSyncCallback(env, &result, keyboardType);
+        };
     int32_t napiCode = InputManager::GetInstance()->GetKeyboardType(id, callback);
     if (napiCode != OTHER_ERROR && napiCode != RET_OK) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Invalid input device id");
@@ -185,7 +187,8 @@ napi_value JsInputDeviceManager::GetDeviceInfoSync(napi_env env, int32_t id, nap
     CreateCallbackInfo(env, handle, cb);
     napi_value result = nullptr;
     auto callback = [env, &result, cb] (std::shared_ptr<InputDevice> inputDevice) {
-        return GetDeviceInfoSyncCallback(env, &result, cb, inputDevice); };
+        return GetDeviceInfoSyncCallback(env, &result, cb, inputDevice);
+        };
     int32_t napiCode = InputManager::GetInstance()->GetDevice(id, callback);
     if (napiCode != OTHER_ERROR && napiCode != RET_OK) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Invalid input device id");

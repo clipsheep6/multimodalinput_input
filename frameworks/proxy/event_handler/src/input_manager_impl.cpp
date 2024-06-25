@@ -427,10 +427,9 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     if (client->IsEventHandlerChanged()) {
         BytraceAdapter::StartPostTaskEvent(keyEvent);
         if (!eventHandler->PostTask([this, inputConsumer, keyEvent] {
-            return this->OnKeyEventTask(inputConsumer, keyEvent);
-        },
-        std::string("MMI::OnKeyEvent"), 0, AppExecFwk::EventHandler::Priority::VIP)) {
-
+                return this->OnKeyEventTask(inputConsumer, keyEvent);
+            },
+            std::string("MMI::OnKeyEvent"), 0, AppExecFwk::EventHandler::Priority::VIP)) {
             MMI_HILOG_DISPATCHE("Post task failed");
             BytraceAdapter::StopPostTaskEvent();
             return;
@@ -486,9 +485,9 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
     if (client->IsEventHandlerChanged()) {
         BytraceAdapter::StartPostTaskEvent(pointerEvent);
         if (!eventHandler->PostTask([this, inputConsumer, pointerEvent] {
-            return this->OnPointerEventTask(inputConsumer, pointerEvent);
-        },
-        std::string("MMI::OnPointerEvent"), 0, AppExecFwk::EventHandler::Priority::VIP)) {
+                return this->OnPointerEventTask(inputConsumer, pointerEvent);
+            },
+            std::string("MMI::OnPointerEvent"), 0, AppExecFwk::EventHandler::Priority::VIP)) {
             MMI_HILOG_DISPATCHE("Post task failed");
             BytraceAdapter::StopPostTaskEvent();
             return;
