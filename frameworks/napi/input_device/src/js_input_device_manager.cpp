@@ -152,7 +152,7 @@ napi_value JsInputDeviceManager::GetDeviceInfo(napi_env env, int32_t id, napi_va
     sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
     CHKPP(cb);
     napi_value ret = CreateCallbackInfo(env, handle, cb);
-    auto callback = [cb] (std::shared_ptr<InputDevice> inputDevice) { return EmitJsDev(cb, device); };
+    auto callback = [cb] (std::shared_ptr<InputDevice> inputDevice) { return EmitJsDev(cb, inputDevice); };
     int32_t napiCode = InputManager::GetInstance()->GetDevice(id, callback);
     if (napiCode != OTHER_ERROR && napiCode != RET_OK) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Invalid input device id");
