@@ -79,6 +79,7 @@ ohos_unittest("InjectEventTest") {
     "c_utils:utils",
     "hilog:libhilog",
     "image_framework:image_native",
+    "googletest:gtest_main",
   ]
 }
 
