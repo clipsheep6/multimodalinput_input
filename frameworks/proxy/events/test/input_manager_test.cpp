@@ -205,7 +205,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_InterceptTabletToolEvent_001, TestSi
     TestSimulateInputEvent(pointerEvent);
 
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
-    TestSimulateInputEvent(pointerEvent);
+    TestSimulateInputEvent(pointerEvent, TestScene::EXCEPTION_TEST);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
     if (IsValidHandlerId(interceptorId)) {
@@ -245,7 +245,7 @@ HWTEST_F(InputManagerTest, AppendExtraData_001, TestSize.Level1)
     InputManager::GetInstance()->AppendExtraData(extraData);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     ASSERT_TRUE(pointerEvent != nullptr);
-    SimulateInputEventUtilTest(pointerEvent);
+    TestSimulateInputEvent(pointerEvent, TestScene::EXCEPTION_TEST);
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
@@ -270,7 +270,7 @@ HWTEST_F(InputManagerTest, AppendExtraData_002, TestSize.Level1)
     InputManager::GetInstance()->AppendExtraData(extraData);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     ASSERT_TRUE(pointerEvent != nullptr);
-    SimulateInputEventUtilTest(pointerEvent);
+    TestSimulateInputEvent(pointerEvent, TestScene::EXCEPTION_TEST);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
 
@@ -464,7 +464,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_RemoteControlAutoRepeat, TestSize.Le
     injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     injectDownEvent->AddPressedKeyItems(kitDown);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    SimulateInputEventUtilTest(injectDownEvent);
+    TestSimulateInputEvent(injectDownEvent, TestScene::EXCEPTION_TEST);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
     std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
@@ -480,7 +480,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_RemoteControlAutoRepeat, TestSize.Le
     injectUpEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     injectUpEvent->RemoveReleasedKeyItems(kitUp);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    SimulateInputEventUtilTest(injectUpEvent);
+    TestSimulateInputEvent(injectUpEvent, TestScene::EXCEPTION_TEST);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
