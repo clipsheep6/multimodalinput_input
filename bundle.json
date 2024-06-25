@@ -88,7 +88,9 @@
         "libuv",
         "libevdev",
         "mtdev",
-        "libinput"
+        "libinput",
+        "FreeBSD",
+        "googletest"
       ]
     },
     "build": {

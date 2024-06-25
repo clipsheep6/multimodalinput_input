@@ -67,7 +67,10 @@ ohos_rust_unittest("rust_mmi_key_config_test") {
   module_out_path = module_output_path
   sources = [ "rust_key/src/lib.rs" ]
   deps = [ ":mmi_rust_key_config" ]
-  external_deps = [ "hilog:hilog_rust" ]
+  external_deps = [
+    "hilog:hilog_rust",
+    "googletest:gtest_main",
+  ]
   subsystem_name = "multimodalinput"
   part_name = "input"
 }
@@ -81,7 +84,10 @@ ohos_shared_library("libmmi-util") {
 
   configs = [ ":libmmi_util_config" ]
   branch_protector_ret = "pac_ret"
-  deps = [ ":mmi_rust_key_config" ]
+  deps = [
+    ":mmi_rust_key_config",
+    "${mmi_path}/frameworks/proxy:libmmi-common",
+    ]
 
   external_deps = [
     "c_utils:utils",
@@ -89,7 +95,8 @@ ohos_shared_library("libmmi-util") {
     "hisysevent:libhisysevent",
     "napi:ace_napi",
   ]
-  public_deps = [ "${mmi_path}/frameworks/proxy:libmmi-common" ]
+  
+  public_deps = []
 
   if (security_component_enable) {
     external_deps += [ "security_component_manager:libsecurity_component_sdk" ]
@@ -103,7 +110,6 @@ ohos_unittest("ut-mmi-util-out") {
   configs = [ "${mmi_path}:coverage_flags" ]
   module_out_path = module_output_path
   include_dirs = [
-    "//third_party/googletest/googletest/include",
     "${mmi_path}/frameworks/proxy/event_handler",
     "${mmi_path}/frameworks/proxy/event_handler/include",
     "${mmi_path}/frameworks/proxy/module_loader",
@@ -135,12 +141,12 @@ ohos_unittest("ut-mmi-util-out") {
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/util:libmmi-util",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
   ]
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
     "image_framework:image_native",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
   ]
 }
