@@ -34,8 +34,8 @@ namespace OHOS {
 namespace MMI {
 InputHandlerManager::InputHandlerManager()
 {
-    monitorCallback_ =
-        std::bind(&InputHandlerManager::OnDispatchEventProcessed, this, std::placeholders::_1, std::placeholders::_2);
+    monitorCallback_ = 
+        [this] (int32_t eventId, int64_t actionTime) { return this->OnDispatchEventProcessed(eventId, actionTime) };
 }
 
 int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType, std::shared_ptr<IInputEventConsumer> consumer,
