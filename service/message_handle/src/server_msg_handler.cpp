@@ -711,7 +711,10 @@ int32_t ServerMsgHandler::OnAuthorize(bool isAuthorize)
         noticeInfo.pid = CurrentPID_;
         AddInjectNotice(noticeInfo);
         auto result = AUTHORIZE_HELPER->AddAuthorizeProcess(CurrentPID_,
-            std::bind(&ServerMsgHandler::CloseInjectNotice, this, std::placeholders::_1));
+            [this] (int32_t pid) {
+                return this->CloseInjectNotice(pid);
+            }
+            );
         if (result != RET_OK) {
             MMI_HILOGI("Authorize process failed, pid:%{public}d", CurrentPID_);
         }
