@@ -276,7 +276,7 @@ void UDSServer::OnEpollRecv(int32_t fd, epoll_event& ev)
             }
             OnReadPackets(buf,
                 [this, fd] (NetPacket& pkt) {
-                    this->OnPacket(fd, pkt);
+                    return this->OnPacket(fd, pkt);
                 }
                 );
         } else if (size < 0) {
