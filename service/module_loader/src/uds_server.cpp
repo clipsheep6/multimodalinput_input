@@ -275,7 +275,7 @@ void UDSServer::OnEpollRecv(int32_t fd, epoll_event& ev)
                 MMI_HILOGW("Write data failed. size:%{public}zu", size);
             }
             OnReadPackets(buf, [this, fd] (NetPacket& pkt) {
-                    return this->OnPacket(fd, pkt);
+                return this->OnPacket(fd, pkt);
                 }
                 );
         } else if (size < 0) {

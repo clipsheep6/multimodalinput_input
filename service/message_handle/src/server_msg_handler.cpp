@@ -710,9 +710,8 @@ int32_t ServerMsgHandler::OnAuthorize(bool isAuthorize)
         InjectNoticeInfo noticeInfo;
         noticeInfo.pid = CurrentPID_;
         AddInjectNotice(noticeInfo);
-        auto result = AUTHORIZE_HELPER->AddAuthorizeProcess(CurrentPID_,
-            [this] (int32_t pid) {
-                return this->CloseInjectNotice(pid);
+        auto result = AUTHORIZE_HELPER->AddAuthorizeProcess(CurrentPID_, [this] (int32_t pid) {
+            return this->CloseInjectNotice(pid);
             }
             );
         if (result != RET_OK) {
