@@ -69,7 +69,11 @@ void AuthorizeHelper::Init(UDSServer& udsServer)
     }
     udsServer_ = &udsServer;
     CHKPV(udsServer_);
-    udsServer_->AddSessionDeletedCallback(std::bind(&AuthorizeHelper::OnSessionLost, this, std::placeholders::_1));
+    udsServer_->AddSessionDeletedCallback(
+        [this] (SessionPtr session) {
+            return this->OnSessionLost(session);
+        }
+        );
 }
 
 void AuthorizeHelper::OnSessionLost(SessionPtr session)
