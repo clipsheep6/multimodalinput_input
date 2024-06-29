@@ -24,13 +24,13 @@
 #include "gesturesense_wrapper.h"
 #include "input_event_handler.h"
 #include "input_handler_type.h"
+#include "input_windows_manager.h"
 #include "i_preference_manager.h"
 #include "key_command_handler.h"
 #include "mmi_log.h"
 #include "multimodal_event_handler.h"
 #include "system_info.h"
 #include "stylus_key_handler.h"
-
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "KeyCommandHandlerTest"
@@ -2901,6 +2901,176 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandlePointerVisibleKeys_0
     keyEvent->keyCode_ = KeyEvent::KEYCODE_F1;
     handler.lastKeyEventCode_ = KeyEvent::KEYCODE_CAPS_LOCK;
     ASSERT_NO_FATAL_FAILURE(handler.HandlePointerVisibleKeys(keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_ConvertVPToPX_002
+ * @tc.desc: Test the funcation ConvertVPToPX
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ConvertVPToPX_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    int32_t vp = -5;
+    int32_t ret = handler.ConvertVPToPX(vp);
+    ASSERT_EQ(ret, 0);
+    vp = 5;
+    InputWindowsManager inputWindowsManager;
+    DisplayInfo displayInfo;
+    displayInfo.id = 1;
+    displayInfo.x = 2;
+    displayInfo.y = 3;
+    displayInfo.width = 4;
+    displayInfo.height = 5;
+    displayInfo.dpi = -1;
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    ret = handler.ConvertVPToPX(vp);
+    ASSERT_EQ(ret, 0);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_ConvertVPToPX_003
+ * @tc.desc: Test the funcation ConvertVPToPX
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_ConvertVPToPX_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    int32_t vp = 5;
+    InputWindowsManager inputWindowsManager;
+    DisplayInfo displayInfo;
+    displayInfo.id = 1;
+    displayInfo.x = 2;
+    displayInfo.y = 3;
+    displayInfo.width = 4;
+    displayInfo.height = 5;
+    displayInfo.dpi = 160;
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    int32_t ret = handler.ConvertVPToPX(vp);
+    ASSERT_EQ(ret, 0);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_CheckTwoFingerGestureAction_003
+ * @tc.desc: Test the funcation CheckTwoFingerGestureAction
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckTwoFingerGestureAction_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    handler.twoFingerGesture_.active = true;
+    handler.twoFingerGesture_.touches[0].id = 1;
+    handler.twoFingerGesture_.touches[0].x = -100;
+    handler.twoFingerGesture_.touches[0].y = -200;
+    handler.twoFingerGesture_.touches[0].downTime = 100000;
+    handler.twoFingerGesture_.touches[1].id = 2;
+    handler.twoFingerGesture_.touches[1].x = -300;
+    handler.twoFingerGesture_.touches[1].y = -400;
+    handler.twoFingerGesture_.touches[1].downTime = 50000;
+    InputWindowsManager inputWindowsManager;
+    DisplayInfo displayInfo;
+    displayInfo.id = 1;
+    displayInfo.x = 2;
+    displayInfo.y = 3;
+    displayInfo.width = 4;
+    displayInfo.height = 5;
+    displayInfo.dpi = -1;
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    bool ret = handler.CheckTwoFingerGestureAction();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_CheckTwoFingerGestureAction_004
+ * @tc.desc: Test the funcation CheckTwoFingerGestureAction
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckTwoFingerGestureAction_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    handler.twoFingerGesture_.active = true;
+    handler.twoFingerGesture_.touches[0].id = 1;
+    handler.twoFingerGesture_.touches[0].x = 100;
+    handler.twoFingerGesture_.touches[0].y = 200;
+    handler.twoFingerGesture_.touches[0].downTime = 100000;
+    handler.twoFingerGesture_.touches[1].id = 2;
+    handler.twoFingerGesture_.touches[1].x = 300;
+    handler.twoFingerGesture_.touches[1].y = 400;
+    handler.twoFingerGesture_.touches[1].downTime = 50000;
+    InputWindowsManager inputWindowsManager;
+    DisplayInfo displayInfo;
+    displayInfo.id = 1;
+    displayInfo.x = 2;
+    displayInfo.y = 3;
+    displayInfo.width = 40;
+    displayInfo.height = 50;
+    displayInfo.dpi = -1;
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    bool ret = handler.CheckTwoFingerGestureAction();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_CheckTwoFingerGestureAction_005
+ * @tc.desc: Test the funcation CheckTwoFingerGestureAction
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckTwoFingerGestureAction_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    handler.twoFingerGesture_.active = true;
+    handler.twoFingerGesture_.touches[0].id = 1;
+    handler.twoFingerGesture_.touches[0].x = 10;
+    handler.twoFingerGesture_.touches[0].y = 20;
+    handler.twoFingerGesture_.touches[0].downTime = 100000;
+    handler.twoFingerGesture_.touches[1].id = 2;
+    handler.twoFingerGesture_.touches[1].x = 30;
+    handler.twoFingerGesture_.touches[1].y = 20;
+    handler.twoFingerGesture_.touches[1].downTime = 50000;
+    InputWindowsManager inputWindowsManager;
+    DisplayInfo displayInfo;
+    displayInfo.id = 1;
+    displayInfo.x = 2;
+    displayInfo.y = 3;
+    displayInfo.width = 40;
+    displayInfo.height = 50;
+    displayInfo.dpi = -1;
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    bool ret = handler.CheckTwoFingerGestureAction();
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_StartTwoFingerGesture_002
+ * @tc.desc: Test the funcation StartTwoFingerGesture
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_StartTwoFingerGesture_002, TestSize.Level1)
+{
+    KeyCommandHandler handler;
+    handler.twoFingerGesture_.active = false;
+    ASSERT_NO_FATAL_FAILURE(handler.StartTwoFingerGesture());
+    handler.twoFingerGesture_.active = true;
+    handler.twoFingerGesture_.touches[0].id = 5;
+    handler.twoFingerGesture_.touches[0].x = 50;
+    handler.twoFingerGesture_.touches[0].y = 60;
+    handler.twoFingerGesture_.touches[0].downTime = 13000;
+    handler.twoFingerGesture_.touches[1].id = 9;
+    handler.twoFingerGesture_.touches[1].x = 100;
+    handler.twoFingerGesture_.touches[1].y = 400;
+    handler.twoFingerGesture_.touches[1].downTime = 96000;
+    ASSERT_NO_FATAL_FAILURE(handler.StartTwoFingerGesture());
 }
 } // namespace MMI
 } // namespace OHOS
