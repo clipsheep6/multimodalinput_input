@@ -27,8 +27,8 @@
 #include "i_input_event_handler.h"
 #include "key_event.h"
 #include "key_option.h"
-#include "uds_server.h"
 #include "nap_process.h"
+#include "uds_server.h"
 
 namespace OHOS {
 namespace MMI {
