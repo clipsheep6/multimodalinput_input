@@ -24,8 +24,8 @@
 
 #include "aggregator.h"
 #include "define_multimodal.h"
-#include "timer_manager.h"
 #include "pointer_event.h"
+#include "timer_manager.h"
 #include "window_info.h"
 
 namespace OHOS {
