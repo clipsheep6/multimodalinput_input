@@ -21,9 +21,10 @@
 #include <thread>
 #include <unordered_map>
 
+#include "nocopyable.h"
+
 #include "hotplug_detector.h"
 #include "libinput.h"
-#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
