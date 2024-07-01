@@ -41,7 +41,7 @@ public:
 
     private:
         sptr<IRemoteObject> remoteObject_ { nullptr };
-        std::atomic_bool isConnected_ = false;
+        std::atomic_bool isConnected_ { false };
     };
     bool StartNoticeAbility();
     bool ConnectNoticeSrv();
@@ -50,7 +50,7 @@ public:
 
 private:
     sptr<InjectNoticeConnection> connectionCallback_ { nullptr };
-    std::atomic_bool isStartSrv_ = false;
+    std::atomic_bool isStartSrv_ { false };
 };
 } // namespace MMI
 } // namespace OHOS
