@@ -16,10 +16,10 @@
 #ifndef STYLUS_KEY_HANDLER_H
 #define STYLUS_KEY_HANDLER_H
 
+#include "singleton.h"
+
 #include "key_command_handler.h"
 #include "key_event.h"
-
-#include "singleton.h"
 
 namespace OHOS {
 namespace MMI {
