@@ -33,7 +33,7 @@ public:
     void SetUpdateFunc(UpdateFunc& func);
 private:
     std::string key_ {};
-    UpdateFunc update_ = nullptr;
+    UpdateFunc update_ { nullptr };
 };
 }
 } // OHOS::MMI
