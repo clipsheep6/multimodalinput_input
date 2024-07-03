@@ -93,6 +93,7 @@ void AuthorizeHelper::AuthorizeProcessExit()
         MMI_HILOGI("Exit callback function will be called, authorize pid:%{public}d", pid_);
         exitCallback_(pid_);
     }
+    pid_ = INVALID_AUTHORIZE_PID;
 }
 
 int32_t AuthorizeHelper::AddAuthorizeProcess(int32_t pid, AuthorizeExitCallback exitCallback)
@@ -117,6 +118,7 @@ int32_t AuthorizeHelper::AddAuthorizeProcess(int32_t pid, AuthorizeExitCallback 
         }
         pid_ = pid;
         state_ = AuthorizeState::STATE_SELECTION_AUTHORIZE;
+        exitCallback_ = exitCallback;
         MMI_HILOGD("A process enters the authorization select state %{public}d", state_);
         return RET_OK; 
     } 

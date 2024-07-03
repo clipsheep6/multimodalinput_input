@@ -118,12 +118,12 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
             CurrentPID_ = pid;
             InjectionType_ = InjectionType::KEYEVENT;
             keyEvent_ = keyEvent;
-            LaunchAbility();    //OnAuthorize
+            LaunchAbility(); 
             AUTHORIZE_HELPER->AddAuthorizeProcess(CurrentPID_,
             [&] (int32_t pid) {
               MMI_HILOGI("User not authorized to inject pid:%{public}d", pid);
             }
-            );    
+            );  
             return COMMON_PERMISSION_CHECK_ERROR;
         }
         CurrentPID_ = pid;
