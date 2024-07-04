@@ -22,10 +22,8 @@ namespace OHOS {
 namespace MMI {
 class IInputBinderClient : public IRemoteBroker {
 public:
-    IInputBinderClient() = default;
-    virtual ~IInputBinderClient() = default;
     DECLARE_INTERFACE_DESCRIPTOR(u"IInputBinderClient");
 };
-}  // namespace MMI
-}  // namespace OHOS
+} // namespace MMI
+} // namespace OHOS
 #endif // I_INPUT_BINDER_CLIENT_H

@@ -20,8 +20,8 @@
 
 #include "singleton.h"
 
-#include "input_binder_client_stub.h"
 #include "i_multimodal_input_connect.h"
+#include "input_binder_client_stub.h"
 
 namespace OHOS {
 namespace MMI {
@@ -32,11 +32,11 @@ public:
     DISALLOW_COPY_AND_MOVE(InputBinderClientServer);
     sptr<IRemoteObject> GetClientSrv();
 private:
-    int32_t InitClientSrv();
+    void InitClientSrv();
     std::mutex clientSrvMutex_;
     sptr<InputBinderClientStub> clientSrvStub_ = nullptr;
 };
 #define INPUT_BINDER_CLIENT_SERVICE ::OHOS::DelayedSingleton<InputBinderClientServer>::GetInstance()
-}  // namespace MMI
-}  // namespace OHOS
+} // namespace MMI
+} // namespace OHOS
 #endif // INPUT_BINDER_CLIENT_SERVER_H

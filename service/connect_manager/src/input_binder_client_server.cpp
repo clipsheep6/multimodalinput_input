@@ -14,6 +14,7 @@
  */
 
 #include "input_binder_client_server.h"
+
 #include "mmi_log.h"
 
 #undef MMI_LOG_TAG
@@ -24,27 +25,25 @@ namespace MMI {
 
 InputBinderClientServer::InputBinderClientServer() 
 {
-  InitClientSrv();
+    InitClientSrv();
 }
 
-InputBinderClientServer::~InputBinderClientServer() 
+InputBinderClientServer::~InputBinderClientServer() {}
+
+void InputBinderClientServer::InitClientSrv() 
 {
-
-}
-int32_t InputBinderClientServer::InitClientSrv() {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> clientLock(clientSrvMutex_);
-     if (clientSrvStub_ == nullptr) {
+    if (clientSrvStub_ == nullptr) {
         clientSrvStub_ = new (std::nothrow) InputBinderClientStub();
     }
-    return ERR_OK;
 }
 
 sptr<IRemoteObject> InputBinderClientServer::GetClientSrv()
 {
-  std::lock_guard<std::mutex> clientLock(clientSrvMutex_);
-  CHKPP(clientSrvStub_);
-  return clientSrvStub_->AsObject();
+    std::lock_guard<std::mutex> clientLock(clientSrvMutex_);
+    CHKPP(clientSrvStub_);
+    return clientSrvStub_->AsObject();
 }
-}  // namespace MMI
-}  // namespace OHOS
+} // namespace MMI
+} // namespace OHOS

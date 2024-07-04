@@ -30,6 +30,6 @@ public:
     virtual int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
                                     MessageOption &option) override;
 };
-}  // namespace MMI
-}  // namespace OHOS
+} // namespace MMI
+} // namespace OHOS
 #endif // I_INPUT_BINDER_CLIENT_STUB_H

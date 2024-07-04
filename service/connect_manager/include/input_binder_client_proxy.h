@@ -25,14 +25,13 @@ namespace OHOS {
 namespace MMI {
 class InputBinderClientProxy : public IRemoteProxy<IInputBinderClient> {
 public:
-    explicit InputBinderClientProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IInputBinderClient>(impl)
-    {}
+    DISALLOW_COPY_AND_MOVE(InputBinderClientProxy);
+    explicit InputBinderClientProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IInputBinderClient>(impl) {}
     virtual ~InputBinderClientProxy() = default;
 
 private:
-    DISALLOW_COPY_AND_MOVE(InputBinderClientProxy);
     static inline BrokerDelegator<InputBinderClientProxy> delegator_;
 };
-}  // namespace MMI
-}  // namespace OHOS
+} // namespace MMI
+} // namespace OHOS
 #endif // INPUT_BINDER_CLIENT_PROXY_H

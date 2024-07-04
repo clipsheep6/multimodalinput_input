@@ -360,7 +360,7 @@ inline constexpr int32_t INVALID_PID { -1 };
     do { \
         if (!(parcel).WriteRemoteObject(data)) { \
             MMI_HILOGE("WriteRemoteObject "#data" failed"); \
-             return DEFRET(false, ##__VA_ARGS__); \
+            return DEFRET(false, ##__VA_ARGS__); \
         } \
     } while (0)
 

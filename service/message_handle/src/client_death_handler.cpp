@@ -25,7 +25,7 @@ ClientDeathHandler::ClientDeathHandler() {}
 
 ClientDeathHandler::~ClientDeathHandler() {}
 
-bool ClientDeathHandler::RegisterClientDeathRecipient(sptr<IRemoteObject> binderClientSrv, int32_t pid)
+bool ClientDeathHandler::RegisterClientDeathRecipient(const sptr<IRemoteObject> &binderClientSrv, int32_t pid)
 {
     CALL_DEBUG_ENTER;
     if (!RegisterClientDeathRecipient(binderClientSrv)) {
@@ -83,7 +83,7 @@ void ClientDeathHandler::OnDeath(const wptr<IRemoteObject> &remoteObj)
     RemoveClientPid(pid);
 }
 
-bool ClientDeathHandler::RegisterClientDeathRecipient(sptr<IRemoteObject> binderClientSrv)
+bool ClientDeathHandler::RegisterClientDeathRecipient(const sptr<IRemoteObject> &binderClientSrv)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> clientDeathLock(mutexDeathRecipient_);
@@ -92,10 +92,9 @@ bool ClientDeathHandler::RegisterClientDeathRecipient(sptr<IRemoteObject> binder
         CALL_DEBUG_ENTER;
         OnDeath(object);
     };
-    if (!deathRecipient_) {
+    if (deathRecipient_ == nullptr) {
         deathRecipient_ = new (std::nothrow) InputBinderClientDeathRecipient(deathCallback);
     }
-
     CHKPF(deathRecipient_);
     if (!binderClientSrv->AddDeathRecipient(deathRecipient_)) {
         MMI_HILOGE("Failed to add death recipient");

@@ -14,17 +14,18 @@
  */
 
 #include "input_binder_client_stub.h"
+
 #include "message_parcel.h"
 #include "mmi_log.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "InputBinderClientStub"
+
 namespace OHOS {
 namespace MMI {
-using namespace OHOS::HiviewDFX;
 
-int32_t InputBinderClientStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
-                                          MessageOption &option)
+int32_t InputBinderClientStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, 
+     MessageOption &option)
 {
     std::u16string descriptor = InputBinderClientStub::GetDescriptor();
     std::u16string remoteDescriptor = data.ReadInterfaceToken();
@@ -35,5 +36,5 @@ int32_t InputBinderClientStub::OnRemoteRequest(uint32_t code, MessageParcel &dat
     MMI_HILOGD("Begin, cmd:%{public}u", code);
     return NO_ERROR;
 }
-}  // namespace OHOS
-}  // namespace MMI
+} // namespace OHOS
+} // namespace MMI

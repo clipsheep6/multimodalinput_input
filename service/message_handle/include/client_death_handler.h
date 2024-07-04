@@ -38,17 +38,18 @@ public:
     ClientDeathHandler();
     ~ClientDeathHandler();
     DISALLOW_COPY_AND_MOVE(ClientDeathHandler);
-    bool RegisterClientDeathRecipient(sptr<IRemoteObject> binderClientSrv, int32_t pid);
+    bool RegisterClientDeathRecipient(const sptr<IRemoteObject> &binderClientSrv, int32_t pid);
     bool AddClientDeathCallback(CallBackType type, ClientDeathCallback callback);
     bool UnregisterClientDeathRecipient(const wptr<IRemoteObject> &remoteObj);
     void RemoveClientDeathCallback(CallBackType type);
 
 protected:
-    bool RegisterClientDeathRecipient(sptr<IRemoteObject> binderClientSrv);
+    bool RegisterClientDeathRecipient(const sptr<IRemoteObject> &binderClientSrv);
     bool AddClientPid(const sptr<IRemoteObject> &binderClientSrv, int32_t pid);
     void RemoveClientPid(int32_t pid);
     int32_t FindClientPid(const sptr<IRemoteObject> &binderClientSrv);
     void NotifyDeath(int32_t pid);
+
 private:
     void OnDeath(const wptr<IRemoteObject> &remoteObj);
     std::mutex mutexPidMap_; 
@@ -56,7 +57,7 @@ private:
     std::mutex mutexDeathRecipient_;
     sptr<InputBinderClientDeathRecipient> deathRecipient_ = nullptr;
     std::mutex mutexCallbacks_; 
-    std::map<CallBackType,ClientDeathCallback> deathCallbacks_;
+    std::map<CallBackType, ClientDeathCallback> deathCallbacks_;
 };
 } // namespace MMI
 } // namespace OHOS

@@ -64,7 +64,7 @@ void AuthorizeHelper::Init(ClientDeathHandler &clientDeathHandler)
 {
     CALL_DEBUG_ENTER;
     if (isInit_) {
-        MMI_HILOGI("Already initialized, no need to initialize again");
+        MMI_HILOGD("Already initialized, no need to initialize again");
         return;
     }
 
@@ -111,9 +111,9 @@ int32_t AuthorizeHelper::AddAuthorizeProcess(int32_t pid, AuthorizeExitCallback 
 
     std::lock_guard<std::mutex> lock(mutex_);
     if (state_ == AuthorizeState::STATE_UNAUTHORIZE) {
-        if(pid_ != INVALID_AUTHORIZE_PID) {
-            MMI_HILOGE("Failed to authorize helper state.state:%{public}d,pid_:%{public}d,pid:%{public}d",
-            state_, pid_, pid);
+        if (pid_ != INVALID_AUTHORIZE_PID) {
+            MMI_HILOGI("Failed to authorize helper state.state:%{public}d,pid_:%{public}d,pid:%{public}d",
+                state_, pid_, pid);
             return RET_ERR;
         }
         pid_ = pid;
@@ -150,12 +150,6 @@ void AuthorizeHelper::CancelAuthorize(int32_t pid)
     state_ = AuthorizeState::STATE_UNAUTHORIZE;
     pid_ = INVALID_AUTHORIZE_PID;
     exitCallback_ = nullptr;
-}
-
-AuthorizeState AuthorizeHelper::GetAuthorizeState()
-{
-    std::lock_guard<std::mutex> lock(mutex_);
-    return state_;
 }
 } // namespace MMI
 } // namespace OHOS
