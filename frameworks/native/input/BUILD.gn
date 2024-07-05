@@ -27,6 +27,7 @@ ohos_shared_library("oh_input_manager") {
   include_dirs = [
     "${mmi_path}/common/anco/comm/include",
     "${mmi_path}/frameworks/native/input/",
+    "${mmi_path}/frameworks/proxy/event_handle/include/",
     "${mmi_path}/interfaces/kits/c/input/",
     "${mmi_path}/interfaces/native/innerkits/",
     "${mmi_path}/service/connect_manager/include",
@@ -48,7 +49,9 @@ ohos_shared_library("oh_input_manager") {
 
   external_deps = [
     "c_utils:utils",
+    "eventhandler:libeventhandler",
     "hilog:libhilog",
+    "ipc:ipc_core",
     "napi:ace_napi",
   ]
 

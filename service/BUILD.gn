@@ -87,9 +87,7 @@ config("libmmi_server_config") {
     "${mmi_path}/util/socket/include",
     "${mmi_path}/util/network/include",
     "${mmi_path}/frameworks/proxy/event_handler/include",
-    "//third_party/cJSON",
     "${preferences_path}/frameworks/native/include",
-    "${graphics_path}/2d_graphics/include",
   ]
 
   if (input_feature_fingerprint) {
@@ -140,7 +138,10 @@ ohos_rust_unittest("rust_mmi_test") {
   module_out_path = module_output_path
   sources = [ "rust/src/lib.rs" ]
   deps = [ ":mmi_rust" ]
-  external_deps = [ "hilog:hilog_rust" ]
+  external_deps = [
+    "hilog:hilog_rust",
+    "googletest:gtest_main",
+  ]
   subsystem_name = "multimodalinput"
   part_name = "input"
 }
@@ -234,18 +235,24 @@ ohos_shared_library("libmmi-server") {
     ":mmi_device_config.ini",
     ":mmi_rust",
     "${mmi_path}/etc/mouse_icon:input_mouse_icon",
+    "${mmi_path}/frameworks/proxy:libmmi-client",
+    "${mmi_path}/libudev:mmi_libudev",
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service/connect_manager:mmi_connect_manager_service",
     "${mmi_path}/service/filter:mmi_event_filter_proxy",
     "${mmi_path}/util:libmmi-util",
-    "//third_party/cJSON:cjson",
   ]
 
   if (input_ext_feature_anco) {
     deps += [ "${mmi_path}/common/anco/comm:mmi_anco_channel_proxy" ]
   }
 
-  external_deps = [ "c_utils:utils" ]
+  external_deps = [
+    "c_utils:utils",
+    "cJSON:cjson",
+    "graphic_2d:2d_graphics",
+  ]
+  
   if (input_feature_pointer_drawing) {
     external_deps += [ "window_manager:libwm_lite" ]
   }
@@ -305,6 +312,8 @@ ohos_shared_library("libmmi-server") {
     "window_manager:libwsutils",
   ]
 
+  public_external_deps = [ "cJSON:cjson" ]
+
   if (defined(use_rosen_drawing) && use_rosen_drawing) {
     defines += [ "USE_ROSEN_DRAWING" ]
   }
@@ -320,7 +329,6 @@ ohos_unittest("event_resample_test") {
   module_out_path = module_output_path
   include_dirs = [
     "${mmi_path}/service/event_resample/include",
-    "${graphics_path}/2d_graphics/include",
   ]
 
   sources = [
@@ -339,9 +347,6 @@ ohos_unittest("event_resample_test") {
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
-    "//third_party/cJSON:cjson",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
@@ -354,6 +359,9 @@ ohos_unittest("event_resample_test") {
     "preferences:native_preferences",
     "window_manager:libdm",
     "window_manager:libwm",
+    "cJSON:cjson",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
   ]
 }
 
@@ -361,7 +369,6 @@ ohos_unittest("FingerprintEventProcessorTest") {
   module_out_path = module_output_path
   include_dirs = [
     "${mmi_path}/service/fingerprint_event_processor/include",
-    "${graphics_path}/2d_graphics/include",
   ]
 
   sources = [
@@ -381,9 +388,6 @@ ohos_unittest("FingerprintEventProcessorTest") {
     "${mmi_path}/test/facility/libinput_wrapper:libinput_wrapper_sources",
     "${mmi_path}/test/facility/virtual_device:virtual_device_sources",
     "${mmi_path}/util:libmmi-util",
-    "//third_party/cJSON:cjson",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
@@ -396,6 +400,9 @@ ohos_unittest("FingerprintEventProcessorTest") {
     "preferences:native_preferences",
     "window_manager:libdm",
     "window_manager:libwm",
+    "cJSON:cjson",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
   ]
 }
 
@@ -404,7 +411,6 @@ ohos_unittest("TwoFingerLongTouchTest") {
   include_dirs = [
     "${mmi_path}/service/key_command/include",
     "${mmi_path}/service/key_command/test",
-    "${graphics_path}/2d_graphics/include",
   ]
 
   configs = [ ":libmmi_server_config" ]
@@ -422,9 +428,6 @@ ohos_unittest("TwoFingerLongTouchTest") {
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
-    "//third_party/cJSON:cjson",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
@@ -438,6 +441,9 @@ ohos_unittest("TwoFingerLongTouchTest") {
     "preferences:native_preferences",
     "window_manager:libdm",
     "window_manager:libwm",
+    "cJSON:cjson",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
   ]
 }
 
@@ -459,9 +465,6 @@ ohos_unittest("EventFilterDeathRecipientTest") {
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
-    "//third_party/cJSON:cjson",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
@@ -472,6 +475,10 @@ ohos_unittest("EventFilterDeathRecipientTest") {
     "image_framework:image_native",
     "preferences:native_preferences",
     "window_manager:libwm",
+    "cJSON:cjson",
+    "graphic_2d:2d_graphics",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
   ]
 }
 
@@ -480,7 +487,6 @@ ohos_unittest("EventFilterHandlerTest") {
 
   include_dirs = [
     "${mmi_path}/service/filter/include",
-    "${graphics_path}/2d_graphics/include",
   ]
 
   configs = [ ":libmmi_server_config" ]
@@ -500,9 +506,6 @@ ohos_unittest("EventFilterHandlerTest") {
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
-    "//third_party/cJSON:cjson",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
@@ -517,6 +520,9 @@ ohos_unittest("EventFilterHandlerTest") {
     "preferences:native_preferences",
     "window_manager:libdm",
     "window_manager:libwm",
+    "cJSON:cjson",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
   ]
 }
 
@@ -542,9 +548,6 @@ ohos_unittest("ApplicationStateObserverTest") {
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
-    "//third_party/cJSON:cjson",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
@@ -560,6 +563,10 @@ ohos_unittest("ApplicationStateObserverTest") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "window_manager:libwm",
+    "cJSON:cjson",
+    "graphic_2d:2d_graphics",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
   ]
 }
 
@@ -584,14 +591,15 @@ ohos_unittest("TimerManagerTest") {
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
-    "//third_party/cJSON:cjson",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
     "access_token:libaccesstoken_sdk",
     "hilog:libhilog",
+    "cJSON:cjson",
+    "graphic_2d:2d_graphics",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
   ]
 }
 
@@ -622,8 +630,6 @@ ohos_unittest("InputDisplayBindHelperTest") {
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/util:libmmi-util",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
@@ -637,6 +643,10 @@ ohos_unittest("InputDisplayBindHelperTest") {
     "window_manager:libdm",
     "window_manager:libwm",
     "window_manager:libwsutils",
+    "cJSON:cjson",
+    "graphic_2d:2d_graphics",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
   ]
 }
 
@@ -667,8 +677,6 @@ ohos_unittest("KnuckleGlowPointTest") {
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/util:libmmi-util",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
@@ -682,6 +690,10 @@ ohos_unittest("KnuckleGlowPointTest") {
     "window_manager:libdm",
     "window_manager:libwm",
     "window_manager:libwsutils",
+    "cJSON:cjson",
+    "graphic_2d:2d_graphics",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
   ]
 }
 
@@ -712,8 +724,6 @@ ohos_unittest("KnuckleDivergentPointTest") {
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/util:libmmi-util",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
@@ -727,6 +737,10 @@ ohos_unittest("KnuckleDivergentPointTest") {
     "window_manager:libdm",
     "window_manager:libwm",
     "window_manager:libwsutils",
+    "cJSON:cjson",
+    "graphic_2d:2d_graphics",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
   ]
 }
 
@@ -757,8 +771,6 @@ ohos_unittest("KnuckleGlowTraceSystemTest") {
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/util:libmmi-util",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
@@ -772,6 +784,10 @@ ohos_unittest("KnuckleGlowTraceSystemTest") {
     "window_manager:libdm",
     "window_manager:libwm",
     "window_manager:libwsutils",
+    "cJSON:cjson",
+    "graphic_2d:2d_graphics",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
   ]
 }
 
@@ -802,8 +818,6 @@ ohos_unittest("PointerDrawingManagerTest") {
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/util:libmmi-util",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
@@ -817,6 +831,10 @@ ohos_unittest("PointerDrawingManagerTest") {
     "window_manager:libdm",
     "window_manager:libwm",
     "window_manager:libwsutils",
+    "cJSON:cjson",
+    "graphic_2d:2d_graphics",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
   ]
 }
 
@@ -847,8 +865,6 @@ ohos_unittest("TouchDrawingManagerTest") {
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/util:libmmi-util",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
@@ -862,6 +878,10 @@ ohos_unittest("TouchDrawingManagerTest") {
     "window_manager:libdm",
     "window_manager:libwm",
     "window_manager:libwsutils",
+    "cJSON:cjson",
+    "graphic_2d:2d_graphics",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
   ]
 }
 
@@ -891,7 +911,6 @@ ohos_unittest("KnuckleDrawingManagerTest") {
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
@@ -902,6 +921,9 @@ ohos_unittest("KnuckleDrawingManagerTest") {
     "window_manager:libdm",
     "window_manager:libwm",
     "window_manager:libwsutils",
+    "cJSON:cjson",
+    "graphic_2d:2d_graphics",
+    "googletest:gtest_main",
   ]
 }
 
@@ -931,7 +953,6 @@ ohos_unittest("KnuckleDynamicDrawingManagerTest") {
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
@@ -942,6 +963,9 @@ ohos_unittest("KnuckleDynamicDrawingManagerTest") {
     "window_manager:libdm",
     "window_manager:libwm",
     "window_manager:libwsutils",
+    "cJSON:cjson",
+    "graphic_2d:2d_graphics",
+    "googletest:gtest_main",
   ]
 }
 
@@ -977,6 +1001,9 @@ ohos_unittest("InputWindowsManagerTest") {
     "window_manager:libdm",
     "window_manager:libwm",
     "window_manager:libwsutils",
+    "cJSON:cjson",
+    "c_utils:utils",
+    "googletest:gtest_main",
   ]
 }
 
@@ -1007,7 +1034,6 @@ ohos_unittest("InputWindowsManagerEXTest") {
 
   deps = [
     "${mmi_path}/util:libmmi-util",
-    "//third_party/googletest:gmock_main",
   ]
 
   if (defined(use_rosen_drawing) && use_rosen_drawing) {
@@ -1052,6 +1078,9 @@ ohos_unittest("InputWindowsManagerEXTest") {
     "window_manager:libdm",
     "window_manager:libwm_lite",
     "window_manager:libwsutils",
+    "cJSON:cjson",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
   ]
 }
 
@@ -1091,6 +1120,9 @@ ohos_unittest("SubscriberTest") {
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "hilog:libhilog",
+    "cJSON:cjson",
+    "graphic_2d:2d_graphics",
+    "googletest:gtest_main",
   ]
 
   if (input_feature_switch) {
@@ -1122,7 +1154,12 @@ ohos_unittest("NapProcessTest") {
     "${mmi_path}/util:libmmi-util",
   ]
 
-  external_deps = [ "c_utils:utils" ]
+  external_deps = [
+    "c_utils:utils",
+    "cJSON:cjson",
+    "graphic_2d:2d_graphics",
+    "googletest:gtest_main",
+  ]
 }
 
 ohos_unittest("MonitorTest") {
@@ -1154,6 +1191,8 @@ ohos_unittest("MonitorTest") {
     "image_framework:image_native",
     "window_manager:libdm",
     "window_manager:libwm",
+    "cJSON:cjson",
+    "googletest:gtest_main",
   ]
 }
 
@@ -1162,7 +1201,6 @@ ohos_unittest("ModuleLoaderTest") {
 
   include_dirs = [
     "${mmi_path}/util/common/include",
-    "//third_party/node/src",
   ]
 
   configs = [
@@ -1197,6 +1235,9 @@ ohos_unittest("ModuleLoaderTest") {
     "security_component_manager:libsecurity_component_sdk",
     "window_manager:libdm",
     "window_manager:libwm",
+    "cJSON:cjson",
+    "node:node_header_notice",
+    "googletest:gtest_main",
   ]
 }
 
@@ -1230,6 +1271,8 @@ ohos_unittest("KeyEventNormalizeTest") {
     "image_framework:image_native",
     "window_manager:libdm",
     "window_manager:libwm",
+    "cJSON:cjson",
+    "googletest:gtest_main",
   ]
 }
 
@@ -1271,6 +1314,8 @@ ohos_unittest("KeyCommandTest") {
     "image_framework:image_native",
     "window_manager:libdm",
     "window_manager:libwm",
+    "cJSON:cjson",
+    "googletest:gtest_main",
   ]
 }
 
@@ -1300,6 +1345,9 @@ ohos_unittest("StylusKeyTest") {
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
+    "cJSON:cjson",
+    "graphic_2d:2d_graphics",
+    "googletest:gtest_main",
   ]
 }
 
@@ -1326,6 +1374,9 @@ ohos_unittest("InfraredEmitterTest") {
   external_deps = [
     "hdf_core:libhdi",
     "hilog:libhilog",
+    "cJSON:cjson",
+    "graphic_2d:2d_graphics",
+    "googletest:gtest_main",
   ]
 }
 
@@ -1349,7 +1400,12 @@ ohos_unittest("InterceptorTest") {
     "${mmi_path}/util:libmmi-util",
   ]
 
-  external_deps = [ "hilog:libhilog" ]
+  external_deps = [
+    "hilog:libhilog",
+    "cJSON:cjson",
+    "graphic_2d:2d_graphics",
+    "googletest:gtest_main",
+  ]
 }
 
 ohos_unittest("KeyAutoRepeatExTest") {
@@ -1375,13 +1431,14 @@ ohos_unittest("KeyAutoRepeatExTest") {
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/util:libmmi-util",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
+    "googletest:gtest_main",
+    "googletest:gmock_main",
+    "cJSON:cjson",
   ]
 }
 
@@ -1423,6 +1480,8 @@ ohos_unittest("EventHandlerTest") {
     "image_framework:image_native",
     "window_manager:libdm",
     "window_manager:libwm",
+    "cJSON:cjson",
+    "googletest:gtest_main",
   ]
 }
 
@@ -1448,8 +1507,6 @@ ohos_unittest("EventHandlerEXTest") {
     "${mmi_path}/test/facility/mock:mmi_mock_sources",
     "${mmi_path}/test/facility/virtual_device:virtual_device_sources",
     "${mmi_path}/util:libmmi-util",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
@@ -1460,6 +1517,9 @@ ohos_unittest("EventHandlerEXTest") {
     "image_framework:image_native",
     "window_manager:libdm",
     "window_manager:libwm",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
+    "cJSON:cjson",
   ]
 }
 
@@ -1493,6 +1553,9 @@ ohos_unittest("EventDispatchTest") {
     "window_manager:libdm",
     "window_manager:libwm",
     "window_manager:libwsutils",
+    "cJSON:cjson",
+    "graphic_2d:2d_graphics",
+    "googletest:gtest_main",
   ]
 }
 
@@ -1531,6 +1594,9 @@ ohos_unittest("ServerMsgHandlerTest") {
     "napi:ace_napi",
     "security_component_manager:libsecurity_component_sdk",
     "window_manager:libwm",
+    "cJSON:cjson",
+    "graphic_2d:2d_graphics",
+    "googletest:gtest_main",
   ]
 }
 
@@ -1561,6 +1627,9 @@ ohos_unittest("PermissionHelperTest") {
     "c_utils:utils",
     "hilog:libhilog",
     "security_component_manager:libsecurity_component_sdk",
+    "cJSON:cjson",
+    "graphic_2d:2d_graphics",
+    "googletest:gtest_main",
   ]
 }
 
@@ -1586,7 +1655,6 @@ ohos_unittest("DisplayStateManagerTest") {
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
-    "//third_party/googletest:gmock_main",
   ]
 
   external_deps = [
@@ -1596,6 +1664,8 @@ ohos_unittest("DisplayStateManagerTest") {
     "image_framework:image_native",
     "window_manager:libdm",
     "window_manager:libwm",
+    "cJSON:cjson",
+    "googletest:gtest_main",
   ]
 }
 
@@ -1618,11 +1688,15 @@ ohos_unittest("DeviceManagerTest") {
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
   ]
 
-  external_deps = [ "hilog:libhilog" ]
+  external_deps = [
+    "hilog:libhilog",
+    "cJSON:cjson",
+    "graphic_2d:2d_graphics",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
+  ]
 }
 
 ohos_unittest("DeviceConfigTest") {
@@ -1643,7 +1717,13 @@ ohos_unittest("DeviceConfigTest") {
   deps = [
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
-    "//third_party/googletest:gmock_main",
+  ]
+
+  external_deps = [
+    "cJSON:cjson",
+    "graphic_2d:2d_graphics",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
   ]
 }
 
@@ -1667,7 +1747,11 @@ ohos_unittest("DelegateTaskTest") {
     "${mmi_path}/util:libmmi-util",
   ]
 
-  external_deps = [ "hilog:libhilog" ]
+  external_deps = [
+    "cJSON:cjson",
+    "graphic_2d:2d_graphics",
+    "googletest:gtest_main",
+  ]
 }
 
 ohos_unittest("ConnectManagerTest") {
@@ -1699,6 +1783,7 @@ ohos_unittest("ConnectManagerTest") {
     "security_component_manager:libsecurity_component_sdk",
     "window_manager:libdm",
     "window_manager:libwm",
+    "cJSON:cjson",
   ]
 }
 
@@ -1734,7 +1819,6 @@ ohos_unittest("ConnectManagerProxyEXTest") {
   deps = [
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/util:libmmi-util",
-    "//third_party/googletest:gmock_main",
   ]
 
   external_deps = [
@@ -1747,6 +1831,8 @@ ohos_unittest("ConnectManagerProxyEXTest") {
     "security_component_manager:libsecurity_component_sdk",
     "window_manager:libdm",
     "window_manager:libwm",
+    "googletest:gmock_main",
+    "cJSON:cjson",
   ]
 }
 
@@ -1775,7 +1861,6 @@ ohos_unittest("ConnectManagerEXTest") {
   deps = [
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/util:libmmi-util",
-    "//third_party/googletest:gmock_main",
   ]
 
   external_deps = [
@@ -1789,6 +1874,9 @@ ohos_unittest("ConnectManagerEXTest") {
     "security_component_manager:libsecurity_component_sdk",
     "window_manager:libdm",
     "window_manager:libwm",
+    "cJSON:cjson",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
   ]
 }
 
@@ -1822,6 +1910,8 @@ ohos_unittest("EventDumpTest") {
     "image_framework:image_native",
     "window_manager:libdm",
     "window_manager:libwm",
+    "cJSON:cjson",
+    "googletest:gtest_main",
   ]
 }
 
@@ -1848,7 +1938,12 @@ ohos_unittest("DfxHisysEventTest") {
     "${mmi_path}/util:libmmi-util",
   ]
 
-  external_deps = [ "hilog:libhilog" ]
+  external_deps = [
+    "hilog:libhilog",
+    "cJSON:cjson",
+    "graphic_2d:2d_graphics",
+    "googletest:gtest_main",
+  ]
 }
 
 group("mmi-service-tests") {

@@ -50,6 +50,7 @@ ohos_source_set("mmi_event_filter_service") {
     "hilog:libhilog",
     "ipc:ipc_single",
     "safwk:system_ability_fwk",
+    "c_utils:utils",
   ]
 }
 
@@ -77,6 +78,7 @@ ohos_source_set("mmi_event_filter_proxy") {
     "hilog:libhilog",
     "ipc:ipc_single",
     "safwk:system_ability_fwk",
+    "c_utils:utils",
   ]
 
   if (is_ohos && is_clang && (target_cpu == "arm" || target_cpu == "arm64") &&

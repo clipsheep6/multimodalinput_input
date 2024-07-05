@@ -60,6 +60,11 @@ ohos_source_set("mmi_connect_manager_service") {
     "ipc:ipc_single",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "c_utils:utilsbase",
+    "eventhandler:libeventhandler",
+    "bounds_checking_function:libsec_shared",
+    "graphic_2d:2d_graphics",
+    "skia:skia_canvaskit",
   ]
 
   if (is_ohos && is_clang && (target_cpu == "arm" || target_cpu == "arm64") &&
@@ -108,5 +113,10 @@ ohos_source_set("mmi_connect_manager_proxy") {
     "ipc:ipc_single",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "c_utils:utilsbase",
+    "eventhandler:libeventhandler",
+    "bounds_checking_function:libsec_shared",
+    "graphic_2d:2d_graphics",
+    "skia:skia_canvaskit",
   ]
 }

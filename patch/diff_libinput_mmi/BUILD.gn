@@ -40,7 +40,6 @@ config("libinput-third_public_config") {
   include_dirs = [
     "$gen_dst_dir/export_include",
     "$gen_dst_dir/include",
-    "//third_party/FreeBSD/sys/dev/evdev",
     "$gen_dst_dir/src",
   ]
 
@@ -61,12 +60,17 @@ ohos_source_set("patch_gen_libinput-third-mmi") {
 
   public_configs = [ ":libinput-third_public_config" ]
 
-  deps = [ "//third_party/libinput/patch:apply_patch" ]
-
-  public_deps = [
+  deps = [ 
+    "//third_party/libinput/patch:apply_patch",
     "${mmi_path}/libudev:mmi_libudev",
     "${mmi_path}/patch/diff_libmtdev_mmi:libmtdev-third-mmi",
-    "//third_party/libevdev:libevdev",
+  ]
+
+  public_deps = []
+
+  public_external_deps = [
+    "libevdev:libevdev",
+    "FreeBSD:libfreebsd_static",
   ]
 }
 
@@ -86,12 +90,17 @@ ohos_shared_library("libinput-third-mmi") {
 
   public_configs = [ ":libinput-third_public_config" ]
 
-  deps = [ ":patch_gen_libinput-third-mmi" ]
-
-  public_deps = [
+  deps = [ 
+    ":patch_gen_libinput-third-mmi",
     "${mmi_path}/libudev:mmi_libudev",
     "${mmi_path}/patch/diff_libmtdev_mmi:libmtdev-third-mmi",
-    "//third_party/libevdev:libevdev",
+  ]
+
+  public_deps = []
+
+  public_external_deps = [
+    "libevdev:libevdev",
+    "FreeBSD:libfreebsd_static",
   ]
 
   external_deps = [ "hilog:libhilog" ]
@@ -118,12 +127,17 @@ ohos_source_set("patch_gen_libinput-debug") {
 
   public_configs = [ ":libinput-third_public_config" ]
 
-  deps = [ "//third_party/libinput/patch:apply_patch" ]
-
-  public_deps = [
+  deps = [ 
+    "//third_party/libinput/patch:apply_patch",
     "${mmi_path}/libudev:mmi_libudev",
     "${mmi_path}/patch/diff_libmtdev_mmi:libmtdev-third-mmi",
-    "//third_party/libevdev:libevdev",
+  ]
+
+  public_deps = []
+
+  public_external_deps = [
+    "libevdev:libevdev",
+    "FreeBSD:libfreebsd_static",
   ]
 }
 
@@ -144,12 +158,15 @@ ohos_executable("libinput-debug-mmi") {
   deps = [
     ":libinput-third-mmi",
     ":patch_gen_libinput-debug",
-  ]
-
-  public_deps = [
     "${mmi_path}/libudev:mmi_libudev",
     "${mmi_path}/patch/diff_libmtdev_mmi:libmtdev-third-mmi",
-    "//third_party/libevdev:libevdev",
+  ]
+
+  public_deps = []
+
+  public_external_deps = [
+    "libevdev:libevdev",
+    "FreeBSD:libfreebsd_static",
   ]
 
   part_name = "input"
@@ -174,12 +191,17 @@ ohos_source_set("patch_gen_libinput-list") {
 
   public_configs = [ ":libinput-third_public_config" ]
 
-  deps = [ "//third_party/libinput/patch:apply_patch" ]
-
-  public_deps = [
+  deps = [ 
+    "//third_party/libinput/patch:apply_patch",
     "${mmi_path}/libudev:mmi_libudev",
-    "${mmi_path}/patch/diff_libmtdev_mmi:libmtdev-third-mmi",
-    "//third_party/libevdev:libevdev",
+    "${mmi_path}/patch/diff_libmtdev_mmi:libmtdev-third-mmi"
+  ]
+
+  public_deps = []
+
+  public_external_deps = [
+    "libevdev:libevdev",
+    "FreeBSD:libfreebsd_static",
   ]
 }
 
@@ -200,12 +222,15 @@ ohos_executable("libinput-list-mmi") {
   deps = [
     ":libinput-third-mmi",
     ":patch_gen_libinput-list",
-  ]
-
-  public_deps = [
     "${mmi_path}/libudev:mmi_libudev",
     "${mmi_path}/patch/diff_libmtdev_mmi:libmtdev-third-mmi",
-    "//third_party/libevdev:libevdev",
+  ]
+
+  public_deps = []
+
+  public_external_deps = [
+    "libevdev:libevdev",
+    "FreeBSD:libfreebsd_static",
   ]
 
   part_name = "input"
@@ -230,12 +255,17 @@ ohos_source_set("patch_gen_libinput-tablet") {
 
   public_configs = [ ":libinput-third_public_config" ]
 
-  deps = [ "//third_party/libinput/patch:apply_patch" ]
-
-  public_deps = [
+  deps = [ 
+    "//third_party/libinput/patch:apply_patch",
     "${mmi_path}/libudev:mmi_libudev",
     "${mmi_path}/patch/diff_libmtdev_mmi:libmtdev-third-mmi",
-    "//third_party/libevdev:libevdev",
+  ]
+
+  public_deps = []
+
+  public_external_deps = [
+    "libevdev:libevdev",
+    "FreeBSD:libfreebsd_static",
   ]
 }
 
@@ -256,12 +286,15 @@ ohos_executable("libinput-tablet-mmi") {
   deps = [
     ":libinput-third-mmi",
     ":patch_gen_libinput-tablet",
-  ]
-
-  public_deps = [
     "${mmi_path}/libudev:mmi_libudev",
     "${mmi_path}/patch/diff_libmtdev_mmi:libmtdev-third-mmi",
-    "//third_party/libevdev:libevdev",
+  ]
+
+  public_deps = []
+
+  public_external_deps = [
+    "libevdev:libevdev",
+    "FreeBSD:libfreebsd_static",
   ]
 
   part_name = "input"
@@ -287,12 +320,17 @@ ohos_source_set("patch_gen_libinput-record") {
 
   public_configs = [ ":libinput-third_public_config" ]
 
-  deps = [ "//third_party/libinput/patch:apply_patch" ]
-
-  public_deps = [
+  deps = [ 
+    "//third_party/libinput/patch:apply_patch",
     "${mmi_path}/libudev:mmi_libudev",
     "${mmi_path}/patch/diff_libmtdev_mmi:libmtdev-third-mmi",
-    "//third_party/libevdev:libevdev",
+  ]
+
+  public_deps = []
+
+  public_external_deps = [
+    "libevdev:libevdev",
+    "FreeBSD:libfreebsd_static",
   ]
 }
 
@@ -313,12 +351,15 @@ ohos_executable("libinput-record-mmi") {
   deps = [
     ":libinput-third-mmi",
     ":patch_gen_libinput-record",
-  ]
-
-  public_deps = [
     "${mmi_path}/libudev:mmi_libudev",
     "${mmi_path}/patch/diff_libmtdev_mmi:libmtdev-third-mmi",
-    "//third_party/libevdev:libevdev",
+  ]
+
+  public_deps = []
+
+  public_external_deps = [
+    "libevdev:libevdev",
+    "FreeBSD:libfreebsd_static",
   ]
 
   part_name = "input"
@@ -343,12 +384,17 @@ ohos_source_set("patch_gen_libinput-analyze") {
 
   public_configs = [ ":libinput-third_public_config" ]
 
-  deps = [ "//third_party/libinput/patch:apply_patch" ]
-
-  public_deps = [
+  deps = [
+    "//third_party/libinput/patch:apply_patch",
     "${mmi_path}/libudev:mmi_libudev",
     "${mmi_path}/patch/diff_libmtdev_mmi:libmtdev-third-mmi",
-    "//third_party/libevdev:libevdev",
+  ]
+
+  public_deps = []
+
+  public_external_deps = [
+    "libevdev:libevdev",
+    "FreeBSD:libfreebsd_static",
   ]
 }
 
@@ -369,12 +415,15 @@ ohos_executable("libinput-analyze-mmi") {
   deps = [
     ":libinput-third-mmi",
     ":patch_gen_libinput-analyze",
-  ]
-
-  public_deps = [
     "${mmi_path}/libudev:mmi_libudev",
     "${mmi_path}/patch/diff_libmtdev_mmi:libmtdev-third-mmi",
-    "//third_party/libevdev:libevdev",
+  ]
+
+  public_deps = []
+
+  public_external_deps = [
+    "libevdev:libevdev",
+    "FreeBSD:libfreebsd_static",
   ]
 
   part_name = "input"
@@ -399,12 +448,17 @@ ohos_source_set("patch_gen_libinput-measure") {
 
   public_configs = [ ":libinput-third_public_config" ]
 
-  deps = [ "//third_party/libinput/patch:apply_patch" ]
-
-  public_deps = [
+  deps = [
+    "//third_party/libinput/patch:apply_patch",
     "${mmi_path}/libudev:mmi_libudev",
     "${mmi_path}/patch/diff_libmtdev_mmi:libmtdev-third-mmi",
-    "//third_party/libevdev:libevdev",
+  ]
+
+  public_deps = []
+
+  public_external_deps = [
+    "libevdev:libevdev",
+    "FreeBSD:libfreebsd_static",
   ]
 }
 
@@ -425,12 +479,15 @@ ohos_executable("libinput-measure-mmi") {
   deps = [
     ":libinput-third-mmi",
     ":patch_gen_libinput-measure",
-  ]
-
-  public_deps = [
     "${mmi_path}/libudev:mmi_libudev",
     "${mmi_path}/patch/diff_libmtdev_mmi:libmtdev-third-mmi",
-    "//third_party/libevdev:libevdev",
+  ]
+
+  public_deps = []
+
+  public_external_deps = [
+    "libevdev:libevdev",
+    "FreeBSD:libfreebsd_static",
   ]
 
   part_name = "input"
@@ -455,12 +512,17 @@ ohos_source_set("patch_gen_libinput-quirks") {
 
   public_configs = [ ":libinput-third_public_config" ]
 
-  deps = [ "//third_party/libinput/patch:apply_patch" ]
-
-  public_deps = [
+  deps = [
+    "//third_party/libinput/patch:apply_patch",
     "${mmi_path}/libudev:mmi_libudev",
     "${mmi_path}/patch/diff_libmtdev_mmi:libmtdev-third-mmi",
-    "//third_party/libevdev:libevdev",
+  ]
+
+  public_deps = []
+
+  public_external_deps = [
+    "libevdev:libevdev",
+    "FreeBSD:libfreebsd_static",
   ]
 }
 
@@ -481,12 +543,15 @@ ohos_executable("libinput-quirks-mmi") {
   deps = [
     ":libinput-third-mmi",
     ":patch_gen_libinput-quirks",
-  ]
-
-  public_deps = [
     "${mmi_path}/libudev:mmi_libudev",
     "${mmi_path}/patch/diff_libmtdev_mmi:libmtdev-third-mmi",
-    "//third_party/libevdev:libevdev",
+  ]
+
+  public_deps = []
+
+  public_external_deps = [
+    "libevdev:libevdev",
+    "FreeBSD:libfreebsd_static",
   ]
 
   part_name = "input"
