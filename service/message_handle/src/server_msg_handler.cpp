@@ -118,12 +118,12 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
             CurrentPID_ = pid;
             InjectionType_ = InjectionType::KEYEVENT;
             keyEvent_ = keyEvent;
-            LaunchAbility(); 
+            LaunchAbility();
             AUTHORIZE_HELPER->AddAuthorizeProcess(CurrentPID_,
-            [&] (int32_t pid) {
-              MMI_HILOGI("User not authorized to inject pid:%{public}d", pid);
-            }
-            );  
+                [&] (int32_t pid) {
+                    MMI_HILOGI("User not authorized to inject pid:%{public}d", pid);
+                }
+                );
             return COMMON_PERMISSION_CHECK_ERROR;
         }
         CurrentPID_ = pid;
@@ -183,7 +183,7 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
     if (isNativeInject) {
         auto iter = authorizationCollection_.find(pid);
         if ((iter == authorizationCollection_.end()) || (iter->second == AuthorizationStatus::UNAUTHORIZED)) {
-           auto state = AUTHORIZE_HELPER->GetAuthorizeState();
+            auto state = AUTHORIZE_HELPER->GetAuthorizeState();
             if (state != AuthorizeState::STATE_UNAUTHORIZE) {
                 MMI_HILOGI("The process is already being processed,s:%{public}d,pid:%{public}d,inputPid:%{public}d",
                     state, AUTHORIZE_HELPER->GetAuthorizePid(), pid);
@@ -709,9 +709,10 @@ int32_t ServerMsgHandler::OnAuthorize(bool isAuthorize)
         noticeInfo.pid = CurrentPID_;
         AddInjectNotice(noticeInfo);
         auto result = AUTHORIZE_HELPER->AddAuthorizeProcess(CurrentPID_,
-                [&](int32_t pid) ->void {
-                    CloseInjectNotice(pid);
-                });
+            [&] (int32_t pid) {
+                CloseInjectNotice(pid);
+            }
+            );
         if (result != RET_OK) {
             MMI_HILOGI("Authorize process failed, pid:%{public}d", CurrentPID_);
         }
@@ -882,7 +883,7 @@ int32_t ServerMsgHandler::OnTransferBinderClientSrv(const sptr<IRemoteObject> &b
 {
     CALL_DEBUG_ENTER;
     bool bRet = clientDeathHandler_.RegisterClientDeathRecipient(binderClientObject, pid);
-    if(!bRet) {
+    if (!bRet) {
         MMI_HILOGE("Failed to registerClientDeathRecipient");
         return RET_ERR;
     }

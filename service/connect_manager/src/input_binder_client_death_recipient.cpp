@@ -26,7 +26,7 @@ namespace OHOS {
 namespace MMI {
 InputBinderClientDeathRecipient::InputBinderClientDeathRecipient(
     const std::function<void(const wptr<IRemoteObject> &object)> &deathCallback)
-    : deathCallback_(deathCallback){}
+    : deathCallback_(deathCallback) {}
 
 void InputBinderClientDeathRecipient::OnRemoteDied(const OHOS::wptr<OHOS::IRemoteObject> &object)
 {

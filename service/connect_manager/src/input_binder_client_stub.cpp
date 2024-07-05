@@ -24,8 +24,8 @@
 namespace OHOS {
 namespace MMI {
 
-int32_t InputBinderClientStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, 
-     MessageOption &option)
+int32_t InputBinderClientStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
+    MessageOption &option)
 {
     std::u16string descriptor = InputBinderClientStub::GetDescriptor();
     std::u16string remoteDescriptor = data.ReadInterfaceToken();

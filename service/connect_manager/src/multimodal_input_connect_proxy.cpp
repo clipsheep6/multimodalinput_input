@@ -2235,7 +2235,8 @@ int32_t MultimodalInputConnectProxy::TransferBinderClientSrv(const sptr<IRemoteO
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(
-        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::TRANSFER_BINDER_CLIENT_SERVICE), data, reply, option);
+        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::TRANSFER_BINDER_CLIENT_SERVICE),
+        data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request fail, ret:%{public}d", ret);
         return ret;

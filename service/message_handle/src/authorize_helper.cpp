@@ -120,16 +120,16 @@ int32_t AuthorizeHelper::AddAuthorizeProcess(int32_t pid, AuthorizeExitCallback 
         state_ = AuthorizeState::STATE_SELECTION_AUTHORIZE;
         exitCallback_ = exitCallback;
         MMI_HILOGD("A process enters the authorization select state %{public}d", state_);
-        return RET_OK; 
-    } 
-    if(pid_ != pid) {
+        return RET_OK;
+    }
+    if (pid_ != pid) {
         MMI_HILOGI("The process that has been authorized is different from input.pid_:%{public}d,pid:%{public}d",
-        pid_, pid);
+            pid_, pid);
         return RET_ERR;
     }
     if (state_ == AuthorizeState::STATE_SELECTION_AUTHORIZE) {
         state_ = AuthorizeState::STATE_AUTHORIZE;
-    }    
+    }
     exitCallback_ = exitCallback;
     MMI_HILOGD("A process will be authorized, authorize pid:%{public}d", pid_);
     return RET_OK;

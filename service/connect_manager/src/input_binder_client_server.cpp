@@ -23,14 +23,14 @@
 namespace OHOS {
 namespace MMI {
 
-InputBinderClientServer::InputBinderClientServer() 
+InputBinderClientServer::InputBinderClientServer()
 {
     InitClientSrv();
 }
 
 InputBinderClientServer::~InputBinderClientServer() {}
 
-void InputBinderClientServer::InitClientSrv() 
+void InputBinderClientServer::InitClientSrv()
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> clientLock(clientSrvMutex_);

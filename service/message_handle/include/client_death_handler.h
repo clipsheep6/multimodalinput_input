@@ -29,8 +29,8 @@
 
 namespace OHOS {
 namespace MMI {
-enum class CallBackType : int32_t { 
-    CALLBACK_TYPE_AUTHORIZE_HELPER, 
+enum class CallBackType : int32_t {
+    CALLBACK_TYPE_AUTHORIZE_HELPER,
 };
 using ClientDeathCallback = std::function<void(int32_t)>;
 class ClientDeathHandler final : RefBase {
@@ -52,11 +52,11 @@ protected:
 
 private:
     void OnDeath(const wptr<IRemoteObject> &remoteObj);
-    std::mutex mutexPidMap_; 
+    std::mutex mutexPidMap_;
     std::map<int32_t, sptr<IRemoteObject>> clientPidMap_;
     std::mutex mutexDeathRecipient_;
     sptr<InputBinderClientDeathRecipient> deathRecipient_ = nullptr;
-    std::mutex mutexCallbacks_; 
+    std::mutex mutexCallbacks_;
     std::map<CallBackType, ClientDeathCallback> deathCallbacks_;
 };
 } // namespace MMI

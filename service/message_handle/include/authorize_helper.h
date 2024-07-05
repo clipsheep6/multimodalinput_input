@@ -43,7 +43,7 @@ public:
     void CancelAuthorize(int32_t pid);
     int32_t GetAuthorizePid();
     int32_t AddAuthorizeProcess(int32_t pid, AuthorizeExitCallback exitCallback);
-    inline AuthorizeState GetAuthorizeState() 
+    inline AuthorizeState GetAuthorizeState()
     {
         std::lock_guard<std::mutex> lock(mutex_);
         return state_;

@@ -25,8 +25,7 @@
 
 namespace OHOS {
 namespace MMI {
-class InputBinderClientServer final
-{
+class InputBinderClientServer final {
     DECLARE_DELAYED_SINGLETON(InputBinderClientServer);
 public:
     DISALLOW_COPY_AND_MOVE(InputBinderClientServer);
