@@ -255,6 +255,34 @@ public:
     static const int32_t KEYCODE_BRIGHTNESS_DOWN;
 
     /**
+     * Voice key
+     *
+     * @since 9
+     */
+    static const int32_t KEYCODE_VOICE;
+
+    /**
+     * Wireless-screen-projection key
+     *
+     * @since 9
+     */
+    static const int32_t KEYCODE_WIRELESS_SCREEN_PROJECTION;
+
+    /**
+     * Screen-recording key
+     *
+     * @since 9
+     */  
+    static const int32_t KEYCODE_SCREEN_RECORDING;
+
+    /**
+     * Wisdom key
+     *
+     * @since 9
+     */   
+    static const int32_t KEYCODE_WISDOM;
+
+    /**
      * General-purpose key 1 on wearables
      *
      * @since 3

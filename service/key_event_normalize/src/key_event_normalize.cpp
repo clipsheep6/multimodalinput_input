@@ -58,6 +58,7 @@ int32_t KeyEventNormalize::Normalize(struct libinput_event *event, std::shared_p
     int32_t keyCode = static_cast<int32_t>(libinput_event_keyboard_get_key(data));
     MMI_HILOGD("The linux input keyCode:%{public}d", keyCode);
     keyCode = KeyMapMgr->TransferDeviceKeyValue(device, keyCode);
+    keyCode = HandleKeyF(keyCode, keyEvent);
     int32_t keyAction = (libinput_event_keyboard_get_key_state(data) == 0) ?
         (KeyEvent::KEY_ACTION_UP) : (KeyEvent::KEY_ACTION_DOWN);
     auto preAction = keyEvent->GetAction();
@@ -93,6 +94,34 @@ int32_t KeyEventNormalize::Normalize(struct libinput_event *event, std::shared_p
     int32_t keyIntention = KeyItemsTransKeyIntention(keyEvent->GetKeyItems());
     keyEvent->SetKeyIntention(keyIntention);
     return RET_OK;
+}
+
+int32_t KeyEventNormalize::HandleKeyF(int32_t keyCode, std::shared_ptr<KeyEvent> keyEvent)
+{
+    keyCode = HandleKeyWidsom(keyCode);
+    std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
+    int32_t lastPressedKey = -1;
+    if (!pressedKeys.empty()) {
+        lastPressedKey = pressedKeys.back();
+        MMI_HILOGD("The pressing button, keyCode:%{public}d", lastPressedKey);
+    }
+    if(lastPressedKey == KeyEvent::KEYCODE_FN) {
+        MMI_HILOGD("FN pressing,The input oh keyCode now:%{public}d", keyCode);
+        return keyCode;
+    } else {
+        keyCode = KeyMapMgr->TransferDefaultHosKeyValue(keyCode);
+        MMI_HILOGD("FN not pressing, The input oh keyCode now:%{public}d", keyCode);
+        return keyCode;
+    }    
+}
+
+int32_t KeyEventNormalize::HandleKeyWidsom(int32_t keyCode)
+{
+    if(keyCode == KeyEvent::KEYCODE_CTRL_RIGHT) {
+        return KeyEvent::KEYCODE_WISDOM;
+    } else {
+        return keyCode;
+    }
 }
 
 void KeyEventNormalize::HandleKeyAction(struct libinput_device* device, KeyEvent::KeyItem &item,

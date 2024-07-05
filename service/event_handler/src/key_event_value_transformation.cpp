@@ -222,6 +222,10 @@ const std::multimap<int32_t, KeyEventValueTransformation> MAP_KEY_EVENT_VALUE_TR
     {212, {"KEY_CAMERA", 212, 19, HOS_KEY_CAMERA}},
     {225, {"KEY_BRIGHTNESS_UP", 225, 40, HOS_KEY_BRIGHTNESS_UP}},
     {224, {"KEY_BRIGHTNESS_DOWN", 224, 41, HOS_KEY_BRIGHTNESS_DOWN}},
+    {249, {"KEY_VOICE", 249, 3300, HOS_KEY_VOICE}},
+    {595, {"KEY_WIRELESS_SCREEN_PROJECTION", 595, 3301, HOS_KEY_WIRELESS_SCREEN_PROJECTION}},
+    {597, {"KEY_SCREEN_RECORDING", 597, 3303, HOS_KEY_SCREEN_RECORDING}},
+    {251, {"KEY_WISDOM", 251, 3304, HOS_KEY_WISDOM}},
     {355, {"KEY_CLEAR", 355, 5, HOS_KEY_CLEAR}},
     {528, {"KEY_FOCUS", 528, 7, HOS_KEY_FOCUS}},
     {594, {"KEY_SEARCH", 594, 9, HOS_KEY_SEARCH}},
@@ -444,6 +448,31 @@ const std::multimap<int32_t, KeyEventValueTransformation> MAP_KEY_EVENT_VALUE_TR
     {407, {"KEY_NEXT", 407, 2629, HOS_KEY_NEXT}},
     {412, {"KEY_PREVIOUS", 412, 2631, HOS_KEY_PREVIOUS}},
 };
+
+const std::multimap<int32_t, int32_t> LINUX_KEY_CODE_TRANSFORMATION = {
+    {KeyEvent::KEYCODE_F1, KeyEvent::KEYCODE_BRIGHTNESS_DOWN},
+    {KeyEvent::KEYCODE_F2, KeyEvent::KEYCODE_BRIGHTNESS_UP},
+    {KeyEvent::KEYCODE_F4, KeyEvent::KEYCODE_VOLUME_MUTE},
+    {KeyEvent::KEYCODE_F5, KeyEvent::KEYCODE_VOLUME_DOWN},
+    {KeyEvent::KEYCODE_F6, KeyEvent::KEYCODE_VOLUME_UP},
+    {KeyEvent::KEYCODE_F7, KeyEvent::KEYCODE_MUTE},
+    {KeyEvent::KEYCODE_F8, KeyEvent::KEYCODE_WIRELESS_SCREEN_PROJECTION},
+    {KeyEvent::KEYCODE_F9, KeyEvent::KEYCODE_SEARCH},
+    {KeyEvent::KEYCODE_F10, KeyEvent::KEYCODE_SCREEN_RECORDING},
+    {KeyEvent::KEYCODE_F11, KeyEvent::KEYCODE_SYSRQ},
+    {KeyEvent::KEYCODE_F12, KeyEvent::KEYCODE_INSERT},
+};
+
+int32_t TransferHosKeyValue(int32_t KeyCode)
+{
+    auto it = LINUX_KEY_CODE_TRANSFORMATION.find(KeyCode);
+    if (it == LINUX_KEY_CODE_TRANSFORMATION.end()) {     
+        MMI_HILOGD("Not found input keyCode,The input keyCode now:%{public}d", KeyCode);
+        return KeyCode;
+    }
+    MMI_HILOGD("found input keyCode,The input keyCode now:%{public}d", it->second);
+    return it->second;
+}
 
 KeyEventValueTransformation TransferKeyValue(int32_t keyValueOfInput)
 {

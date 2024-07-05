@@ -101,6 +101,11 @@ int32_t KeyMapManager::TransferDefaultKeyValue(int32_t inputKey)
     return TransferKeyValue(inputKey).sysKeyValue;
 }
 
+int32_t KeyMapManager::TransferDefaultHosKeyValue(int32_t inputKey)
+{
+    return TransferHosKeyValue(inputKey);
+}
+
 int32_t KeyMapManager::TransferDeviceKeyValue(struct libinput_device *device,
     int32_t inputKey)
 {

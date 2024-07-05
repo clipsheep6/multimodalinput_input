@@ -29,6 +29,7 @@ struct KeyEventValueTransformation {
     int32_t sysKeyEvent { 0 };
 };
 
+int32_t TransferHosKeyValue(int32_t KeyCode);
 KeyEventValueTransformation TransferKeyValue(int32_t keyValueOfInput);
 int32_t InputTransformationKeyValue(int32_t keyCode);
 int32_t KeyItemsTransKeyIntention(const std::vector<KeyEvent::KeyItem> &items);

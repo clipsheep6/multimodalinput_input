@@ -36,6 +36,8 @@ public:
     void SetCurrentShieldMode(int32_t shieldMode);
     int32_t GetCurrentShieldMode();
 private:
+    int32_t HandleKeyF(int32_t keyCode, std::shared_ptr<KeyEvent> keyEvent);
+    int32_t HandleKeyWidsom(int32_t keyCode);
     void HandleKeyAction(struct libinput_device* device, KeyEvent::KeyItem &item, std::shared_ptr<KeyEvent> keyEvent);
 
 private:

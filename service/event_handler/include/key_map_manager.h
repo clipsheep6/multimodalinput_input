@@ -36,6 +36,7 @@ public:
     std::string GetKeyEventFileName(struct libinput_device *device);
     int32_t GetDefaultKeyId();
     int32_t TransferDefaultKeyValue(int32_t inputKey);
+    int32_t TransferDefaultHosKeyValue(int32_t inputKey);
     int32_t TransferDeviceKeyValue(struct libinput_device *device, int32_t inputKey);
     std::vector<int32_t> InputTransferKeyValue(int32_t deviceId, int32_t keyCode);
 private:
