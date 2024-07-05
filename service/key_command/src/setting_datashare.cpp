@@ -198,6 +198,7 @@ ErrCode SettingDataShare::GetStringValue(const std::string& key, std::string& va
     int32_t count = 0;
     resultSet->GetRowCount(count);
     if (count == 0) {
+        resultSet->Close();
         IPCSkeleton::SetCallingIdentity(callingIdentity);
         return ERR_NAME_NOT_FOUND;
     }
@@ -205,6 +206,7 @@ ErrCode SettingDataShare::GetStringValue(const std::string& key, std::string& va
     resultSet->GoToRow(tmpRow);
     int32_t ret = resultSet->GetString(tmpRow, value);
     if (ret != NativeRdb::E_OK) {
+        resultSet->Close();
         IPCSkeleton::SetCallingIdentity(callingIdentity);
         return ERR_INVALID_VALUE;
     }
@@ -229,8 +231,17 @@ ErrCode SettingDataShare::PutStringValue(const std::string& key, const std::stri
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(SETTING_COLUMN_KEYWORD, key);
     Uri uri(AssembleUri(key));
-    if (helper->Update(uri, predicates, bucket) <= 0) {
-        helper->Insert(uri, bucket);
+    auto [errCode, status] = helper->Update(uri, predicates, bucket);
+    if (errCode == 0) {
+        MMI_HILOGD("data exist, helper updata success, status = %{public}d", status);
+    } else {
+        MMI_HILOGW("helper updata fail, errcode = %{public}d, no data exist, insert one row", errCode);
+        auto [errRet, result] = helper->Insert(uri, bucket);
+        if (errRet == 0) {
+            MMI_HILOGD("helper insert success, status = %{public}d", result);
+        } else {
+            MMI_HILOGE("helper insert fail, errcode = %{public}d", errRet);
+        }
     }
     if (needNotify) {
         helper->NotifyChange(AssembleUri(key));
