@@ -13,13 +13,16 @@
  * limitations under the License.
  */
 
+#include <dlfcn.h>
 #include <gtest/gtest.h>
 
 #include "proto.h"
 
+#include "fingersense_wrapper.h"
 #include "input_event_handler.h"
 #include "mmi_log.h"
 #include "mmi_service.h"
+#include "nap_process.h"
 #include "udp_wrap.h"
 
 #undef MMI_LOG_TAG
@@ -28,6 +31,8 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
+constexpr int32_t UNOBSERVED { -1 };
+constexpr int32_t REMOVE_OBSERVER { -2 };
 } // namespace
 
 class MMIServerTest : public testing::Test {
@@ -182,6 +187,192 @@ HWTEST_F(MMIServerTest, MMIServerTest_RemoveInputHandler_01, TestSize.Level1)
     uint32_t deviceTags = 2;
     int32_t ret = mmiService.RemoveInputHandler(handlerType, eventType, priority, deviceTags);
     EXPECT_NE(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: MMIServerTest_InitFingerSenseWrapper_001
+ * @tc.desc: Test InitFingerSenseWrapper
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_InitFingerSenseWrapper_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    FingersenseWrapper fingersensewrapper;
+    ASSERT_NO_FATAL_FAILURE(fingersensewrapper.InitFingerSenseWrapper());
+}
+
+/**
+ * @tc.name: MMIServerTest_InitFingerSenseWrapper_002
+ * @tc.desc: Test InitFingerSenseWrapper
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_InitFingerSenseWrapper_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    FingersenseWrapper fingersensewrapper;
+    const char* FINGERSENSE_WRAPPER_PATH = "path/to/your/library.so";
+    fingersensewrapper.fingerSenseWrapperHandle_ = dlopen(FINGERSENSE_WRAPPER_PATH, 0x00002);
+    ASSERT_NO_FATAL_FAILURE(fingersensewrapper.InitFingerSenseWrapper());
+}
+
+/**
+ * @tc.name: MMIServerTest_UpdateCombineKeyState_01
+ * @tc.desc: Test UpdateCombineKeyState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_UpdateCombineKeyState_01, TestSize.Level1)
+{
+    MMIService mmiService;
+    bool enable = false;
+    int32_t ret = mmiService.UpdateCombineKeyState(enable);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: MMIServerTest_UpdateCombineKeyState_02
+ * @tc.desc: Test UpdateCombineKeyState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_UpdateCombineKeyState_02, TestSize.Level1)
+{
+    MMIService mmiService;
+    bool enable = true;
+    int32_t ret = mmiService.UpdateCombineKeyState(enable);
+    EXPECT_EQ(ret, RET_ERR);
+}
+
+/**
+ * @tc.name: MMIServerTest_SubscribeKeyEvent_01
+ * @tc.desc: Test the function SubscribeKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_SubscribeKeyEvent_01, TestSize.Level1)
+{
+    MMIService mmiService;
+    int32_t subscribeId = 2;
+    std::shared_ptr<KeyOption> option = std::make_shared<KeyOption>();
+
+    int32_t ret1 = NapProcess::GetInstance()->GetNapClientPid();
+    EXPECT_TRUE(ret1 != REMOVE_OBSERVER);
+    int32_t ret2 = mmiService.SubscribeKeyEvent(subscribeId, option);
+    EXPECT_EQ(ret2, ETASKS_POST_SYNCTASK_FAIL);
+}
+
+/**
+ * @tc.name: MMIServerTest_SubscribeKeyEvent_02
+ * @tc.desc: Test the function SubscribeKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_SubscribeKeyEvent_02, TestSize.Level1)
+{
+    MMIService mmiService;
+    int32_t subscribeId = 3;
+    std::shared_ptr<KeyOption> option = std::make_shared<KeyOption>();
+
+    int32_t ret1 = NapProcess::GetInstance()->GetNapClientPid();
+    EXPECT_FALSE(ret1 != UNOBSERVED);
+    int32_t ret2 = mmiService.SubscribeKeyEvent(subscribeId, option);
+    EXPECT_EQ(ret2, ETASKS_POST_SYNCTASK_FAIL);
+}
+
+/**
+ * @tc.name: MMIServerTest_UnsubscribeKeyEvent_01
+ * @tc.desc: Test the function UnsubscribeKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_UnsubscribeKeyEvent_01, TestSize.Level1)
+{
+    MMIService mmiService;
+    int32_t subscribeId = 2;
+
+    int32_t ret1 = NapProcess::GetInstance()->GetNapClientPid();
+    EXPECT_TRUE(ret1 != REMOVE_OBSERVER);
+    int32_t ret2 = mmiService.UnsubscribeKeyEvent(subscribeId);
+    EXPECT_EQ(ret2, ETASKS_POST_SYNCTASK_FAIL);
+}
+
+/**
+ * @tc.name: MMIServerTest_UnsubscribeKeyEvent_02
+ * @tc.desc: Test the function UnsubscribeKeyEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_UnsubscribeKeyEvent_02, TestSize.Level1)
+{
+    MMIService mmiService;
+    int32_t subscribeId = 3;
+
+    int32_t ret1 = NapProcess::GetInstance()->GetNapClientPid();
+    EXPECT_FALSE(ret1 != UNOBSERVED);
+    int32_t ret2 = mmiService.UnsubscribeKeyEvent(subscribeId);
+    EXPECT_EQ(ret2, ETASKS_POST_SYNCTASK_FAIL);
+}
+
+/**
+ * @tc.name: MMIServerTest_InitLibinputService_01
+ * @tc.desc: Test the function InitLibinputService
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_InitLibinputService_01, TestSize.Level1)
+{
+    MMIService mmiService;
+    int32_t fd = 2;
+    int32_t ret1 = mmiService.AddEpoll(EPOLL_EVENT_INPUT, fd);
+    EXPECT_TRUE(ret1 < 0);
+    bool ret2 = mmiService.InitLibinputService();
+    EXPECT_FALSE(ret2);
+}
+
+/**
+ * @tc.name: MMIServerTest_InitLibinputService_02
+ * @tc.desc: Test the function InitLibinputService
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_InitLibinputService_02, TestSize.Level1)
+{
+    MMIService mmiService;
+    int32_t fd = -1;
+    int32_t ret1 = mmiService.AddEpoll(EPOLL_EVENT_INPUT, fd);
+    EXPECT_TRUE(ret1 < 0);
+    bool ret2 = mmiService.InitLibinputService();
+    EXPECT_FALSE(ret2);
+}
+
+/**
+ * @tc.name: MMIServerTest_SetMouseScrollRows_01
+ * @tc.desc: Test the function SetMouseScrollRows
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_SetMouseScrollRows_01, TestSize.Level1)
+{
+    MMIService mmiService;
+    int32_t rows = 5;
+    int32_t ret = mmiService.SetMouseScrollRows(rows);
+    EXPECT_EQ(ret, ETASKS_POST_SYNCTASK_FAIL);
+}
+
+/**
+ * @tc.name: MMIServerTest_SetMouseScrollRows_02
+ * @tc.desc: Test the function SetMouseScrollRows
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MMIServerTest, MMIServerTest_SetMouseScrollRows_02, TestSize.Level1)
+{
+    MMIService mmiService;
+    int32_t rows = -2;
+    int32_t ret = mmiService.SetMouseScrollRows(rows);
+    EXPECT_EQ(ret, ETASKS_POST_SYNCTASK_FAIL);
 }
 
 /**
