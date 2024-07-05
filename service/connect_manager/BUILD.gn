@@ -47,7 +47,7 @@ ohos_source_set("mmi_connect_manager_service") {
   sources += [
     "${mmi_connect_manager_path}/src/input_binder_client_death_recipient.cpp",
   ]
-  
+
   branch_protector_ret = "pac_ret"
   sanitize = {
     cfi = true
