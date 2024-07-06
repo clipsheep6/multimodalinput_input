@@ -129,7 +129,7 @@ HWTEST_F(FingerprintEventProcessorTest,
     EXPECT_CALL(mock, GetDevice)
         .WillRepeatedly(Return(&device));
     EXPECT_CALL(mock, DeviceGetName)
-        .WillOnce(Return(const_cast<char*>("fingerprint")));
+        .WillRepeatedly(Return(const_cast<char*>("fingerprint")));
     EXPECT_CALL(mock, LibinputEventGetKeyboardEvent)
         .WillRepeatedly(Return(&keyBoardEvent));
     EXPECT_CALL(mock, LibinputEventKeyboardGetKey)
