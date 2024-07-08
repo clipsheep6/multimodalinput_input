@@ -393,6 +393,21 @@ int32_t InputWindowsManager::UpdateTarget(std::shared_ptr<KeyEvent> keyEvent)
     }
     return fd;
 }
+
+void InputWindowsManager::HandleKeyEventWindowId(std::shared_ptr<KeyEvent> keyEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(keyEvent);
+    int32_t focusWindowId = displayGroupInfo_.focusWindowId;
+    std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(keyEvent->GetTargetDisplayId());
+    for (auto &item : windowsInfo) {
+        if (item.id == focusWindowId) {
+            keyEvent->SetTargetWindowId(item.id);
+            keyEvent->SetAgentWindowId(item.agentWindowId);
+            return;
+        }
+    }
+}
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 int32_t InputWindowsManager::GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const
@@ -2074,7 +2089,8 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     }
     PointerStyle pointerStyle;
     if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
-        if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
+        if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState() &&
+            IsMouseDrawing(pointerEvent->GetPointerAction())) {
             MMI_HILOGD("Turn the mouseDisplay from false to true");
             IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
         }
@@ -2130,11 +2146,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     MAGIC_POINTER_VELOCITY_TRACKER->MonitorCursorMovement(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     int64_t beginTime = GetSysClockTime();
-    int32_t currentAction = pointerEvent->GetPointerAction();
-    if (currentAction != PointerEvent::POINTER_ACTION_LEAVE_WINDOW &&
-        currentAction != PointerEvent::POINTER_ACTION_ENTER_WINDOW &&
-        currentAction != PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW &&
-        currentAction != PointerEvent::POINTER_ACTION_PULL_IN_WINDOW) {
+    if (IsMouseDrawing(pointerEvent->GetPointerAction())) {
         IPointerDrawingManager::GetInstance()->DrawPointer(displayId, physicalX, physicalY,
             dragPointerStyle_, direction);
     }
@@ -2199,6 +2211,17 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     return ERR_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
+
+bool InputWindowsManager::IsMouseDrawing(int32_t currentAction)
+{
+    if (currentAction != PointerEvent::POINTER_ACTION_LEAVE_WINDOW &&
+        currentAction != PointerEvent::POINTER_ACTION_ENTER_WINDOW &&
+        currentAction != PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW &&
+        currentAction != PointerEvent::POINTER_ACTION_PULL_IN_WINDOW) {
+        return true;
+    }
+    return false;
+}
 
 void InputWindowsManager::SetMouseFlag(bool state)
 {
