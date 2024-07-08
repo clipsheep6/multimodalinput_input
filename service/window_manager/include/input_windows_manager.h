@@ -37,23 +37,6 @@ struct WindowInfoEX {
 };
 
 class InputWindowsManager final : public IInputWindowsManager {
-private:
-    class FoldStatusLisener final : public Rosen::DisplayManager::IFoldStatusListener {
-    public:
-        FoldStatusLisener(InputWindowsManager &winMgr) : winMgr_(winMgr) {}
-        ~FoldStatusLisener() = default;
-        DISALLOW_COPY_AND_MOVE(FoldStatusLisener);
-
-        /**
-        * @param FoldStatus; UNKNOWN = 0, EXPAND = 1,  FOLDED = 2,  HALF_FOLD = 3;
-        */
-        void OnFoldStatusChanged(Rosen::FoldStatus foldStatus) override;
-
-    private:
-        Rosen::FoldStatus lastFoldStatus_ = Rosen::FoldStatus::UNKNOWN;
-        InputWindowsManager &winMgr_;
-    };
-
 public:
     InputWindowsManager();
     ~InputWindowsManager();
@@ -186,8 +169,6 @@ private:
     void CoordinateCorrection(int32_t width, int32_t height, int32_t &integerX, int32_t &integerY);
     void GetWidthAndHeight(const DisplayInfo* displayInfo, int32_t &width, int32_t &height);
     void SetPrivacyModeFlag(SecureFlag privacyMode, std::shared_ptr<InputEvent> event);
-    void RegisterFoldStatusListener();
-    void UnregisterFoldStatusListener();
     void FoldScreenRotation(std::shared_ptr<PointerEvent> pointerEvent);
     void PrintChangedWindowByEvent(int32_t eventType, const WindowInfo &newWindowInfo);
     void PrintChangedWindowBySync(const DisplayGroupInfo &newDisplayInfo);
@@ -308,7 +289,6 @@ private:
     int32_t pointerActionFlag_ { -1 };
     int32_t currentUserId_ { -1 };
     std::shared_ptr<KnuckleDynamicDrawingManager> knuckleDynamicDrawingManager_ { nullptr };
-    sptr<Rosen::DisplayManager::IFoldStatusListener> foldStatusListener_ { nullptr };
     std::shared_ptr<PointerEvent> lastPointerEventForFold_ { nullptr };
     Direction lastDirection_ = static_cast<Direction>(-1);
     std::map<int32_t, WindowInfo> lastMatchedWindow_;
