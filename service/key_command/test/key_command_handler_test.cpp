@@ -1852,12 +1852,12 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyUpCancel, TestSiz
 }
 
 /**
- * @tc.name: KeyCommandHandlerTest_HandleRepeatKey
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKey_001
  * @tc.desc: HandleRepeatKey
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKey, TestSize.Level1)
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKey_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     KeyCommandHandler handler;
@@ -1867,11 +1867,213 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKey, TestSize.
     ASSERT_NE(keyEvent, nullptr);
     handler.count_ = 2;
     repeatKey.times = 2;
-    repeatKey.statusConfig = true;
+    repeatKey.statusConfig = "true";
+    repeatKey.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    Ability ability;
+    ability.deviceId = "deviceId";
+    ability.bundleName = "bundleName";
+    ability.abilityName = "abilityName";
+    ability.uri = "abilityUri";
+    ability.type = "type";
+    ability.action = "abilityAction";
+    repeatKey.ability = ability;
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    handler.repeatKeyMaxTimes_.insert(std::make_pair(KeyEvent::KEYCODE_VOLUME_DOWN, 2));
+    ASSERT_FALSE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKey_002
+ * @tc.desc: HandleRepeatKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKey_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    RepeatKey repeatKey;
+    bool isLaunched = false;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    handler.count_ = 2;
+    repeatKey.times = 2;
+    repeatKey.statusConfig = "";
+    Ability ability;
+    ability.deviceId = "deviceId";
+    ability.bundleName = "bundleName";
+    ability.abilityName = "abilityName";
+    ability.uri = "abilityUri";
+    ability.type = "type";
+    ability.action = "abilityAction";
+    repeatKey.ability = ability;
     repeatKey.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
-    ASSERT_FALSE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
+    handler.repeatKeyMaxTimes_.insert(std::make_pair(KeyEvent::KEYCODE_VOLUME_DOWN, 4));
+    ASSERT_TRUE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKey_003
+ * @tc.desc: HandleRepeatKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKey_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    RepeatKey repeatKey;
+    bool isLaunched = false;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    handler.count_ = 2;
+    repeatKey.times = 2;
+    repeatKey.statusConfig = "";
+    Ability ability;
+    ability.deviceId = "deviceId";
+    ability.bundleName = "bundleName";
+    ability.abilityName = "abilityName";
+    ability.uri = "abilityUri";
+    ability.type = "type";
+    ability.action = "abilityAction";
+    repeatKey.ability = ability;
+    repeatKey.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    handler.repeatKeyMaxTimes_.insert(std::make_pair(KeyEvent::KEYCODE_VOLUME_DOWN, 4));
+    int32_t timerId = 1;
+    handler.repeatKeyTimerIds_.insert(std::make_pair(KeyEvent::KEYCODE_VOLUME_DOWN, timerId));
+    ASSERT_TRUE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKey_004
+ * @tc.desc: HandleRepeatKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKey_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    RepeatKey repeatKey;
+    bool isLaunched = false;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    handler.count_ = 2;
+    repeatKey.times = 2;
+    repeatKey.statusConfig = "";
+    Ability ability;
+    ability.deviceId = "deviceId";
+    ability.bundleName = "bundleName";
+    ability.abilityName = "abilityName";
+    ability.uri = "abilityUri";
+    ability.type = "type";
+    ability.action = "abilityAction";
+    repeatKey.ability = ability;
+    repeatKey.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    handler.repeatKeyMaxTimes_.insert(std::make_pair(KeyEvent::KEYCODE_VOLUME_DOWN, 2));
+    ASSERT_TRUE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyAbility_001
+ * @tc.desc: HandleRepeatKeyAbility
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyAbility_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    RepeatKey repeatKey;
+    bool isLaunched = false;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    handler.count_ = 2;
+    repeatKey.times = 2;
+    repeatKey.statusConfig = "";
+    Ability ability;
+    ability.deviceId = "deviceId";
+    ability.bundleName = "bundleName";
+    ability.abilityName = "abilityName";
+    ability.uri = "abilityUri";
+    ability.type = "type";
+    ability.action = "abilityAction";
+    repeatKey.ability = ability;
+    repeatKey.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    ASSERT_TRUE(handler.HandleRepeatKeyAbility(repeatKey, isLaunched, keyEvent, false));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyAbility_002
+ * @tc.desc: HandleRepeatKeyAbility
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyAbility_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    RepeatKey repeatKey;
+    bool isLaunched = false;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    handler.count_ = 2;
+    handler.launchAbilityCount_ = 0;
+    repeatKey.times = 2;
+    repeatKey.statusConfig = "";
+    Ability ability;
+    ability.deviceId = "deviceId";
+    ability.bundleName = "bundleName";
+    ability.abilityName = "abilityName";
+    ability.uri = "abilityUri";
+    ability.type = "type";
+    ability.action = "abilityAction";
+    repeatKey.ability = ability;
+    repeatKey.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    ASSERT_TRUE(handler.HandleRepeatKeyAbility(repeatKey, isLaunched, keyEvent, true));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKeyAbility_003
+ * @tc.desc: HandleRepeatKeyAbility
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyAbility_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    RepeatKey repeatKey;
+    bool isLaunched = false;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    handler.count_ = 2;
+    handler.launchAbilityCount_ = 2;
+    repeatKey.times = 2;
+    repeatKey.statusConfig = "";
+    Ability ability;
+    ability.deviceId = "deviceId";
+    ability.bundleName = "bundleName";
+    ability.abilityName = "abilityName";
+    ability.uri = "abilityUri";
+    ability.type = "type";
+    ability.action = "abilityAction";
+    repeatKey.ability = ability;
+    repeatKey.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    ASSERT_TRUE(handler.HandleRepeatKeyAbility(repeatKey, isLaunched, keyEvent, true));
 }
 
 /**
