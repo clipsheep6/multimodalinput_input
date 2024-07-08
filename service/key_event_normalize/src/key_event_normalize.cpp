@@ -105,23 +105,22 @@ int32_t KeyEventNormalize::HandleKeyF(int32_t keyCode, std::shared_ptr<KeyEvent>
         lastPressedKey = pressedKeys.back();
         MMI_HILOGD("The pressing button, keyCode:%{public}d", lastPressedKey);
     }
-    if(lastPressedKey == KeyEvent::KEYCODE_FN) {
+    if (lastPressedKey == KeyEvent::KEYCODE_FN) {
         MMI_HILOGD("FN pressing,The input oh keyCode now:%{public}d", keyCode);
         return keyCode;
     } else {
         keyCode = KeyMapMgr->TransferDefaultHosKeyValue(keyCode);
         MMI_HILOGD("FN not pressing, The input oh keyCode now:%{public}d", keyCode);
         return keyCode;
-    }    
+    }
 }
 
 int32_t KeyEventNormalize::HandleKeyWidsom(int32_t keyCode)
 {
-    if(keyCode == KeyEvent::KEYCODE_CTRL_RIGHT) {
+    if (keyCode == KeyEvent::KEYCODE_CTRL_RIGHT) {
         return KeyEvent::KEYCODE_WISDOM;
-    } else {
-        return keyCode;
     }
+    return keyCode;
 }
 
 void KeyEventNormalize::HandleKeyAction(struct libinput_device* device, KeyEvent::KeyItem &item,

@@ -449,7 +449,7 @@ const std::multimap<int32_t, KeyEventValueTransformation> MAP_KEY_EVENT_VALUE_TR
     {412, {"KEY_PREVIOUS", 412, 2631, HOS_KEY_PREVIOUS}},
 };
 
-const std::multimap<int32_t, int32_t> LINUX_KEY_CODE_TRANSFORMATION = {
+const std::multimap<int32_t, int32_t> HOS_KEY_CODE_TRANSFORMATION = {
     {KeyEvent::KEYCODE_F1, KeyEvent::KEYCODE_BRIGHTNESS_DOWN},
     {KeyEvent::KEYCODE_F2, KeyEvent::KEYCODE_BRIGHTNESS_UP},
     {KeyEvent::KEYCODE_F4, KeyEvent::KEYCODE_VOLUME_MUTE},
@@ -465,12 +465,12 @@ const std::multimap<int32_t, int32_t> LINUX_KEY_CODE_TRANSFORMATION = {
 
 int32_t TransferHosKeyValue(int32_t KeyCode)
 {
-    auto it = LINUX_KEY_CODE_TRANSFORMATION.find(KeyCode);
-    if (it == LINUX_KEY_CODE_TRANSFORMATION.end()) {     
+    auto it = HOS_KEY_CODE_TRANSFORMATION.find(KeyCode);
+    if (it == HOS_KEY_CODE_TRANSFORMATION.end()) {
         MMI_HILOGD("Not found input keyCode,The input keyCode now:%{public}d", KeyCode);
         return KeyCode;
     }
-    MMI_HILOGD("found input keyCode,The input keyCode now:%{public}d", it->second);
+    MMI_HILOGD("Found input keyCode,The input keyCode now:%{public}d", it->second);
     return it->second;
 }
 

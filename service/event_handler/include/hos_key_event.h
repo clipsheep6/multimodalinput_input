@@ -223,28 +223,28 @@ enum HosKeyEventEnum {
     /**
      * Voice key
      *
-     * @since 1
+     * @since 12
      */
     HOS_KEY_VOICE = 3300,
 
     /**
      * Wireless Screen Projection key
      *
-     * @since 1
+     * @since 12
      */
     HOS_KEY_WIRELESS_SCREEN_PROJECTION = 3301,
 
     /**
      * Screen Recording key
      *
-     * @since 1
+     * @since 12
      */
     HOS_KEY_SCREEN_RECORDING = 3303,
 
     /**
      * Wisdom key
      *
-     * @since 1
+     * @since 12
      */
 
     HOS_KEY_WISDOM = 3304,

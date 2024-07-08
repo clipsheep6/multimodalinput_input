@@ -257,29 +257,29 @@ public:
     /**
      * Voice key
      *
-     * @since 9
+     * @since 12
      */
     static const int32_t KEYCODE_VOICE;
 
     /**
      * Wireless-screen-projection key
      *
-     * @since 9
+     * @since 12
      */
     static const int32_t KEYCODE_WIRELESS_SCREEN_PROJECTION;
 
     /**
      * Screen-recording key
      *
-     * @since 9
-     */  
+     * @since 12
+     */
     static const int32_t KEYCODE_SCREEN_RECORDING;
 
     /**
      * Wisdom key
      *
-     * @since 9
-     */   
+     * @since 12
+     */
     static const int32_t KEYCODE_WISDOM;
 
     /**
