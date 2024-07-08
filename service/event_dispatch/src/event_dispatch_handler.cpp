@@ -313,9 +313,15 @@ int32_t EventDispatchHandler::DispatchKeyEventPid(UDSServer& udsServer, std::sha
     CHKPR(session, RET_ERR);
     auto currentTime = GetSysClockTime();
     if (ANRMgr->TriggerANR(ANR_DISPATCH, currentTime, session)) {
-        MMI_HILOGW("The key event does not report normally, application not response."
-            "KeyEvent(deviceid:%{public}d, keycode:%{public}d, key action:%{public}d)",
-            key->GetDeviceId(), key->GetKeyCode(), key->GetKeyAction());
+        if (!IsBetaVersion()) {
+            MMI_HILOGW("The key event does not report normally, application not response."
+                "KeyEvent(deviceid:%{public}d, key action:%{public}d)",
+                key->GetDeviceId(), key->GetKeyAction());
+        } else {
+            MMI_HILOGW("The key event does not report normally, application not response."
+                "KeyEvent(deviceid:%{public}d, keycode:%{public}d, key action:%{public}d)",
+                key->GetDeviceId(), key->GetKeyCode(), key->GetKeyAction());
+        }
         return RET_OK;
     }
 
