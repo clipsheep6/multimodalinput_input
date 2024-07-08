@@ -27,6 +27,7 @@
 #include "bytrace_adapter.h"
 #include "dfx_hisysevent.h"
 #include "error_multimodal.h"
+#include "event_log_helper.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
 #include "i_input_windows_manager.h"
@@ -313,9 +314,19 @@ int32_t EventDispatchHandler::DispatchKeyEventPid(UDSServer& udsServer, std::sha
     CHKPR(session, RET_ERR);
     auto currentTime = GetSysClockTime();
     if (ANRMgr->TriggerANR(ANR_DISPATCH, currentTime, session)) {
-        MMI_HILOGW("The key event does not report normally, application not response."
-            "KeyEvent(deviceid:%{public}d, keycode:%{public}d, key action:%{public}d)",
-            key->GetDeviceId(), key->GetKeyCode(), key->GetKeyAction());
+<<<<<<< Updated upstream
+        if (!IsBetaVersion()) {
+=======
+        if (!EventLogHelper::IsBetaVersion()) {
+>>>>>>> Stashed changes
+            MMI_HILOGW("The key event does not report normally, application not response."
+                "KeyEvent(deviceid:%{public}d, key action:%{public}d)",
+                key->GetDeviceId(), key->GetKeyAction());
+        } else {
+            MMI_HILOGW("The key event does not report normally, application not response."
+                "KeyEvent(deviceid:%{public}d, keycode:%{public}d, key action:%{public}d)",
+                key->GetDeviceId(), key->GetKeyCode(), key->GetKeyAction());
+        }
         return RET_OK;
     }
 

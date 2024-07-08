@@ -230,12 +230,29 @@ int32_t ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, N
         return PACKET_READ_FAIL;
     }
     if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER) {
-        MMI_HILOGI("Subscribe:%{public}d,Fd:%{public}d,KeyEvent:%{public}d,"
-            "KeyCode:%{public}d,ActionTime:%{public}" PRId64 ",ActionStartTime:%{public}" PRId64 ","
-            "Action:%{public}d,KeyAction:%{public}d,EventType:%{public}d,Flag:%{public}u",
-        subscribeId, fd, keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
-        keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
-        keyEvent->GetEventType(), keyEvent->GetFlag());
+<<<<<<< Updated upstream
+        if (!IsBetaVersion()) {
+            MMI_HILOGI("Subscribe:%{public}d,Fd:%{public}d,KeyEvent:%{public}d,"
+                "Action:%{public}d,KeyAction:%{public}d,EventType:%{public}d,Flag:%{public}u",
+=======
+        if (!EventLogHelper::IsBetaVersion()) {
+            MMI_HILOGI("Subscribe:%{public}d,Fd:%{public}d,KeyEvent:%{public}d, Action:%{public}d, KeyAction:%{public}d"
+                ",EventType:%{public}d,Flag:%{public}u",
+>>>>>>> Stashed changes
+            subscribeId, fd, keyEvent->GetId(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
+            keyEvent->GetEventType(), keyEvent->GetFlag());  
+        } else {
+            MMI_HILOGI("Subscribe:%{public}d,Fd:%{public}d,KeyEvent:%{public}d,"
+                "KeyCode:%{public}d,ActionTime:%{public}" PRId64 ",ActionStartTime:%{public}" PRId64 ","
+                "Action:%{public}d,KeyAction:%{public}d,EventType:%{public}d,Flag:%{public}u",
+            subscribeId, fd, keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
+            keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
+<<<<<<< Updated upstream
+            keyEvent->GetEventType(), keyEvent->GetFlag());  
+=======
+            keyEvent->GetEventType(), keyEvent->GetFlag());
+>>>>>>> Stashed changes
+        }
     } else {
         MMI_HILOGD("Subscribe:%{public}d,Fd:%{public}d,KeyEvent:%{public}d,"
             "KeyCode:%{public}d,ActionTime:%{public}" PRId64 ",ActionStartTime:%{public}" PRId64 ","
