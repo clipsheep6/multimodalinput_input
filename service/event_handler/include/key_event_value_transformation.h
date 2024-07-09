@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,7 +29,7 @@ struct KeyEventValueTransformation {
     int32_t sysKeyEvent { 0 };
 };
 
-int32_t TransferHosKeyValue(int32_t KeyCode);
+int32_t TransferHotKeyValue(int32_t KeyCode);
 KeyEventValueTransformation TransferKeyValue(int32_t keyValueOfInput);
 int32_t InputTransformationKeyValue(int32_t keyCode);
 int32_t KeyItemsTransKeyIntention(const std::vector<KeyEvent::KeyItem> &items);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -253,34 +253,6 @@ public:
      * @since 9
      */
     static const int32_t KEYCODE_BRIGHTNESS_DOWN;
-
-    /**
-     * Voice key
-     *
-     * @since 12
-     */
-    static const int32_t KEYCODE_VOICE;
-
-    /**
-     * Wireless-screen-projection key
-     *
-     * @since 12
-     */
-    static const int32_t KEYCODE_WIRELESS_SCREEN_PROJECTION;
-
-    /**
-     * Screen-recording key
-     *
-     * @since 12
-     */
-    static const int32_t KEYCODE_SCREEN_RECORDING;
-
-    /**
-     * Wisdom key
-     *
-     * @since 12
-     */
-    static const int32_t KEYCODE_WISDOM;
 
     /**
      * General-purpose key 1 on wearables
@@ -2791,6 +2763,34 @@ public:
      * @since 9
      */
     static const int32_t KEYCODE_BRL_DOT10;
+
+    /**
+     * Voice key
+     *
+     * @since 12
+     */
+    static const int32_t KEYCODE_VOICE;
+
+    /**
+     * Wireless-screen-projection key
+     *
+     * @since 12
+     */
+    static const int32_t KEYCODE_WIRELESS_SCREEN_PROJECTION;
+
+    /**
+     * Screen-recording key
+     *
+     * @since 12
+     */
+    static const int32_t KEYCODE_SCREEN_RECORDING;
+
+    /**
+     * Wisdom key
+     *
+     * @since 12
+     */
+    static const int32_t KEYCODE_WISDOM;
 
     /**
      * Left Knob roll-up

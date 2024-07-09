@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -101,9 +101,9 @@ int32_t KeyMapManager::TransferDefaultKeyValue(int32_t inputKey)
     return TransferKeyValue(inputKey).sysKeyValue;
 }
 
-int32_t KeyMapManager::TransferDefaultHosKeyValue(int32_t inputKey)
+int32_t KeyMapManager::TransferDefaultHotKeyValue(int32_t inputKey)
 {
-    return TransferHosKeyValue(inputKey);
+    return TransferHotKeyValue(inputKey);
 }
 
 int32_t KeyMapManager::TransferDeviceKeyValue(struct libinput_device *device,

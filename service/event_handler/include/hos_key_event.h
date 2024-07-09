@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -219,35 +219,6 @@ enum HosKeyEventEnum {
      * @since 1
      */
     HOS_KEY_BRIGHTNESS_DOWN = 41,
-
-    /**
-     * Voice key
-     *
-     * @since 12
-     */
-    HOS_KEY_VOICE = 3300,
-
-    /**
-     * Wireless Screen Projection key
-     *
-     * @since 12
-     */
-    HOS_KEY_WIRELESS_SCREEN_PROJECTION = 3301,
-
-    /**
-     * Screen Recording key
-     *
-     * @since 12
-     */
-    HOS_KEY_SCREEN_RECORDING = 3303,
-
-    /**
-     * Wisdom key
-     *
-     * @since 12
-     */
-
-    HOS_KEY_WISDOM = 3304,
 
     /**
      * Indicates general-purpose key 1 on the wearables
@@ -1350,6 +1321,34 @@ enum HosKeyEventEnum {
     HOS_KEY_BRL_DOT8 = 3208,
     HOS_KEY_BRL_DOT9 = 3209,
     HOS_KEY_BRL_DOT10 = 3210,
+
+    /**
+     * Voice key
+     *
+     * @since 12
+     */
+    HOS_KEY_VOICE = 3300,
+
+    /**
+     * Wireless Screen Projection key
+     *
+     * @since 12
+     */
+    HOS_KEY_WIRELESS_SCREEN_PROJECTION = 3301,
+
+    /**
+     * Screen Recording key
+     *
+     * @since 12
+     */
+    HOS_KEY_SCREEN_RECORDING = 3303,
+
+    /**
+     * Wisdom key
+     *
+     * @since 12
+     */
+    HOS_KEY_WISDOM = 3304,
 
     /**
      * Left Knob roll-up

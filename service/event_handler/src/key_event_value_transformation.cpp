@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -222,10 +222,6 @@ const std::multimap<int32_t, KeyEventValueTransformation> MAP_KEY_EVENT_VALUE_TR
     {212, {"KEY_CAMERA", 212, 19, HOS_KEY_CAMERA}},
     {225, {"KEY_BRIGHTNESS_UP", 225, 40, HOS_KEY_BRIGHTNESS_UP}},
     {224, {"KEY_BRIGHTNESS_DOWN", 224, 41, HOS_KEY_BRIGHTNESS_DOWN}},
-    {249, {"KEY_VOICE", 249, 3300, HOS_KEY_VOICE}},
-    {595, {"KEY_WIRELESS_SCREEN_PROJECTION", 595, 3301, HOS_KEY_WIRELESS_SCREEN_PROJECTION}},
-    {597, {"KEY_SCREEN_RECORDING", 597, 3303, HOS_KEY_SCREEN_RECORDING}},
-    {251, {"KEY_WISDOM", 251, 3304, HOS_KEY_WISDOM}},
     {355, {"KEY_CLEAR", 355, 5, HOS_KEY_CLEAR}},
     {528, {"KEY_FOCUS", 528, 7, HOS_KEY_FOCUS}},
     {594, {"KEY_SEARCH", 594, 9, HOS_KEY_SEARCH}},
@@ -444,12 +440,16 @@ const std::multimap<int32_t, KeyEventValueTransformation> MAP_KEY_EVENT_VALUE_TR
     {504, {"KEY_BRL_DOT8", 504, 3208, HOS_KEY_BRL_DOT8}},
     {505, {"KEY_BRL_DOT9", 505, 3209, HOS_KEY_BRL_DOT9}},
     {506, {"KEY_BRL_DOT10", 506, 3210, HOS_KEY_BRL_DOT10}},
+    {249, {"KEY_VOICE", 249, 3300, HOS_KEY_VOICE}},
+    {595, {"KEY_WIRELESS_SCREEN_PROJECTION", 595, 3301, HOS_KEY_WIRELESS_SCREEN_PROJECTION}},
+    {597, {"KEY_SCREEN_RECORDING", 597, 3303, HOS_KEY_SCREEN_RECORDING}},
+    {251, {"KEY_WISDOM", 251, 3304, HOS_KEY_WISDOM}},
     {744, {"KEY_ENDCALL", 744, 4, HOS_KEY_ENDCALL}},
     {407, {"KEY_NEXT", 407, 2629, HOS_KEY_NEXT}},
     {412, {"KEY_PREVIOUS", 412, 2631, HOS_KEY_PREVIOUS}},
 };
 
-const std::multimap<int32_t, int32_t> HOS_KEY_CODE_TRANSFORMATION = {
+const std::multimap<int32_t, int32_t> HOT_KEY_CODE_TRANSFORMATION = {
     {KeyEvent::KEYCODE_F1, KeyEvent::KEYCODE_BRIGHTNESS_DOWN},
     {KeyEvent::KEYCODE_F2, KeyEvent::KEYCODE_BRIGHTNESS_UP},
     {KeyEvent::KEYCODE_F4, KeyEvent::KEYCODE_VOLUME_MUTE},
@@ -463,10 +463,10 @@ const std::multimap<int32_t, int32_t> HOS_KEY_CODE_TRANSFORMATION = {
     {KeyEvent::KEYCODE_F12, KeyEvent::KEYCODE_INSERT},
 };
 
-int32_t TransferHosKeyValue(int32_t KeyCode)
+int32_t TransferHotKeyValue(int32_t KeyCode)
 {
-    auto it = HOS_KEY_CODE_TRANSFORMATION.find(KeyCode);
-    if (it == HOS_KEY_CODE_TRANSFORMATION.end()) {
+    auto it = HOT_KEY_CODE_TRANSFORMATION.find(KeyCode);
+    if (it == HOT_KEY_CODE_TRANSFORMATION.end()) {
         MMI_HILOGD("Not found input keyCode,The input keyCode now:%{public}d", KeyCode);
         return KeyCode;
     }

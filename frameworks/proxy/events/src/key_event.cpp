@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -52,10 +52,6 @@ const std::map <int32_t, std::string> KEYCODE_TO_STRING = {
     {KeyEvent::KEYCODE_MUTE, "KEYCODE_MUTE"},
     {KeyEvent::KEYCODE_BRIGHTNESS_UP, "KEYCODE_BRIGHTNESS_UP"},
     {KeyEvent::KEYCODE_BRIGHTNESS_DOWN, "KEYCODE_BRIGHTNESS_DOWN"},
-    {KeyEvent::KEYCODE_VOICE, "KEYCODE_VOICE"},
-    {KeyEvent::KEYCODE_WIRELESS_SCREEN_PROJECTION, "KEYCODE_WIRELESS_SCREEN_PROJECTION"},
-    {KeyEvent::KEYCODE_SCREEN_RECORDING, "KEYCODE_SCREEN_RECORDING"},
-    {KeyEvent::KEYCODE_WISDOM, "KEYCODE_WISDOM"},
     {KeyEvent::KEYCODE_WEAR_1, "KEYCODE_WEAR_1"},
     {KeyEvent::KEYCODE_0, "KEYCODE_0"},
     {KeyEvent::KEYCODE_1, "KEYCODE_1"},
@@ -410,6 +406,10 @@ const std::map <int32_t, std::string> KEYCODE_TO_STRING = {
     {KeyEvent::KEYCODE_BRL_DOT8, "KEYCODE_BRL_DOT8"},
     {KeyEvent::KEYCODE_BRL_DOT9, "KEYCODE_BRL_DOT9"},
     {KeyEvent::KEYCODE_BRL_DOT10, "KEYCODE_BRL_DOT10"},
+    {KeyEvent::KEYCODE_VOICE, "KEYCODE_VOICE"},
+    {KeyEvent::KEYCODE_WIRELESS_SCREEN_PROJECTION, "KEYCODE_WIRELESS_SCREEN_PROJECTION"},
+    {KeyEvent::KEYCODE_SCREEN_RECORDING, "KEYCODE_SCREEN_RECORDING"},
+    {KeyEvent::KEYCODE_WISDOM, "KEYCODE_WISDOM"},
     {KeyEvent::KEYCODE_LEFT_KNOB_ROLL_UP, "KEYCODE_LEFT_KNOB_ROLL_UP"},
     {KeyEvent::KEYCODE_LEFT_KNOB_ROLL_DOWN, "KEYCODE_LEFT_KNOB_ROLL_DOWN"},
     {KeyEvent::KEYCODE_LEFT_KNOB, "KEYCODE_LEFT_KNOB"},
@@ -453,10 +453,6 @@ const int32_t KeyEvent::KEYCODE_VOLUME_MUTE = 22;
 const int32_t KeyEvent::KEYCODE_MUTE = 23;
 const int32_t KeyEvent::KEYCODE_BRIGHTNESS_UP = 40;
 const int32_t KeyEvent::KEYCODE_BRIGHTNESS_DOWN = 41;
-const int32_t KeyEvent::KEYCODE_VOICE = 3300;
-const int32_t KeyEvent::KEYCODE_WIRELESS_SCREEN_PROJECTION = 3301;
-const int32_t KeyEvent::KEYCODE_SCREEN_RECORDING = 3303;
-const int32_t KeyEvent::KEYCODE_WISDOM = 3304;
 const int32_t KeyEvent::KEYCODE_WEAR_1 = 1001;
 const int32_t KeyEvent::KEYCODE_0 = 2000;
 const int32_t KeyEvent::KEYCODE_1 = 2001;
@@ -813,6 +809,10 @@ const int32_t KeyEvent::KEYCODE_BRL_DOT7 = 3207;
 const int32_t KeyEvent::KEYCODE_BRL_DOT8 = 3208;
 const int32_t KeyEvent::KEYCODE_BRL_DOT9 = 3209;
 const int32_t KeyEvent::KEYCODE_BRL_DOT10 = 3210;
+const int32_t KeyEvent::KEYCODE_VOICE = 3300;
+const int32_t KeyEvent::KEYCODE_WIRELESS_SCREEN_PROJECTION = 3301;
+const int32_t KeyEvent::KEYCODE_SCREEN_RECORDING = 3303;
+const int32_t KeyEvent::KEYCODE_WISDOM = 3304;
 const int32_t KeyEvent::KEYCODE_LEFT_KNOB_ROLL_UP = 10001;
 const int32_t KeyEvent::KEYCODE_LEFT_KNOB_ROLL_DOWN = 10002;
 const int32_t KeyEvent::KEYCODE_LEFT_KNOB = 10003;
