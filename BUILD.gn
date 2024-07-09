@@ -123,8 +123,6 @@ group("mmi_debug_tools") {
     "patch/diff_libinput_mmi:libinput-quirks-mmi",
     "patch/diff_libinput_mmi:libinput-record-mmi",
     "patch/diff_libinput_mmi:libinput-tablet-mmi",
-    "tools/event_inject:mmi-event-injection",
-    "tools/vuinput:vuinput",
   ]
 }
 
