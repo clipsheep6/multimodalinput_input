@@ -20,6 +20,7 @@
 #include <memory>
 
 #include "pixel_map.h"
+
 #include "pointer_style.h"
 #include "window_info.h"
 #include "struct_multimodal.h"
@@ -127,6 +128,10 @@ public:
         return 0;
     }
     virtual int32_t GetHardwareCursorStats(int32_t pid, uint32_t &frameCount, uint32_t &vsyncCount)
+    {
+        return 0;
+    }
+    virtual int32_t GetPointerSnapshot(void *pixelMapPtr)
     {
         return 0;
     }

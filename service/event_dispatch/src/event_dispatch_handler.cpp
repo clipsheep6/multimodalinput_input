@@ -280,8 +280,8 @@ void EventDispatchHandler::DispatchPointerEventInner(std::shared_ptr<PointerEven
             static_cast<uint32_t>(session->GetPid()), pointerCnt);
     }
     if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE) {
-        MMI_HILOG_FREEZEI("InputTracking id:%{public}d, SendMsg to %{public}s:pid:%{public}d",
-            pointerEvent->GetId(), session->GetProgramName().c_str(), session->GetPid());
+        MMI_HILOG_FREEZEI("SendMsg to %{public}s:pid:%{public}d",
+            session->GetProgramName().c_str(), session->GetPid());
     }
     if (!udsServer->SendMsg(fd, pkt)) {
         MMI_HILOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
@@ -299,7 +299,24 @@ int32_t EventDispatchHandler::DispatchKeyEventPid(UDSServer& udsServer, std::sha
 {
     CALL_DEBUG_ENTER;
     CHKPR(key, PARAM_INPUT_INVALID);
-    auto fd = WIN_MGR->UpdateTarget(key);
+    int32_t ret = RET_OK;
+    auto vecTarget = WIN_MGR->UpdateTarget(key);
+    for (const auto &item : vecTarget) {
+        key->ClearFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE);
+        if (item.second.privacyMode == SecureFlag::PRIVACY_MODE) {
+            key->AddFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE);
+        }
+        key->SetTargetWindowId(item.second.id);
+        key->SetAgentWindowId(item.second.agentWindowId);
+        ret = DispatchKeyEvent(item.first, udsServer, key);
+    }
+    return ret;
+}
+
+int32_t EventDispatchHandler::DispatchKeyEvent(int32_t fd, UDSServer& udsServer, std::shared_ptr<KeyEvent> key)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(key, PARAM_INPUT_INVALID);
     currentTime_ = key->GetActionTime();
     if (fd < 0 && currentTime_ - eventTime_ > INTERVAL_TIME) {
         eventTime_ = currentTime_;
