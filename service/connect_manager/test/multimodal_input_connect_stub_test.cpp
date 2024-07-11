@@ -84,7 +84,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetM
 
 /**
  * @tc.name: MultimodalInputConnectStubTest_StubSetPointerSize
- * @tc.desc: Test the function StubSetPointerSize
+ * @tc.desc: Test the function StubSetPointerSizeGlobal
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -95,11 +95,11 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetP
     service->state_ = ServiceRunningState::STATE_NOT_START;
     MessageParcel data;
     MessageParcel reply;
-    EXPECT_EQ(stub->StubSetPointerSize(data, reply), MMISERVICE_NOT_RUNNING);
+    EXPECT_EQ(stub->StubSetPointerSizeGlobal(data, reply), MMISERVICE_NOT_RUNNING);
     int32_t size = 10;
     data.WriteInt32(size);
     service->state_ = ServiceRunningState::STATE_RUNNING;
-    EXPECT_NE(stub->StubSetPointerSize(data, reply), RET_OK);
+    EXPECT_NE(stub->StubSetPointerSizeGlobal(data, reply), RET_OK);
 }
 
 /**
@@ -131,7 +131,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetN
 
 /**
  * @tc.name: MultimodalInputConnectStubTest_StubGetPointerSize
- * @tc.desc: Test the function StubGetPointerSize
+ * @tc.desc: Test the function StubGetPointerSizeGlobal
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -142,10 +142,10 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetP
     service->state_ = ServiceRunningState::STATE_NOT_START;
     MessageParcel data;
     MessageParcel reply;
-    EXPECT_EQ(stub->StubGetPointerSize(data, reply), MMISERVICE_NOT_RUNNING);
+    EXPECT_EQ(stub->StubGetPointerSizeGlobal(data, reply), MMISERVICE_NOT_RUNNING);
 
     service->state_ = ServiceRunningState::STATE_RUNNING;
-    EXPECT_NE(stub->StubGetPointerSize(data, reply), RET_OK);
+    EXPECT_NE(stub->StubGetPointerSizeGlobal(data, reply), RET_OK);
 }
 
 /**
@@ -223,7 +223,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubMark
 
 /**
  * @tc.name: MultimodalInputConnectStubTest_StubSetPointerColor
- * @tc.desc: Test the function StubSetPointerColor
+ * @tc.desc: Test the function StubSetPointerColorGlobal
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -234,17 +234,17 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetP
     service->state_ = ServiceRunningState::STATE_NOT_START;
     MessageParcel data;
     MessageParcel reply;
-    EXPECT_NE(stub->StubSetPointerColor(data, reply), RET_OK);
+    EXPECT_NE(stub->StubSetPointerColorGlobal(data, reply), RET_OK);
 
     int32_t color = 123456;
     data.WriteInt32(color);
     service->state_ = ServiceRunningState::STATE_RUNNING;
-    EXPECT_NE(stub->StubSetPointerColor(data, reply), RET_OK);
+    EXPECT_NE(stub->StubSetPointerColorGlobal(data, reply), RET_OK);
 }
 
 /**
  * @tc.name: MultimodalInputConnectStubTest_StubGetPointerColor
- * @tc.desc: Test the function StubGetPointerColor
+ * @tc.desc: Test the function StubGetPointerColorGlobal
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -255,9 +255,9 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetP
     service->state_ = ServiceRunningState::STATE_NOT_START;
     MessageParcel data;
     MessageParcel reply;
-    EXPECT_NE(stub->StubGetPointerColor(data, reply), RET_OK);
+    EXPECT_NE(stub->StubGetPointerColorGlobal(data, reply), RET_OK);
     service->state_ = ServiceRunningState::STATE_RUNNING;
-    EXPECT_NE(stub->StubGetPointerColor(data, reply), RET_OK);
+    EXPECT_NE(stub->StubGetPointerColorGlobal(data, reply), RET_OK);
 }
 
 /**
@@ -327,12 +327,12 @@ HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_001, TestSize.Level1)
     code = static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_POINTER_SIZE);
     data.WriteInterfaceToken(IMultimodalInputConnect::GetDescriptor());
     ret = stub->OnRemoteRequest(code, data, reply, option);
-    temp = stub->StubSetPointerSize(data, reply);
+    temp = stub->StubSetPointerSizeGlobal(data, reply);
     EXPECT_EQ(ret, temp);
     code = static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_POINTER_SIZE);
     data.WriteInterfaceToken(IMultimodalInputConnect::GetDescriptor());
     ret = stub->OnRemoteRequest(code, data, reply, option);
-    temp = stub->StubGetPointerSize(data, reply);
+    temp = stub->StubGetPointerSizeGlobal(data, reply);
     EXPECT_EQ(ret, temp);
     code = static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_CUSTOM_CURSOR);
     data.WriteInterfaceToken(IMultimodalInputConnect::GetDescriptor());
@@ -484,12 +484,12 @@ HWTEST_F(MultimodalInputConnectStubTest, OnRemoteRequest_004, TestSize.Level1)
     code = static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_POINTER_COLOR);
     data.WriteInterfaceToken(IMultimodalInputConnect::GetDescriptor());
     ret = stub->OnRemoteRequest(code, data, reply, option);
-    temp = stub->StubSetPointerColor(data, reply);
+    temp = stub->StubSetPointerColorGlobal(data, reply);
     EXPECT_EQ(ret, temp);
     code = static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_POINTER_COLOR);
     data.WriteInterfaceToken(IMultimodalInputConnect::GetDescriptor());
     ret = stub->OnRemoteRequest(code, data, reply, option);
-    temp = stub->StubGetPointerColor(data, reply);
+    temp = stub->StubGetPointerColorGlobal(data, reply);
     EXPECT_EQ(ret, temp);
     code = static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_POINTER_SPEED);
     data.WriteInterfaceToken(IMultimodalInputConnect::GetDescriptor());
@@ -1005,7 +1005,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetMouseScrollRows_001, TestSize.Le
 
 /**
  * @tc.name: StubSetPointerSize_001
- * @tc.desc: Test the function StubSetPointerSize
+ * @tc.desc: Test the function StubSetPointerSizeGlobal
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1015,7 +1015,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetPointerSize_001, TestSize.Level1
     MessageParcel data;
     MessageParcel reply;
     int32_t returnCode = 65142800;
-    int32_t ret = stub->StubSetPointerSize(data, reply);
+    int32_t ret = stub->StubSetPointerSizeGlobal(data, reply);
     EXPECT_EQ(ret, returnCode);
 }
 
@@ -1037,7 +1037,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetNapStatus_001, TestSize.Level1)
 
 /**
  * @tc.name: StubGetPointerSize_001
- * @tc.desc: Test the function StubGetPointerSize
+ * @tc.desc: Test the function StubGetPointerSizeGlobal
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1047,13 +1047,13 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetPointerSize_001, TestSize.Level1
     MessageParcel data;
     MessageParcel reply;
     int32_t returnCode = 65142800;
-    int32_t ret = stub->StubGetPointerSize(data, reply);
+    int32_t ret = stub->StubGetPointerSizeGlobal(data, reply);
     EXPECT_EQ(ret, returnCode);
 }
 
 /**
  * @tc.name: MultimodalInputConnectStubTest_StubGetPointerSize_002
- * @tc.desc: Test the function StubGetPointerSize
+ * @tc.desc: Test the function StubGetPointerSizeGlobal
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1063,10 +1063,10 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetP
     MessageParcel data;
     MessageParcel reply;
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
-    int32_t ret = stub->StubGetPointerSize(data, reply);
+    int32_t ret = stub->StubGetPointerSizeGlobal(data, reply);
     EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
     state_ = ServiceRunningState::STATE_RUNNING;
-    ret = stub->StubGetPointerSize(data, reply);
+    ret = stub->StubGetPointerSizeGlobal(data, reply);
     EXPECT_NE(ret, RET_OK);
 }
 
@@ -1177,7 +1177,7 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubMark
 
 /**
  * @tc.name: MultimodalInputConnectStubTest_StubSetPointerColor_001
- * @tc.desc: Test the function StubSetPointerColor
+ * @tc.desc: Test the function StubSetPointerColorGlobal
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1187,16 +1187,16 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetP
     MessageParcel data;
     MessageParcel reply;
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
-    int32_t ret = stub->StubSetPointerColor(data, reply);
+    int32_t ret = stub->StubSetPointerColorGlobal(data, reply);
     EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
     state_ = ServiceRunningState::STATE_RUNNING;
-    ret = stub->StubSetPointerColor(data, reply);
+    ret = stub->StubSetPointerColorGlobal(data, reply);
     EXPECT_NE(ret, RET_OK);
 }
 
 /**
  * @tc.name: MultimodalInputConnectStubTest_StubGetPointerColor_001
- * @tc.desc: Test the function StubGetPointerColor
+ * @tc.desc: Test the function StubGetPointerColorGlobal
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1206,10 +1206,10 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetP
     MessageParcel data;
     MessageParcel reply;
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
-    int32_t ret = stub->StubGetPointerColor(data, reply);
+    int32_t ret = stub->StubGetPointerColorGlobal(data, reply);
     EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
     state_ = ServiceRunningState::STATE_RUNNING;
-    ret = stub->StubGetPointerColor(data, reply);
+    ret = stub->StubGetPointerColorGlobal(data, reply);
     EXPECT_NE(ret, RET_OK);
 }
 
@@ -2372,7 +2372,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetMouseScrollRows_002, TestSize.Le
 
 /**
  * @tc.name: StubSetPointerSize_002
- * @tc.desc: Test the function StubSetPointerSize
+ * @tc.desc: Test the function StubSetPointerSizeGlobal
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2382,10 +2382,10 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetPointerSize_002, TestSize.Level1
     MessageParcel data;
     MessageParcel reply;
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
-    int32_t ret = stub->StubSetPointerSize(data, reply);
+    int32_t ret = stub->StubSetPointerSizeGlobal(data, reply);
     EXPECT_EQ(ret, MMISERVICE_NOT_RUNNING);
     state_ = ServiceRunningState::STATE_RUNNING;
-    ret = stub->StubSetPointerSize(data, reply);
+    ret = stub->StubSetPointerSizeGlobal(data, reply);
     EXPECT_NE(ret, RET_OK);
 }
 

@@ -252,11 +252,11 @@ bool PointerDrawingManager::GetPointerVisible(int32_t pid)
 {
     return true;
 }
-int32_t PointerDrawingManager::SetPointerColor(int32_t color)
+int32_t PointerDrawingManager::SetPointerColorGlobal(int32_t color)
 {
     return 0;
 }
-int32_t PointerDrawingManager::GetPointerColor()
+int32_t PointerDrawingManager::GetPointerColorGlobal()
 {
     return 0;
 }
@@ -302,7 +302,7 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t size)
 {
     return 0;
 }
-int32_t PointerDrawingManager::GetPointerSize()
+int32_t PointerDrawingManager::GetPointerSizeGlobal()
 {
     return 0;
 }

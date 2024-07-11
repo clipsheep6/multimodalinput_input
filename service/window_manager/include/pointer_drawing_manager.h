@@ -70,8 +70,8 @@ public:
     void OnWindowInfo(const WinInfo &info) override;
     void UpdatePointerDevice(bool hasPointerDevice, bool isPointerVisible, bool isHotPlug) override;
     bool Init() override;
-    int32_t SetPointerColor(int32_t color) override;
-    int32_t GetPointerColor() override;
+    int32_t SetPointerColorGlobal(int32_t color) override;
+    int32_t GetPointerColorGlobal() override;
     void DeletePointerVisible(int32_t pid) override;
     int32_t SetPointerVisible(int32_t pid, bool visible, int32_t priority) override;
     bool GetPointerVisible(int32_t pid) override;
@@ -81,7 +81,7 @@ public:
     int32_t GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle,
         bool isUiExtension = false) override;
     int32_t SetPointerSize(int32_t size) override;
-    int32_t GetPointerSize() override;
+    int32_t GetPointerSizeGlobal() override;
     void DrawPointerStyle(const PointerStyle& pointerStyle) override;
     bool IsPointerVisible() override;
     void SetPointerLocation(int32_t x, int32_t y) override;

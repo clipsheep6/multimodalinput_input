@@ -132,10 +132,10 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
             ret = StubGetMouseScrollRows(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_POINTER_SIZE):
-            ret = StubSetPointerSize(data, reply);
+            ret = StubSetPointerSizeGlobal(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_POINTER_SIZE):
-            ret = StubGetPointerSize(data, reply);
+            ret = StubGetPointerSizeGlobal(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_CUSTOM_CURSOR):
             ret = StubSetCustomCursor(data, reply);
@@ -198,10 +198,10 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
             ret = StubGetKeyboardType(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_POINTER_COLOR):
-            ret = StubSetPointerColor(data, reply);
+            ret = StubSetPointerColorGlobal(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_POINTER_COLOR):
-            ret = StubGetPointerColor(data, reply);
+            ret = StubGetPointerColorGlobal(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_POINTER_SPEED):
             ret = StubSetPointerSpeed(data, reply);
@@ -633,17 +633,12 @@ int32_t MultimodalInputConnectStub::StubGetMouseScrollRows(MessageParcel& data, 
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectStub::StubSetPointerSize(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubSetPointerSizeGlobal(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
-    }
-
-    if (!PER_HELPER->VerifySystemApp()) {
-        MMI_HILOGE("Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
     }
 
     int32_t size = 1; // the initial pointer size is 1.
@@ -686,7 +681,7 @@ int32_t MultimodalInputConnectStub::StubSetNapStatus(MessageParcel& data, Messag
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectStub::StubGetPointerSize(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubGetPointerSizeGlobal(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
     if (!IsRunning()) {
@@ -694,13 +689,8 @@ int32_t MultimodalInputConnectStub::StubGetPointerSize(MessageParcel& data, Mess
         return MMISERVICE_NOT_RUNNING;
     }
 
-    if (!PER_HELPER->VerifySystemApp()) {
-        MMI_HILOGE("Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
-    }
-
     int32_t size = 1; // the initial pointer size is 1.
-    int32_t ret = GetPointerSize(size);
+    int32_t ret = GetPointerSizeGlobal(size);
     if (ret != RET_OK) {
         MMI_HILOGE("Call GetPoinerSize failed ret:%{public}d", ret);
         return ret;
@@ -835,7 +825,7 @@ int32_t MultimodalInputConnectStub::StubMarkProcessed(MessageParcel& data, Messa
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectStub::StubSetPointerColor(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubSetPointerColorGlobal(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
     if (!IsRunning()) {
@@ -843,23 +833,18 @@ int32_t MultimodalInputConnectStub::StubSetPointerColor(MessageParcel& data, Mes
         return MMISERVICE_NOT_RUNNING;
     }
 
-    if (!PER_HELPER->VerifySystemApp()) {
-        MMI_HILOGE("Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
-    }
-
     int32_t color = DEFAULT_POINTER_COLOR;
     READINT32(data, color, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = SetPointerColor(color);
+    int32_t ret = SetPointerColorGlobal(color);
     if (ret != RET_OK) {
-        MMI_HILOGE("Call SetPointerColor failed ret:%{public}d", ret);
+        MMI_HILOGE("Call SetPointerColorGlobal failed ret:%{public}d", ret);
         return ret;
     }
     MMI_HILOGD("Success color:%{public}d, pid:%{public}d", color, GetCallingPid());
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectStub::StubGetPointerColor(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubGetPointerColorGlobal(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
     if (!IsRunning()) {
@@ -867,15 +852,10 @@ int32_t MultimodalInputConnectStub::StubGetPointerColor(MessageParcel& data, Mes
         return MMISERVICE_NOT_RUNNING;
     }
 
-    if (!PER_HELPER->VerifySystemApp()) {
-        MMI_HILOGE("Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
-    }
-
     int32_t color = DEFAULT_POINTER_COLOR;
-    int32_t ret = GetPointerColor(color);
+    int32_t ret = GetPointerColorGlobal(color);
     if (ret != RET_OK) {
-        MMI_HILOGE("Call GetPointerColor failed ret:%{public}d", ret);
+        MMI_HILOGE("Call GetPointerColorGlobal failed ret:%{public}d", ret);
         return ret;
     }
     WRITEINT32(reply, color, IPC_STUB_WRITE_PARCEL_ERR);

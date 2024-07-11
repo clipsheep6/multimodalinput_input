@@ -296,7 +296,7 @@ void PointerDrawingManager::UpdateMouseStyle()
 int32_t PointerDrawingManager::SwitchPointerStyle()
 {
     CALL_DEBUG_ENTER;
-    int32_t size = GetPointerSize();
+    int32_t size = GetPointerSizeGlobal();
     if (size < MIN_POINTER_SIZE) {
         size = MIN_POINTER_SIZE;
     } else if (size > MAX_POINTER_SIZE) {
@@ -1123,7 +1123,7 @@ int32_t PointerDrawingManager::UpdateCursorProperty(void* pixelMap, const int32_
     CHKPR(newPixelMap, RET_ERR);
     Media::ImageInfo imageInfo;
     newPixelMap->GetImageInfo(imageInfo);
-    int32_t cursorSize = GetPointerSize();
+    int32_t cursorSize = GetPointerSizeGlobal();
     int32_t cursorWidth =
         pow(INCREASE_RATIO, cursorSize - 1) * displayInfo_.dpi * GetIndependentPixels() / BASELINE_DENSITY;
     int32_t cursorHeight =
@@ -1213,7 +1213,7 @@ std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::DecodeImageToPixel
         .width = imageWidth_,
         .height = imageHeight_
     };
-    int32_t pointerColor = GetPointerColor();
+    int32_t pointerColor = GetPointerColorGlobal();
     if (tempPointerColor_ != DEFAULT_VALUE) {
         decodeOpts.SVGOpts.fillColor = {.isValidColor = true, .color = pointerColor};
         if (pointerColor == MAX_POINTER_COLOR) {
@@ -1241,7 +1241,7 @@ void PointerDrawingManager::GetPreferenceKey(std::string &name)
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 }
 
-int32_t PointerDrawingManager::SetPointerColor(int32_t color)
+int32_t PointerDrawingManager::SetPointerColorGlobal(int32_t color)
 {
     CALL_DEBUG_ENTER;
     if (surfaceNode_ != nullptr) {
@@ -1267,7 +1267,7 @@ int32_t PointerDrawingManager::SetPointerColor(int32_t color)
     MMI_HILOGD("Set pointer color successfully, color:%{public}d", color);
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     if (HasMagicCursor()) {
-        ret = MAGIC_CURSOR->SetPointerColor(color);
+        ret = MAGIC_CURSOR->SetPointerColorGlobal(color);
     } else {
         ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id));
     }
@@ -1282,7 +1282,7 @@ int32_t PointerDrawingManager::SetPointerColor(int32_t color)
     return RET_OK;
 }
 
-int32_t PointerDrawingManager::GetPointerColor()
+int32_t PointerDrawingManager::GetPointerColorGlobal()
 {
     CALL_DEBUG_ENTER;
     std::string name = POINTER_COLOR;
@@ -1305,7 +1305,7 @@ void PointerDrawingManager::UpdateDisplayInfo(const DisplayInfo &displayInfo)
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     hasDisplay_ = true;
     displayInfo_ = displayInfo;
-    int32_t size = GetPointerSize();
+    int32_t size = GetPointerSizeGlobal();
     imageWidth_ = pow(INCREASE_RATIO, size - 1) * displayInfo.dpi * GetIndependentPixels() / BASELINE_DENSITY;
     imageHeight_ = pow(INCREASE_RATIO, size - 1) * displayInfo.dpi * GetIndependentPixels() / BASELINE_DENSITY;
     canvasWidth_ = (imageWidth_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
@@ -1382,7 +1382,7 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t size)
     return RET_OK;
 }
 
-int32_t PointerDrawingManager::GetPointerSize()
+int32_t PointerDrawingManager::GetPointerSizeGlobal()
 {
     CALL_DEBUG_ENTER;
     std::string name = POINTER_SIZE;

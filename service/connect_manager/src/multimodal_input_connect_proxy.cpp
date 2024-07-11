@@ -374,7 +374,7 @@ int32_t MultimodalInputConnectProxy::SetNapStatus(int32_t pid, int32_t uid, std:
     return ret;
 }
 
-int32_t MultimodalInputConnectProxy::GetPointerSize(int32_t &size)
+int32_t MultimodalInputConnectProxy::GetPointerSizeGlobal(int32_t &size)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -557,7 +557,7 @@ int32_t MultimodalInputConnectProxy::MarkProcessed(int32_t eventType, int32_t ev
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::SetPointerColor(int32_t color)
+int32_t MultimodalInputConnectProxy::SetPointerColorGlobal(int32_t color)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -580,7 +580,7 @@ int32_t MultimodalInputConnectProxy::SetPointerColor(int32_t color)
     return ret;
 }
 
-int32_t MultimodalInputConnectProxy::GetPointerColor(int32_t &color)
+int32_t MultimodalInputConnectProxy::GetPointerColorGlobal(int32_t &color)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;

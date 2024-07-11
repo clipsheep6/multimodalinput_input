@@ -166,8 +166,8 @@ void InputManagerPointerTest::SetUp()
     InputManager::GetInstance()->GetTouchpadSwipeSwitch(preSwipeSwitch_);
     InputManager::GetInstance()->GetTouchpadRightClickType(preRightClickType_);
     InputManager::GetInstance()->GetTouchpadRotateSwitch(preRotateSwitch_);
-    InputManager::GetInstance()->GetPointerSize(prePointerSize_);
-    InputManager::GetInstance()->GetPointerColor(prePointerColor_);
+    InputManager::GetInstance()->GetPointerSizeGlobal(prePointerSize_);
+    InputManager::GetInstance()->GetPointerColorGlobal(prePointerColor_);
     InputManager::GetInstance()->GetTouchpadThreeFingersTapSwitch(threeFingerSwitch_);
 }
 
@@ -188,7 +188,7 @@ void InputManagerPointerTest::TearDown()
     InputManager::GetInstance()->SetTouchpadRotateSwitch(preRotateSwitch_);
     InputManager::GetInstance()->SetTouchpadRightClickType(preRightClickType_);
     InputManager::GetInstance()->SetPointerSize(prePointerSize_);
-    InputManager::GetInstance()->SetPointerColor(prePointerColor_);
+    InputManager::GetInstance()->SetPointerColorGlobal(prePointerColor_);
     InputManager::GetInstance()->SetTouchpadThreeFingersTapSwitch(threeFingerSwitch_);
 }
 
@@ -1636,7 +1636,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetPointerSize_001, Te
     int32_t setSize = 1;
     ASSERT_TRUE(InputManager::GetInstance()->SetPointerSize(setSize) == RET_OK);
     int32_t getSize = 3;
-    ASSERT_TRUE(InputManager::GetInstance()->GetPointerSize(getSize) == RET_OK);
+    ASSERT_TRUE(InputManager::GetInstance()->GetPointerSizeGlobal(getSize) == RET_OK);
     ASSERT_TRUE(setSize == getSize);
 }
 
@@ -1664,9 +1664,9 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetPointerColor_001, T
         ASSERT_TRUE(device != nullptr);
         if (device->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER)) {
             int32_t setColor = 0xA946F1;
-            ASSERT_TRUE(InputManager::GetInstance()->SetPointerColor(setColor) == RET_OK);
+            ASSERT_TRUE(InputManager::GetInstance()->SetPointerColorGlobal(setColor) == RET_OK);
             setColor = 0x000000;
-            InputManager::GetInstance()->SetPointerColor(setColor);
+            InputManager::GetInstance()->SetPointerColorGlobal(setColor);
             break;
         }
     }
@@ -1696,9 +1696,9 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetPointerColor_001, T
         ASSERT_TRUE(device != nullptr);
         if (device->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER)) {
             int32_t setColor = 0x000000;
-            ASSERT_TRUE(InputManager::GetInstance()->SetPointerColor(setColor) == RET_OK);
+            ASSERT_TRUE(InputManager::GetInstance()->SetPointerColorGlobal(setColor) == RET_OK);
             int32_t getColor = 3;
-            ASSERT_TRUE(InputManager::GetInstance()->GetPointerColor(getColor) == RET_OK);
+            ASSERT_TRUE(InputManager::GetInstance()->GetPointerColorGlobal(getColor) == RET_OK);
             ASSERT_TRUE(setColor == getColor);
             break;
         }

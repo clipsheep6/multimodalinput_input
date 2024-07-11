@@ -73,7 +73,7 @@ public:
         return size_;
     }
     int32_t SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napStatus) override { return pid; }
-    int32_t GetPointerSize(int32_t &size) override { return size_; }
+    int32_t GetPointerSizeGlobal(int32_t &size) override { return size_; }
     int32_t SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY) override { return pid; }
     int32_t SetMousePrimaryButton(int32_t primaryButton) override
     {
@@ -94,12 +94,12 @@ public:
     }
     int32_t IsPointerVisible(bool &visible) override { return static_cast<int32_t>(visible_); }
     int32_t MarkProcessed(int32_t eventType, int32_t eventId) override { return eventType; }
-    int32_t SetPointerColor(int32_t color) override
+    int32_t SetPointerColorGlobal(int32_t color) override
     {
         color_ = color;
         return color_;
     }
-    int32_t GetPointerColor(int32_t &color) override { return color_; }
+    int32_t GetPointerColorGlobal(int32_t &color) override { return color_; }
     int32_t EnableCombineKey(bool enable) override { return static_cast<int32_t>(enable); }
     int32_t SetPointerSpeed(int32_t speed) override
     {
@@ -1232,7 +1232,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetMouseScrollRows_004, TestSize.Le
 
 /**
  * @tc.name: StubSetPointerSize_001
- * @tc.desc: Test the function StubSetPointerSize
+ * @tc.desc: Test the function StubSetPointerSizeGlobal
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1243,12 +1243,12 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetPointerSize_001, TestSize.Level1
     ASSERT_NE(stub, nullptr);
     MessageParcel data;
     MessageParcel reply;
-    EXPECT_NO_FATAL_FAILURE(stub->StubSetPointerSize(data, reply));
+    EXPECT_NO_FATAL_FAILURE(stub->StubSetPointerSizeGlobal(data, reply));
 }
 
 /**
  * @tc.name: StubSetPointerSize_002
- * @tc.desc: Test the function StubSetPointerSize
+ * @tc.desc: Test the function StubSetPointerSizeGlobal
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1262,12 +1262,12 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetPointerSize_002, TestSize.Level1
     service->state_ = ServiceRunningState::STATE_RUNNING;
     MessageParcel data;
     MessageParcel reply;
-    EXPECT_NO_FATAL_FAILURE(stub->StubSetPointerSize(data, reply));
+    EXPECT_NO_FATAL_FAILURE(stub->StubSetPointerSizeGlobal(data, reply));
 }
 
 /**
  * @tc.name: StubSetPointerSize_003
- * @tc.desc: Test the function StubSetPointerSize
+ * @tc.desc: Test the function StubSetPointerSizeGlobal
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1282,12 +1282,12 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetPointerSize_003, TestSize.Level1
     service->state_ = ServiceRunningState::STATE_RUNNING;
     MessageParcel data;
     MessageParcel reply;
-    EXPECT_NO_FATAL_FAILURE(stub->StubSetPointerSize(data, reply));
+    EXPECT_NO_FATAL_FAILURE(stub->StubSetPointerSizeGlobal(data, reply));
 }
 
 /**
  * @tc.name: StubSetPointerSize_004
- * @tc.desc: Test the function StubSetPointerSize
+ * @tc.desc: Test the function StubSetPointerSizeGlobal
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1302,7 +1302,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetPointerSize_004, TestSize.Level1
     service->state_ = ServiceRunningState::STATE_RUNNING;
     MessageParcel data;
     MessageParcel reply;
-    EXPECT_NO_FATAL_FAILURE(stub->StubSetPointerSize(data, reply));
+    EXPECT_NO_FATAL_FAILURE(stub->StubSetPointerSizeGlobal(data, reply));
 }
 
 /**
@@ -1391,7 +1391,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetNapStatus_004, TestSize.Level1)
 
 /**
  * @tc.name: StubGetPointerSize_001
- * @tc.desc: Test the function StubGetPointerSize
+ * @tc.desc: Test the function StubGetPointerSizeGlobal
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1402,12 +1402,12 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetPointerSize_001, TestSize.Level1
     ASSERT_NE(stub, nullptr);
     MessageParcel data;
     MessageParcel reply;
-    EXPECT_NO_FATAL_FAILURE(stub->StubGetPointerSize(data, reply));
+    EXPECT_NO_FATAL_FAILURE(stub->StubGetPointerSizeGlobal(data, reply));
 }
 
 /**
  * @tc.name: StubGetPointerSize_002
- * @tc.desc: Test the function StubGetPointerSize
+ * @tc.desc: Test the function StubGetPointerSizeGlobal
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1421,12 +1421,12 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetPointerSize_002, TestSize.Level1
     service->state_ = ServiceRunningState::STATE_RUNNING;
     MessageParcel data;
     MessageParcel reply;
-    EXPECT_NO_FATAL_FAILURE(stub->StubGetPointerSize(data, reply));
+    EXPECT_NO_FATAL_FAILURE(stub->StubGetPointerSizeGlobal(data, reply));
 }
 
 /**
  * @tc.name: StubGetPointerSize_003
- * @tc.desc: Test the function StubGetPointerSize
+ * @tc.desc: Test the function StubGetPointerSizeGlobal
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1441,13 +1441,13 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetPointerSize_003, TestSize.Level1
     service->state_ = ServiceRunningState::STATE_RUNNING;
     MessageParcel data;
     MessageParcel reply;
-    EXPECT_NO_FATAL_FAILURE(stub->StubSetPointerSize(data, reply));
-    EXPECT_NO_FATAL_FAILURE(stub->StubGetPointerSize(data, reply));
+    EXPECT_NO_FATAL_FAILURE(stub->StubSetPointerSizeGlobal(data, reply));
+    EXPECT_NO_FATAL_FAILURE(stub->StubGetPointerSizeGlobal(data, reply));
 }
 
 /**
  * @tc.name: StubGetPointerSize_004
- * @tc.desc: Test the function StubGetPointerSize
+ * @tc.desc: Test the function StubGetPointerSizeGlobal
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1463,8 +1463,8 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetPointerSize_004, TestSize.Level1
     service->state_ = ServiceRunningState::STATE_RUNNING;
     MessageParcel data;
     MessageParcel reply;
-    EXPECT_NO_FATAL_FAILURE(stub->StubSetPointerSize(data, reply));
-    EXPECT_NO_FATAL_FAILURE(stub->StubGetPointerSize(data, reply));
+    EXPECT_NO_FATAL_FAILURE(stub->StubSetPointerSizeGlobal(data, reply));
+    EXPECT_NO_FATAL_FAILURE(stub->StubGetPointerSizeGlobal(data, reply));
 }
 
 /**
@@ -1820,7 +1820,7 @@ HWTEST_F(MultimodalInputConnectStubTest, StubMarkProcessed_003, TestSize.Level1)
 
 /**
  * @tc.name: StubSetPointerColor_001
- * @tc.desc: Test the function StubSetPointerColor
+ * @tc.desc: Test the function StubSetPointerColorGlobal
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1831,12 +1831,12 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetPointerColor_001, TestSize.Level
     ASSERT_NE(stub, nullptr);
     MessageParcel data;
     MessageParcel reply;
-    EXPECT_NO_FATAL_FAILURE(stub->StubSetPointerColor(data, reply));
+    EXPECT_NO_FATAL_FAILURE(stub->StubSetPointerColorGlobal(data, reply));
 }
 
 /**
  * @tc.name: StubSetPointerColor_002
- * @tc.desc: Test the function StubSetPointerColor
+ * @tc.desc: Test the function StubSetPointerColorGlobal
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1850,12 +1850,12 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetPointerColor_002, TestSize.Level
     service->state_ = ServiceRunningState::STATE_RUNNING;
     MessageParcel data;
     MessageParcel reply;
-    EXPECT_NO_FATAL_FAILURE(stub->StubSetPointerColor(data, reply));
+    EXPECT_NO_FATAL_FAILURE(stub->StubSetPointerColorGlobal(data, reply));
 }
 
 /**
  * @tc.name: StubSetPointerColor_003
- * @tc.desc: Test the function StubSetPointerColor
+ * @tc.desc: Test the function StubSetPointerColorGlobal
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1870,12 +1870,12 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetPointerColor_003, TestSize.Level
     service->state_ = ServiceRunningState::STATE_RUNNING;
     MessageParcel data;
     MessageParcel reply;
-    EXPECT_NO_FATAL_FAILURE(stub->StubSetPointerColor(data, reply));
+    EXPECT_NO_FATAL_FAILURE(stub->StubSetPointerColorGlobal(data, reply));
 }
 
 /**
  * @tc.name: StubSetPointerColor_004
- * @tc.desc: Test the function StubSetPointerColor
+ * @tc.desc: Test the function StubSetPointerColorGlobal
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1890,12 +1890,12 @@ HWTEST_F(MultimodalInputConnectStubTest, StubSetPointerColor_004, TestSize.Level
     service->state_ = ServiceRunningState::STATE_RUNNING;
     MessageParcel data;
     MessageParcel reply;
-    EXPECT_NO_FATAL_FAILURE(stub->StubSetPointerColor(data, reply));
+    EXPECT_NO_FATAL_FAILURE(stub->StubSetPointerColorGlobal(data, reply));
 }
 
 /**
  * @tc.name: StubGetPointerColor_001
- * @tc.desc: Test the function StubGetPointerColor
+ * @tc.desc: Test the function StubGetPointerColorGlobal
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1906,12 +1906,12 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetPointerColor_001, TestSize.Level
     ASSERT_NE(stub, nullptr);
     MessageParcel data;
     MessageParcel reply;
-    EXPECT_NO_FATAL_FAILURE(stub->StubGetPointerColor(data, reply));
+    EXPECT_NO_FATAL_FAILURE(stub->StubGetPointerColorGlobal(data, reply));
 }
 
 /**
  * @tc.name: StubGetPointerColor_002
- * @tc.desc: Test the function StubGetPointerColor
+ * @tc.desc: Test the function StubGetPointerColorGlobal
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1925,12 +1925,12 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetPointerColor_002, TestSize.Level
     service->state_ = ServiceRunningState::STATE_RUNNING;
     MessageParcel data;
     MessageParcel reply;
-    EXPECT_NO_FATAL_FAILURE(stub->StubGetPointerColor(data, reply));
+    EXPECT_NO_FATAL_FAILURE(stub->StubGetPointerColorGlobal(data, reply));
 }
 
 /**
  * @tc.name: StubGetPointerColor_003
- * @tc.desc: Test the function StubGetPointerColor
+ * @tc.desc: Test the function StubGetPointerColorGlobal
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1945,13 +1945,13 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetPointerColor_003, TestSize.Level
     service->state_ = ServiceRunningState::STATE_RUNNING;
     MessageParcel data;
     MessageParcel reply;
-    EXPECT_NO_FATAL_FAILURE(stub->StubSetPointerColor(data, reply));
-    EXPECT_NO_FATAL_FAILURE(stub->StubGetPointerColor(data, reply));
+    EXPECT_NO_FATAL_FAILURE(stub->StubSetPointerColorGlobal(data, reply));
+    EXPECT_NO_FATAL_FAILURE(stub->StubGetPointerColorGlobal(data, reply));
 }
 
 /**
  * @tc.name: StubGetPointerColor_004
- * @tc.desc: Test the function StubGetPointerColor
+ * @tc.desc: Test the function StubGetPointerColorGlobal
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -1967,8 +1967,8 @@ HWTEST_F(MultimodalInputConnectStubTest, StubGetPointerColor_004, TestSize.Level
     service->state_ = ServiceRunningState::STATE_RUNNING;
     MessageParcel data;
     MessageParcel reply;
-    EXPECT_NO_FATAL_FAILURE(stub->StubSetPointerColor(data, reply));
-    EXPECT_NO_FATAL_FAILURE(stub->StubGetPointerColor(data, reply));
+    EXPECT_NO_FATAL_FAILURE(stub->StubSetPointerColorGlobal(data, reply));
+    EXPECT_NO_FATAL_FAILURE(stub->StubGetPointerColorGlobal(data, reply));
 }
 
 /**
