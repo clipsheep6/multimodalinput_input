@@ -2391,5 +2391,68 @@ HWTEST_F(InputWindowsManagerTest, DrawTouchGraphic_003, TestSize.Level1)
     ASSERT_NE(inputWindowsManager->knuckleDynamicDrawingManager_, nullptr);
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DrawTouchGraphic(pointerEvent));
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget
+ * @tc.desc: Test UpdateTouchScreenTarget
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWindowsManager;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetTargetDisplayId(1);
+    pointerEvent->SetPointerId(0);
+    DisplayInfo displayInfo;
+    displayInfo.id = 1;
+    displayInfo.width = 300;
+    displayInfo.height = 300;
+    displayInfo.displayDirection = DIRECTION0;
+    displayInfo.x = INT32_MAX;
+    displayInfo.y = 300;
+    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetDisplayX(100);
+    item.SetDisplayY(100);
+    item.SetDisplayXPos(100);
+    item.SetDisplayYPos(100);
+    item.SetTargetWindowId(-1);
+    pointerEvent->AddPointerItem(item);
+    EXPECT_EQ(inputWindowsManager.UpdateTouchScreenTarget(pointerEvent), RET_ERR);
+
+    pointerEvent->SetPointerId(1);
+    pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_SIMULATE;
+    EXPECT_EQ(inputWindowsManager.UpdateTouchScreenTarget(pointerEvent), RET_ERR);
+
+    pointerEvent->bitwise_ = InputEvent::EVENT_FLAG_NONE;
+    inputWindowsManager.displayGroupInfo_.displaysInfo[0].x = 300;
+    inputWindowsManager.displayGroupInfo_.displaysInfo[0].y = INT32_MAX;
+    EXPECT_EQ(inputWindowsManager.UpdateTouchScreenTarget(pointerEvent), RET_ERR);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateTouchScreenTarget_001
+ * @tc.desc: This test verifies the functionality of updating the touch screen target
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchScreenTarget_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto result = WIN_MGR->UpdateTouchScreenTarget(nullptr);
+    EXPECT_NE(result, RET_ERR);
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->SetTargetDisplayId(-1);
+    result = WIN_MGR->UpdateTouchScreenTarget(pointerEvent);
+    EXPECT_EQ(result, RET_ERR);
+    pointerEvent->SetTargetDisplayId(1);
+    pointerEvent->SetPointerId(1);
+    result = WIN_MGR->UpdateTouchScreenTarget(pointerEvent);
+    EXPECT_EQ(result, RET_ERR);
+}
 } // namespace MMI
 } // namespace OHOS
