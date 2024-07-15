@@ -790,6 +790,13 @@ void InputWindowsManager::UpdateWindowsInfoPerDisplay(const DisplayGroupInfo &di
     windowsPerDisplay_ = windowsPerDisplay;
 }
 
+bool InputWindowsManager::OnRemoveExpandedScreen(DisplayGroupInfo &displayGroupInfo)
+{
+    if(displayGroupInfo.displaysInfo.size() < displayGroupInfo_.displaysInfo.size()) {
+        return true;
+    }
+    return false;
+}
 
 void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
 {
@@ -807,6 +814,8 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
     });
     CheckFocusWindowChange(displayGroupInfo);
     UpdateCaptureMode(displayGroupInfo);
+    bool removeResult = OnRemoveExpandedScreen(displayGroupInfo);
+    MMI_HILOGD("ExpandedScreen decrease:%{public}d", removeResult);
     displayGroupInfoTmp_ = displayGroupInfo;
     if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled() ||
         action == WINDOW_UPDATE_ACTION::ADD_END) {
@@ -830,7 +839,7 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
 #endif // OHOS_BUILD_ENABLE_POINTER
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     if (!displayGroupInfo.displaysInfo.empty() && pointerDrawFlag_) {
-        PointerDrawingManagerOnDisplayInfo(displayGroupInfo);
+        PointerDrawingManagerOnDisplayInfo(displayGroupInfo, removeResult);
     }
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     UpdateDisplayMode();
@@ -870,7 +879,7 @@ void InputWindowsManager::UpdateDisplayMode()
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
+void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupInfo &displayGroupInfo, bool removeResult)
 {
     IPointerDrawingManager::GetInstance()->OnDisplayInfo(displayGroupInfo);
     if (INPUT_DEV_MGR->HasPointerDevice()) {
@@ -912,7 +921,7 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
             dragFlag_ = false;
             isDragBorder_ = false;
         }
-        IPointerDrawingManager::GetInstance()->DrawPointerStyle(dragPointerStyle_);
+        IPointerDrawingManager::GetInstance()->DrawPointerStyle(dragPointerStyle_, removeResult);
     }
 }
 

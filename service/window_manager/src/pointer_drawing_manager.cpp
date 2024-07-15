@@ -223,6 +223,16 @@ int32_t PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physic
     return RET_OK;
 }
 
+void PointerDrawingManager::DestoryPointerWindow()
+{
+    CHKPV(surfaceNode_);
+    surfaceNode_->RemoveChild(canvasNode_);
+    canvasNode_.reset();
+
+    surfaceNode_->ClearChildren();
+    surfaceNode_.reset();
+}
+
 void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY)
 {
     CALL_DEBUG_ENTER;
@@ -252,6 +262,11 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
     if (currentMouseStyle_.id != lastMouseStyle_.id) {
         MMI_HILOGD("MagicCursor AdjustMouseFocus:%{public}d",
             ICON_TYPE(GetMouseIconPath()[MOUSE_ICON(pointerStyle.id)].alignmentWay));
+    }
+    if (displayId != lastDispalyId_) {
+        lastDispalyId_ = displayId;
+        DestoryPointerWindow();
+        CreatePointerWindow(displayId, physicalX, physicalY, direction);
     }
     if (DrawMovePointer(displayId, physicalX, physicalY, pointerStyle, direction) == RET_OK) {
         return;
@@ -1793,7 +1808,7 @@ int32_t PointerDrawingManager::ClearWindowPointerStyle(int32_t pid, int32_t wind
     return WIN_MGR->ClearWindowPointerStyle(pid, windowId);
 }
 
-void PointerDrawingManager::DrawPointerStyle(const PointerStyle& pointerStyle)
+void PointerDrawingManager::DrawPointerStyle(const PointerStyle& pointerStyle, bool removeResult)
 {
     CALL_DEBUG_ENTER;
     if (hasDisplay_ && hasPointerDevice_) {
@@ -1805,7 +1820,7 @@ void PointerDrawingManager::DrawPointerStyle(const PointerStyle& pointerStyle)
         if (ROTATE_POLICY == WINDOW_ROTATE) {
             direction = displayInfo_.direction;
         }
-        if (lastPhysicalX_ == -1 || lastPhysicalY_ == -1) {
+        if (lastPhysicalX_ == -1 || lastPhysicalY_ == -1 || removeResult) {
             DrawPointer(displayInfo_.id, displayInfo_.width / CALCULATE_MIDDLE, displayInfo_.height / CALCULATE_MIDDLE,
                 pointerStyle, direction);
             MMI_HILOGD("Draw pointer style, mouseStyle:%{public}d", pointerStyle.id);
