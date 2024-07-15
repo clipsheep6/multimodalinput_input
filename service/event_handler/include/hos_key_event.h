@@ -1330,14 +1330,14 @@ enum HosKeyEventEnum {
     HOS_KEY_VOICE = 3300,
 
     /**
-     * Wireless Screen Projection key
+     * Wireless screen projection key
      *
      * @since 12
      */
     HOS_KEY_WIRELESS_SCREEN_PROJECTION = 3301,
 
     /**
-     * Screen Recording key
+     * Screen recording key
      *
      * @since 12
      */

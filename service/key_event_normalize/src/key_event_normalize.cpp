@@ -98,19 +98,18 @@ int32_t KeyEventNormalize::Normalize(struct libinput_event *event, std::shared_p
 
 int32_t KeyEventNormalize::TransferFunctionKeyValue(int32_t keyCode, std::shared_ptr<KeyEvent> keyEvent)
 {
-    CALL_DEBUG_ENTER;
-    MMI_HILOGD("The input oh keyCode now:%{public}d", keyCode);
+    MMI_HILOGD("The input oh keyCode:%{public}d", keyCode);
     if (keyCode == KeyEvent::KEYCODE_CTRL_RIGHT) {
         return KeyEvent::KEYCODE_WISDOM;
     }
     std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
     auto it = std::find(pressedKeys.begin(), pressedKeys.end(), KeyEvent::KEYCODE_FN);
     if (it != pressedKeys.end()) {
-        MMI_HILOGD("FN pressing,The input oh keyCode now:%{public}d", keyCode);
+        MMI_HILOGD("FN pressing,The input oh keyCode:%{public}d", keyCode);
         return keyCode;
     } else {
         keyCode = KeyMapMgr->TransferDefaultHotKeyValue(keyCode);
-        MMI_HILOGD("FN not pressing, The input oh keyCode now:%{public}d", keyCode);
+        MMI_HILOGD("FN not pressing,The input oh keyCode:%{public}d", keyCode);
         return keyCode;
     }
 }

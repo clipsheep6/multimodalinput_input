@@ -467,10 +467,10 @@ int32_t TransferHotKeyValue(int32_t KeyCode)
 {
     auto it = HOT_KEY_CODE_TRANSFORMATION.find(KeyCode);
     if (it == HOT_KEY_CODE_TRANSFORMATION.end()) {
-        MMI_HILOGD("Not found input keyCode,The input keyCode now:%{public}d", KeyCode);
+        MMI_HILOGD("Not found input keyCode,The input keyCode:%{public}d", KeyCode);
         return KeyCode;
     }
-    MMI_HILOGD("Found input keyCode,The input keyCode now:%{public}d", it->second);
+    MMI_HILOGD("Found input keyCode,The input keyCode:%{public}d", it->second);
     return it->second;
 }
 
