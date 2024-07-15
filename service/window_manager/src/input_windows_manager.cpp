@@ -792,7 +792,7 @@ void InputWindowsManager::UpdateWindowsInfoPerDisplay(const DisplayGroupInfo &di
 
 bool InputWindowsManager::OnRemoveExpandedScreen(DisplayGroupInfo &displayGroupInfo)
 {
-    if(displayGroupInfo.displaysInfo.size() < displayGroupInfo_.displaysInfo.size()) {
+    if (displayGroupInfo.displaysInfo.size() < displayGroupInfo_.displaysInfo.size()) {
         return true;
     }
     return false;
