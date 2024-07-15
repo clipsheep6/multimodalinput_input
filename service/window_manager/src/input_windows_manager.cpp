@@ -879,7 +879,8 @@ void InputWindowsManager::UpdateDisplayMode()
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupInfo &displayGroupInfo, bool removeResult)
+void InputWindowsManager::PointerDrawingManagerOnDisplayInfo
+    (const DisplayGroupInfo &displayGroupInfo, bool removeResult)
 {
     IPointerDrawingManager::GetInstance()->OnDisplayInfo(displayGroupInfo);
     if (INPUT_DEV_MGR->HasPointerDevice()) {
