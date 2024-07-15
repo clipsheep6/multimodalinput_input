@@ -850,7 +850,7 @@ bool KeyCommandHandler::ParseJson(const std::string &configFile)
     bool isParseSingleKnuckleGesture = IsParseKnuckleGesture(parser, SINGLE_KNUCKLE_ABILITY, singleKnuckleGesture_);
     bool isParseDoubleKnuckleGesture = IsParseKnuckleGesture(parser, DOUBLE_KNUCKLE_ABILITY, doubleKnuckleGesture_);
     bool isParseMultiFingersTap = ParseMultiFingersTap(parser, TOUCHPAD_TRIP_TAP_ABILITY, threeFingersTap_);
-    bool isParseRepeatKeys = ParseRepeatKeys(parser, repeatKeys_);
+    bool isParseRepeatKeys = ParseRepeatKeys(parser, repeatKeys_, repeatKeyMaxTimes_);
     singleKnuckleGesture_.statusConfig = SETTING_KNUCKLE_SWITCH;
     if (!isParseShortKeys && !isParseSequences && !isParseTwoFingerGesture && !isParseSingleKnuckleGesture &&
         !isParseDoubleKnuckleGesture && !isParseMultiFingersTap && !isParseRepeatKeys) {
@@ -1196,10 +1196,6 @@ bool KeyCommandHandler::HandleRepeatKeys(const std::shared_ptr<KeyEvent> keyEven
         return false;
     }
 
-    if (count_ > maxCount_) {
-        return false;
-    }
-
     bool isLaunched = false;
     bool waitRepeatKey = false;
 
@@ -1232,29 +1228,89 @@ bool KeyCommandHandler::HandleRepeatKey(const RepeatKey &item, bool &isLaunched,
         return false;
     }
     if (count_ == item.times) {
-        bool statusValue = true;
-        auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
-            .GetBoolValue(item.statusConfig, statusValue);
-        if (ret != RET_OK) {
-            MMI_HILOGE("Get value from setting date fail");
-            return false;
+        if (item.times < repeatKeyMaxTimes_[item.keyCode] &&
+            repeatKeyTimerIds_.find(item.keyCode) != repeatKeyTimerIds_.end()) {
+            if (repeatKeyTimerIds_[item.keyCode] != 0) {
+                int32_t timerId = repeatKeyTimerIds_[item.keyCode];
+                TimerMgr->RemoveTimer(timerId);
+                repeatKeyTimerIds_[item.keyCode] = 0;
+                return true;
+            }
         }
-        if (!statusValue) {
-            return false;
+        if (!item.statusConfig.empty()) {
+            bool statusValue = true;
+            auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
+                .GetBoolValue(item.statusConfig, statusValue);
+            if (ret != RET_OK) {
+                MMI_HILOGE("Get value from setting data fail");
+                return false;
+            }
+            if (!statusValue) {
+                MMI_HILOGE("Get value from setting data, result is false");
+                return false;
+            }
         }
-        MMI_HILOGI("Repeat key matched keycode:%{public}d", keyEvent->GetKeyCode());
-        BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_REPEAT_KEY, item.ability.bundleName);
-        LaunchAbility(item.ability);
-        BytraceAdapter::StopLaunchAbility();
 
-        launchAbilityCount_ = count_;
-        isLaunched = true;
-        isDownStart_ = false;
+        if (item.times < repeatKeyMaxTimes_[item.keyCode]) {
+            return HandleRepeatKeyAbility(item, isLaunched, keyEvent, false);
+        }
+        return HandleRepeatKeyAbility(item, isLaunched, keyEvent, true);
+    }
+    return true;
+}
+
+bool KeyCommandHandler::HandleRepeatKeyAbility(const RepeatKey &item, bool &isLaunched,
+    const std::shared_ptr<KeyEvent> keyEvent, bool isMaxTimes)
+{
+    if (!isMaxTimes) {
+        int32_t timerId = TimerMgr->AddTimer(
+            intervalTime_ / SECONDS_SYSTEM, 1, [this, item, &isLaunched, keyEvent] () {
+            LaunchRepeatKeyAbility(item, isLaunched, keyEvent);
+            if (repeatKeyTimerIds_.find(item.keyCode) != repeatKeyTimerIds_.end()) {
+                repeatKeyTimerIds_[item.keyCode] = 0;
+            }
+        });
+        if (timerId < 0) {
+            return false;
+        }
+        if (repeatTimerId_ >= 0) {
+            TimerMgr->RemoveTimer(repeatTimerId_);
+            repeatTimerId_ = TimerMgr->AddTimer(intervalTime_ / SECONDS_SYSTEM, 1, [this] () {
+                SendKeyEvent();
+            });
+            if (repeatTimerId_ < 0) {
+                return false;
+            }
+        }
+        if (repeatKeyTimerIds_.find(item.keyCode) == repeatKeyTimerIds_.end()) {
+            repeatKeyTimerIds_.insert(std::make_pair(item.keyCode, timerId));
+            return true;
+        }
+        repeatKeyTimerIds_[item.keyCode] = timerId;
+        return true;
+    }
+    if (launchAbilityCount_ == count_) {
+        return true;
+    }
+    LaunchRepeatKeyAbility(item, isLaunched, keyEvent);
+
+    return true;
+}
+
+void KeyCommandHandler::LaunchRepeatKeyAbility(const RepeatKey &item, bool &isLaunched,
+    const std::shared_ptr<KeyEvent> keyEvent)
+{
+    BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_REPEAT_KEY, item.ability.bundleName);
+    LaunchAbility(item.ability);
+    BytraceAdapter::StopLaunchAbility();
+    launchAbilityCount_ = count_;
+    isLaunched = true;
+    isDownStart_ = false;
+    if (InputHandler->GetSubscriberHandler() != nullptr) {
         auto keyEventCancel = std::make_shared<KeyEvent>(*keyEvent);
         keyEventCancel->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
         InputHandler->GetSubscriberHandler()->HandleKeyEvent(keyEventCancel);
     }
-    return true;
 }
 
 bool KeyCommandHandler::HandleKeyUpCancel(const RepeatKey &item, const std::shared_ptr<KeyEvent> keyEvent)
@@ -1322,6 +1378,12 @@ void KeyCommandHandler::SendKeyEvent()
             int32_t keycode = repeatKey_.keyCode;
             if (IsSpecialType(keycode, SpecialType::KEY_DOWN_ACTION)) {
                 HandleSpecialKeys(keycode, KeyEvent::KEY_ACTION_UP);
+            }
+            if (count_ > repeatKeyMaxTimes_[keycode]) {
+                auto keyEventCancel = CreateKeyEvent(keycode, KeyEvent::KEY_ACTION_CANCEL, false);
+                CHKPV(keyEventCancel);
+                InputHandler->GetSubscriberHandler()->HandleKeyEvent(keyEventCancel);
+                continue;
             }
             if (i != 0) {
                 auto keyEventDown = CreateKeyEvent(keycode, KeyEvent::KEY_ACTION_DOWN, true);
@@ -1794,7 +1856,7 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability)
     want.SetElementName(ability.deviceId, ability.bundleName, ability.abilityName);
     want.SetAction(ability.action);
     want.SetUri(ability.uri);
-    want.SetType(ability.uri);
+    want.SetType(ability.type);
     for (const auto &entity : ability.entities) {
         want.AddEntity(entity);
     }
