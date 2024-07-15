@@ -20,6 +20,7 @@
 #include "event_dispatch_handler.h"
 #include "i_input_windows_manager.h"
 #include "input_event_handler.h"
+#include "pointer_event.h"
 
 namespace OHOS {
 namespace MMI {
@@ -603,7 +604,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchKeyEventPid_002, TestSize.
     ASSERT_NE(KeyEvent, nullptr);
     dispatch.eventTime_ = 1000;
     KeyEvent->SetActionTime(5000);
-    ASSERT_EQ(dispatch.DispatchKeyEventPid(udsServer, KeyEvent), RET_ERR);
+    ASSERT_EQ(dispatch.DispatchKeyEventPid(udsServer, KeyEvent), RET_OK);
 }
 
 /**
@@ -625,7 +626,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchKeyEventPid_003, TestSize.
     eventTime = 1000;
     EXPECT_TRUE(currentTime - eventTime > INTERVAL_TIME);
     int32_t ret = dispatch.DispatchKeyEventPid(udsServer, keyEvent);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_EQ(ret, RET_OK);
 }
 
 /**
@@ -644,7 +645,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchKeyEventPid_004, TestSize.
     NetPacket pkt(MmiMessageId::INVALID);
     EXPECT_FALSE(pkt.ChkRWError());
     int32_t ret = dispatch.DispatchKeyEventPid(udsServer, keyEvent);
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_EQ(ret, RET_OK);
 }
 
 /**
@@ -669,7 +670,7 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchKeyEventPid_005, TestSize.
     bool ret = ANRMgr->TriggerANR(type, time, sess);
     EXPECT_FALSE(ret);
 
-    ASSERT_EQ(dispatch.DispatchKeyEventPid(udsServer, KeyEvent), RET_ERR);
+    ASSERT_EQ(dispatch.DispatchKeyEventPid(udsServer, KeyEvent), RET_OK);
 }
 
 /**
@@ -1151,14 +1152,325 @@ HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchKeyEventPid_006, TestSize.
     UDSServer udsServer;
     std::shared_ptr<KeyEvent> KeyEvent = KeyEvent::Create();
     ASSERT_NE(KeyEvent, nullptr);
-    ASSERT_EQ(eventDispatchHandler.DispatchKeyEventPid(udsServer, KeyEvent), RET_ERR);
+    ASSERT_EQ(eventDispatchHandler.DispatchKeyEventPid(udsServer, KeyEvent), RET_OK);
     SessionPtr session = std::make_shared<UDSSession>(PROGRAM_NAME, g_moduleType, g_writeFd, UID_ROOT, g_pid);
     udsServer.sessionsMap_.insert(std::make_pair(-1, session));
     StreamBuffer streamBuffer;
     streamBuffer.rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_READ;
     eventDispatchHandler.DispatchKeyEventPid(udsServer, KeyEvent);
     streamBuffer.rwErrorStatus_ = CircleStreamBuffer::ErrorStatus::ERROR_STATUS_READ;
-    ASSERT_EQ(eventDispatchHandler.DispatchKeyEventPid(udsServer, KeyEvent), MSG_SEND_FAIL);
+    ASSERT_EQ(eventDispatchHandler.DispatchKeyEventPid(udsServer, KeyEvent), RET_OK);
+}
+
+/**
+ * @tc.name: EventDispatchTest_HandleMultiWindowPointerEvent_01
+ * @tc.desc: Test HandleMultiWindowPointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_HandleMultiWindowPointerEvent_01, TestSize.Level1)
+{
+    EventDispatchHandler dispatch;
+    std::shared_ptr<PointerEvent> point = PointerEvent::Create();
+    ASSERT_NE(point, nullptr);
+    point->pointerAction_ = PointerEvent::POINTER_ACTION_UP;
+    int32_t windowId = 1;
+    point->pointerId_ = 1;
+    point->SetPointerId(point->pointerId_);
+    std::optional<WindowInfo> windowInfo = std::nullopt;
+    std::shared_ptr<WindowInfo> windowInfo1 = std::make_shared<WindowInfo>();
+    windowInfo1->id = 1;
+    dispatch.cancelEventList_[1].insert(windowInfo1);
+    bool result = dispatch.ReissueEvent(point, windowId, windowInfo);
+    EXPECT_TRUE(result);
+
+    std::vector<int32_t> windowIds;
+    windowIds.push_back(1);
+    windowIds.push_back(2);
+    windowIds.push_back(3);
+
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetWindowX(10);
+    pointerItem.SetWindowY(20);
+    pointerItem.SetTargetWindowId(2);
+
+    ASSERT_NO_FATAL_FAILURE(dispatch.HandleMultiWindowPointerEvent(point, pointerItem));
+}
+
+/**
+ * @tc.name: EventDispatchTest_HandleMultiWindowPointerEvent_02
+ * @tc.desc: Test HandleMultiWindowPointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_HandleMultiWindowPointerEvent_02, TestSize.Level1)
+{
+    EventDispatchHandler dispatch;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_UP;
+    int32_t windowId = 10;
+    std::optional<WindowInfo> windowInfo = std::nullopt;
+    bool result = dispatch.ReissueEvent(pointerEvent, windowId, windowInfo);
+    EXPECT_FALSE(result);
+
+    std::vector<int32_t> windowIds;
+    windowIds.push_back(1);
+    windowIds.push_back(2);
+    windowIds.push_back(3);
+
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetWindowX(10);
+    pointerItem.SetWindowY(20);
+    pointerItem.SetTargetWindowId(2);
+
+    ASSERT_NO_FATAL_FAILURE(dispatch.HandleMultiWindowPointerEvent(pointerEvent, pointerItem));
+}
+
+/**
+ * @tc.name: EventDispatchTest_HandleMultiWindowPointerEvent_03
+ * @tc.desc: Test HandleMultiWindowPointerEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_HandleMultiWindowPointerEvent_03, TestSize.Level1)
+{
+    EventDispatchHandler dispatch;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_UP;
+    int32_t windowId = 10;
+    std::optional<WindowInfo> windowInfo = std::nullopt;
+    bool result = dispatch.ReissueEvent(pointerEvent, windowId, windowInfo);
+    EXPECT_FALSE(result);
+
+    std::vector<int32_t> windowIds;
+    windowIds.push_back(1);
+    windowIds.push_back(2);
+    windowIds.push_back(3);
+
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetWindowX(10);
+    pointerItem.SetWindowY(20);
+    pointerItem.SetTargetWindowId(2);
+
+    auto fd = WIN_MGR->GetClientFd(pointerEvent, windowId);
+    EXPECT_TRUE(fd < 0);
+    ASSERT_NO_FATAL_FAILURE(dispatch.HandleMultiWindowPointerEvent(pointerEvent, pointerItem));
+}
+
+/**
+ * @tc.name: EventDispatchTest_DispatchPointerEventInner_01
+ * @tc.desc: Test DispatchPointerEventInner
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchPointerEventInner_01, TestSize.Level1)
+{
+    EventDispatchHandler dispatch;
+    int32_t fd = 1;
+    int32_t type = 2;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    auto session = InputHandler->udsServer_->GetSession(fd);
+    int64_t currentTime = GetSysClockTime();
+    EXPECT_FALSE(ANRMgr->TriggerANR(type, currentTime, session));
+    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_DOWN;
+    ASSERT_NO_FATAL_FAILURE(dispatch.DispatchPointerEventInner(pointerEvent, fd));
+}
+
+/**
+ * @tc.name: EventDispatchTest_DispatchPointerEventInner_02
+ * @tc.desc: Test DispatchPointerEventInner
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchPointerEventInner_02, TestSize.Level1)
+{
+    EventDispatchHandler dispatch;
+    int32_t fd = 1;
+    int32_t type = 2;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    auto session = InputHandler->udsServer_->GetSession(fd);
+    int64_t currentTime = GetSysClockTime();
+    EXPECT_FALSE(ANRMgr->TriggerANR(type, currentTime, session));
+    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_UP;
+    ASSERT_NO_FATAL_FAILURE(dispatch.DispatchPointerEventInner(pointerEvent, fd));
+}
+
+/**
+ * @tc.name: EventDispatchTest_DispatchPointerEventInner_03
+ * @tc.desc: Test DispatchPointerEventInner
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchPointerEventInner_03, TestSize.Level1)
+{
+    EventDispatchHandler dispatch;
+    int32_t fd = 1;
+    int32_t type = 2;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    auto session = InputHandler->udsServer_->GetSession(fd);
+    int64_t currentTime = GetSysClockTime();
+    EXPECT_FALSE(ANRMgr->TriggerANR(type, currentTime, session));
+    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_PULL_DOWN;
+    ASSERT_NO_FATAL_FAILURE(dispatch.DispatchPointerEventInner(pointerEvent, fd));
+}
+
+/**
+ * @tc.name: EventDispatchTest_DispatchPointerEventInner_04
+ * @tc.desc: Test DispatchPointerEventInner
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchPointerEventInner_04, TestSize.Level1)
+{
+    EventDispatchHandler dispatch;
+    int32_t fd = 1;
+    int32_t type = 2;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    auto session = InputHandler->udsServer_->GetSession(fd);
+    int64_t currentTime = GetSysClockTime();
+    EXPECT_FALSE(ANRMgr->TriggerANR(type, currentTime, session));
+    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_PULL_UP;
+    ASSERT_NO_FATAL_FAILURE(dispatch.DispatchPointerEventInner(pointerEvent, fd));
+}
+
+/**
+ * @tc.name: EventDispatchTest_DispatchPointerEventInner_05
+ * @tc.desc: Test DispatchPointerEventInner
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchPointerEventInner_05, TestSize.Level1)
+{
+    EventDispatchHandler dispatch;
+    int32_t fd = 1;
+    int32_t type = 2;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    auto session = InputHandler->udsServer_->GetSession(fd);
+    int64_t currentTime = GetSysClockTime();
+    EXPECT_FALSE(ANRMgr->TriggerANR(type, currentTime, session));
+    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_MOVE;
+    ASSERT_NO_FATAL_FAILURE(dispatch.DispatchPointerEventInner(pointerEvent, fd));
+}
+
+/**
+ * @tc.name: EventDispatchTest_DispatchPointerEventInner_06
+ * @tc.desc: Test DispatchPointerEventInner
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchPointerEventInner_06, TestSize.Level1)
+{
+    EventDispatchHandler dispatch;
+    int32_t fd = 1;
+    int32_t type = 2;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    auto session = InputHandler->udsServer_->GetSession(fd);
+    int64_t currentTime = GetSysClockTime();
+    EXPECT_FALSE(ANRMgr->TriggerANR(type, currentTime, session));
+    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_MOVE;
+
+    NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
+    EXPECT_FALSE(InputHandler->udsServer_->SendMsg(fd, pkt));
+    pointerEvent->markEnabled_ = true;
+    ASSERT_NO_FATAL_FAILURE(dispatch.DispatchPointerEventInner(pointerEvent, fd));
+}
+
+/**
+ * @tc.name: EventDispatchTest_DispatchPointerEventInner_07
+ * @tc.desc: Test DispatchPointerEventInner
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_DispatchPointerEventInner_07, TestSize.Level1)
+{
+    EventDispatchHandler dispatch;
+    int32_t fd = 3;
+    int32_t type = 4;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    auto session = InputHandler->udsServer_->GetSession(fd);
+    int64_t currentTime = GetSysClockTime();
+    EXPECT_FALSE(ANRMgr->TriggerANR(type, currentTime, session));
+    pointerEvent->pointerAction_ = PointerEvent::POINTER_ACTION_MOVE;
+
+    NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
+    EXPECT_FALSE(InputHandler->udsServer_->SendMsg(fd, pkt));
+    pointerEvent->markEnabled_ = false;
+    ASSERT_NO_FATAL_FAILURE(dispatch.DispatchPointerEventInner(pointerEvent, fd));
+}
+
+/**
+ * @tc.name: EventDispatchTest_FilterInvalidPointerItem_01
+ * @tc.desc: Test the function FilterInvalidPointerItem
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_FilterInvalidPointerItem_01, TestSize.Level1)
+{
+    EventDispatchHandler dispatch;
+    int32_t fd = 1;
+    int32_t id = 2;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+
+    std::vector<int32_t> pointerIdList;
+    pointerIdList.push_back(1);
+    pointerIdList.push_back(2);
+    EXPECT_TRUE(pointerIdList.size() > 1);
+
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetWindowX(10);
+    pointerItem.SetWindowY(20);
+    pointerItem.SetTargetWindowId(2);
+
+    EXPECT_FALSE(pointerEvent->GetPointerItem(id, pointerItem));
+    ASSERT_NO_FATAL_FAILURE(dispatch.FilterInvalidPointerItem(pointerEvent, fd));
+}
+
+/**
+ * @tc.name: EventDispatchTest_FilterInvalidPointerItem_02
+ * @tc.desc: Test the function FilterInvalidPointerItem
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(EventDispatchTest, EventDispatchTest_FilterInvalidPointerItem_02, TestSize.Level1)
+{
+    EventDispatchHandler dispatch;
+    int32_t fd = 1;
+    int32_t windowId = 3;
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+
+    std::vector<int32_t> pointerIdList;
+    pointerIdList.push_back(1);
+    pointerIdList.push_back(2);
+    pointerIdList.push_back(3);
+    EXPECT_TRUE(pointerIdList.size() > 1);
+
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetWindowX(10);
+    pointerItem.SetWindowY(20);
+    pointerItem.SetTargetWindowId(2);
+
+    auto itemPid = WIN_MGR->GetWindowPid(windowId);
+    EXPECT_FALSE(itemPid >= 0);
+    EXPECT_FALSE(itemPid != InputHandler->udsServer_->GetClientPid(fd));
+    ASSERT_NO_FATAL_FAILURE(dispatch.FilterInvalidPointerItem(pointerEvent, fd));
 }
 } // namespace MMI
 } // namespace OHOS

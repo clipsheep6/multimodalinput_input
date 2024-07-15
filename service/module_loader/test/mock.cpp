@@ -12,32 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef MESSAGE_PARCEL_MOCK_H
-#define MESSAGE_PARCEL_MOCK_H
-
-#include <memory>
-#include <string>
-#include <gmock/gmock.h>
-
-#include "input_windows_manager.h"
+#include "mock.h"
 
 namespace OHOS {
 namespace MMI {
-class DfsMessageParcel {
-public:
-    virtual ~DfsMessageParcel() = default;
-public:
-    virtual CursorPosition GetCursorPos() = 0;
-    virtual DisplayInfo* GetPhysicalDisplay(int32_t id) = 0;
-public:
-    static inline std::shared_ptr<DfsMessageParcel> messageParcel = nullptr;
-};
 
-class MessageParcelMock : public DfsMessageParcel {
-public:
-    MOCK_METHOD0(GetCursorPos, CursorPosition());
-    MOCK_METHOD1(GetPhysicalDisplay, DisplayInfo*(int32_t id));
-};
+int32_t DelegateTasks::PostSyncTask(DTaskCallback callback)
+{
+    return DfsMessageParcel::messageParcel->PostSyncTask(callback);
+}
 } // namespace MMI
 } // namespace OHOS
-#endif
