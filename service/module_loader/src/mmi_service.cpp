@@ -67,6 +67,7 @@
 #include "res_type.h"
 #include "system_ability_definition.h"
 #endif // OHOS_RSS_CLIENT
+#include "screen_caputure_monitor.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MMIService"
@@ -334,6 +335,11 @@ void MMIService::OnStart()
     APP_OBSERVER_MGR->InitAppStateObserver();
     MMI_HILOGI("Add app manager service listener end");
     AddAppDebugListener();
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    MMI_HILOGI("Add system ability listener start");
+    AddSystemAbilityListener(SCREEN_CAPTURE_SERVICE_ID);  //linshizhi
+    MMI_HILOGI("Add system ability listener start");
+#endif
 #ifdef OHOS_BUILD_ENABLE_ANCO
     InitAncoUds();
 #endif // OHOS_BUILD_ENABLE_ANCO
@@ -1195,6 +1201,31 @@ int32_t MMIService::CheckAddInput(int32_t pid, InputHandlerType handlerType, Han
 }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+void MMIService::SaveScreenCapturePid(int32_t pid)
+{
+    auto it = std::find(screenCapturePid_.begin(), screenCapturePid_.end(), pid);
+    if (it == screenCapturePid_.end()) {
+        screenCapturePid_.push_back(pid);
+    }
+}
+
+void MMIService::RemoveScreenCaptureMonitor(int32_t pid)
+{
+    if (screenCapturePid_.find(pid) == screenCapturePid_.end()) {
+        return;
+    }
+    auto sess = GetSessionByPid(pid);
+    if (sess == nullptr) {
+        return;
+    }
+    NetPacket pkt(MmiMessageId::REMOVE_MONITOR);
+    if (!sess->SendMsg(pkt)) {
+        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+    }
+}
+#endif
+
 int32_t MMIService::AddInputHandler(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
     uint32_t deviceTags)
 {
@@ -1491,6 +1522,13 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
         MMI_HILOGI("Init render service state observer start");
         IPointerDrawingManager::GetInstance()->InitPointerCallback();
     }
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    if (systemAbilityId == SCREEN_CAPTURE_SERVICE_ID) {
+        MMI_HILOGI("Init screen capture monitor listener start");
+        screenCaptureMonitorListener_ = std::make_shared<ScreenCaptureMonitorListener>();
+        ScreenCaptureMonitor::GetInstance()->RegisterScreenCaptureMonitorListener(screenCaptureMonitorListener_);
+    }
+#endif
 }
 
 int32_t MMIService::SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option)

@@ -109,6 +109,17 @@ typedef enum {
     MOUSE_AXIS_SCROLL_HORIZONTAL = 1,
 } InputEvent_MouseAxis;
 
+typedef enum {
+    /** 垂直轴 */
+    TOUCHPAD_AXIS_SCROLL_VERTICAL = 0,
+    /** 水平轴 */
+    TOUCHPAD_AXIS_SCROLL_HORIZONTAL = 1,
+    /** 捏合 */
+    TOUCHPAD_AXIS_SCROLL_PINCH= 2,
+    /** 旋转 */
+    TOUCHPAD_AXIS_SCROLL_ROTATE= 3,
+} InputEvent_TouchPadAxis;
+
 /**
  * @brief Enumerated values of mouse event button.
  *
@@ -175,6 +186,13 @@ struct Input_MouseEvent;
 struct Input_TouchEvent;
 
 /**
+ * @brief 触控板轴事件
+ *
+ * @since 12
+ */
+struct Input_TouchPadAxisEvent;
+
+/**
  * @brief Enumerates the error codes.
  *
  * @since 12
@@ -187,8 +205,36 @@ typedef enum {
     /** Non-system application */
     INPUT_NOT_SYSTEM_APPLICATION = 202,
     /** Parameter check failed */
-    INPUT_PARAMETER_ERROR = 401
+    INPUT_PARAMETER_ERROR = 401,
+    /** @服务异常 */
+    INPUT_SERVICE_EXCEPTION = 3800001,
+    /** @应用不在录屏状态 */
+    INPUT_NOT_RECORDING = 4200001
 } Input_Result;
+
+/**
+ * @brief 定义一个回调函数用于回调鼠标事件
+ * @since 12
+ */
+typedef void (*Input_KeyEventCallback)(struct Input_KeyEvent* keyEvent);
+
+/**
+ * @brief 定义一个回调函数用于回调鼠标事件
+ * @since 12
+ */
+typedef void (*Input_MouseEventCallback)(struct Input_MouseEvent* mouseEvent);
+
+/**
+ * @brief 定义一个回调函数用于回调触摸事件
+ * @since 12
+ */
+typedef void (*Input_TouchEventCallback)(struct Input_TouchEvent* touchEvent);
+
+/**
+ * @brief 定义一个回调函数用于回调轴事件
+ * @since 12
+ */
+typedef void (*Input_TouchPadAxisEventCallback)(struct Input_TouchPadAxisEvent* touchEvent);
 
 /**
  * @brief Queries the key state.
@@ -681,6 +727,303 @@ int64_t OH_Input_GetTouchEventActionTime(const struct Input_TouchEvent* touchEve
  */
 void OH_Input_CancelInjection();
 
+/**
+ * @brief 创建一个触控板轴事件对象.
+ *
+ * @return 成功返回一个触控板轴事件对象指针，失败返回nullptr
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+struct Input_TouchPadAxisEvent* OH_Input_CreateTouchPadAxisEvent();
+
+/**
+ * @brief 删除一个触控板轴事件对象.
+ * 
+ * @param touchPadAxisEvent 触控板轴事件对象.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+void OH_Input_DestroyTouchPadAxisEvent(struct Input_TouchPadAxisEvent** touchPadAxisEvent);
+
+/**
+ * @brief 创建一个按键事件的监听.
+ *
+ * @permission ohos.permission.INPUT_MONITORING
+ * @param callback - 回调函数.
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+int32_t OH_Input_AddKeyEventMonitor(Input_KeyEventCallback callback);
+
+/**
+ * @brief 创建一个鼠标事件的监听.
+ *
+ * @permission ohos.permission.INPUT_MONITORING
+ * @param callback - 回调函数.
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+int32_t OH_Input_AddMouseEventMonitor(Input_MouseEventCallback callback);
+
+/**
+ * @brief 创建一个触摸事件的监听.
+ *
+ * @permission ohos.permission.INPUT_MONITORING
+ * @param callback - 回调函数.
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+int32_t OH_Input_AddTouchEventMonitor(Input_TouchEventCallback callback);
+
+/**
+ * @brief 创建一个轴摸事件的监听.
+ *
+ * @permission ohos.permission.INPUT_MONITORING
+ * @param callback - 回调函数.
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+int32_t OH_Input_AddAxisEventMonitor(Input_TouchPadAxisEventCallback callback);
+
+/**
+ * @brief 删除按键事件监听
+ *
+ * @permission ohos.permission.INPUT_MONITORING
+ * @param callback - 回调函数.
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+int32_t OH_Input_RemoveKeyEventMonitor(Input_KeyEventCallback callback);
+
+/**
+ * @brief 删除鼠标事件监听
+ *
+ * @permission ohos.permission.INPUT_MONITORING
+ * @param callback - 回调函数.
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+int32_t OH_Input_RemoveMouseEventMonitor(Input_MouseEventCallback callback);
+
+/**
+ * @brief 删除触摸事件监听
+ *
+ * @permission ohos.permission.INPUT_MONITORING
+ * @param callback - 回调函数.
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+int32_t OH_Input_RemoveTouchEventMonitor(Input_TouchEventCallback callback);
+
+/**
+ * @brief 删除轴事件监听
+ *
+ * @permission ohos.permission.INPUT_MONITORING
+ * @param callback - 回调函数.
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+int32_t OH_Input_RemoveAxisEventMonitor(Input_TouchPadAxisEventCallback callback);
+
+/**
+ * @brief 创建一个按键事件的拦截.
+ *
+ * @permission ohos.permission.INPUT_MONITORING
+ * @param callback - 回调函数.
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+int32_t OH_Input_AddKeyEventInterceptor(Input_KeyEventCallback callback);
+
+/**
+ * @brief 创建一个鼠标事件的拦截.
+ *
+ * @permission ohos.permission.INPUT_MONITORING
+ * @param callback - 回调函数.
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+int32_t OH_Input_AddMouseEventInterceptor(Input_MouseEventCallback callback);
+
+/**
+ * @brief 创建一个触摸事件的拦截.
+ *
+ * @permission ohos.permission.INPUT_MONITORING
+ * @param callback - 回调函数.
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+int32_t OH_Input_AddTouchEventInterceptor(Input_TouchEventCallback callback);
+
+/**
+ * @brief 创建一个轴事件的拦截.
+ *
+ * @permission ohos.permission.INPUT_MONITORING
+ * @param callback - 回调函数.
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+int32_t OH_Input_AddAxisEventInterceptor(Input_TouchPadAxisEventCallback callback);
+
+/**
+ * @brief 删除按键事件拦截
+ *
+ * @permission ohos.permission.INPUT_MONITORING
+ * @param callback - 回调函数.
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+int32_t OH_Input_RemoveKeyEventInterceptor(Input_KeyEventCallback callback);
+
+/**
+ * @brief 删除鼠标事件拦截
+ *
+ * @permission ohos.permission.INPUT_MONITORING
+ * @param callback - 回调函数.
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+int32_t OH_Input_RemoveMouseEventInterceptor(Input_MouseEventCallback callback);
+
+/**
+ * @brief 删除触摸事件拦截
+ *
+ * @permission ohos.permission.INPUT_MONITORING
+ * @param callback - 回调函数.
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+int32_t OH_Input_RemoveTouchEventInterceptor(Input_TouchEventCallback callback);
+
+/**
+ * @brief 删除轴事件拦截
+ *
+ * @permission ohos.permission.INPUT_MONITORING
+ * @param callback - 回调函数.
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+int32_t OH_Input_RemoveAxisEventInterceptor(Input_TouchPadAxisEventCallback callback);
+
+/**
+ * @brief 设置鼠标样式
+ *
+ * @param windowId - 窗口id.
+ * @param pointerStyle - {@link Input_PointerStyle}定义的鼠标样式id
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+int32_t OH_Input_SetPointerStyle(int32_t windowId, int32_t pointerStyle);
+
+/**
+ * @brief 获取鼠标样式
+ *
+ * @param windowId - 窗口id.
+ * @param pointerStyle - 保存获取到的鼠标样式id
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+int32_t OH_Input_GetPointerStyle(int32_t windowId, int32_t* pointerStyle);
+
+/**
+ * @brief 设置鼠标是否可见
+ *
+ * @param visible - 是否可见
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+int32_t OH_Input_SetPointerVisible(bool visible);
+
+/**
+ * @brief 获取鼠标是否可见
+ *
+ * @return true或false
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+bool OH_Input_IsPointerVisible();
+
+/**
+ * @brief 设置鼠标颜色
+ *
+ * @param color - 鼠标颜色
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+int32_t OH_Input_SetPointerColor(int32_t color);
+
+/**
+ * @brief 获取鼠标颜色
+ *
+ * @param color - 保存获取到的鼠标颜色
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+int32_t OH_Input_GetPointerColor(int32_t* color);
+
+/**
+ * @brief 设置鼠标大小
+ *
+ * @param size - 鼠标大小
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+int32_t OH_Input_SetPointerSize(int32_t size);
+
+/**
+ * @brief 获取鼠标大小
+ *
+ * @param size - 保存获取到的鼠标大小
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+int32_t OH_Input_GetPointerSize(int32_t* size);
 #ifdef __cplusplus
 }
 #endif

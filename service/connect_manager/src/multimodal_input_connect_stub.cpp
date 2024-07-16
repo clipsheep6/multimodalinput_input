@@ -29,6 +29,7 @@
 #include "permission_helper.h"
 #include "pixel_map.h"
 #include "time_cost_chk.h"
+#include "screen_capture_monitor.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_SERVER
@@ -648,11 +649,6 @@ int32_t MultimodalInputConnectStub::StubSetPointerSize(MessageParcel& data, Mess
         return MMISERVICE_NOT_RUNNING;
     }
 
-    if (!PER_HELPER->VerifySystemApp()) {
-        MMI_HILOGE("Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
-    }
-
     int32_t size = 1; // the initial pointer size is 1.
     READINT32(data, size, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = SetPointerSize(size);
@@ -848,11 +844,6 @@ int32_t MultimodalInputConnectStub::StubSetPointerColor(MessageParcel& data, Mes
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
-    }
-
-    if (!PER_HELPER->VerifySystemApp()) {
-        MMI_HILOGE("Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
     }
 
     int32_t color = DEFAULT_POINTER_COLOR;
@@ -1123,17 +1114,29 @@ int32_t MultimodalInputConnectStub::StubGetKeyboardType(MessageParcel& data, Mes
 int32_t MultimodalInputConnectStub::StubAddInputHandler(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    int32_t handlerType = 0;
+    READINT32(data, handlerType, IPC_PROXY_DEAD_OBJECT_ERR);
     if (!PER_HELPER->VerifySystemApp()) {
-        MMI_HILOGE("Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
+        if (handlerType == InputHandlerType::MONITOR) {
+            int pid = GetCallingPid();
+            int capturePid = ScreenCaptureMonitor::GetInstance()->isScreenCaptureWorking();
+            if (capturePid != pid) {
+                return ERROR_NO_PERMISSION;
+            }
+        }
+        else if (handlerType == InputHandlerType::INTERCEPTOR) {
+            int pid = GetCallingPid();
+            MMI_HILOGD("Third process: %{public}d carete interceptor", pid);
+        } else {
+            MMI_HILOGE("Verify system APP failed");
+            return ERROR_NOT_SYSAPI;
+        }        
     }
 
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-    int32_t handlerType = 0;
-    READINT32(data, handlerType, IPC_PROXY_DEAD_OBJECT_ERR);
     if ((handlerType == InputHandlerType::INTERCEPTOR) && (!PER_HELPER->CheckInterceptor())) {
         MMI_HILOGE("Interceptor permission check failed");
         return ERROR_NO_PERMISSION;
@@ -1160,17 +1163,19 @@ int32_t MultimodalInputConnectStub::StubAddInputHandler(MessageParcel& data, Mes
 int32_t MultimodalInputConnectStub::StubRemoveInputHandler(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    int32_t handlerType = 0;
+    READINT32(data, handlerType, IPC_PROXY_DEAD_OBJECT_ERR);
     if (!PER_HELPER->VerifySystemApp()) {
-        MMI_HILOGE("Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
+        if (handlerType != InputHandlerType::MONITOR && handlerType != InputHandlerType::INTERCEPTOR) {
+            MMI_HILOGE("Verify system APP failed");
+            return ERROR_NOT_SYSAPI;
+        }
     }
 
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-    int32_t handlerType = 0;
-    READINT32(data, handlerType, IPC_PROXY_DEAD_OBJECT_ERR);
     if ((handlerType == InputHandlerType::INTERCEPTOR) && (!PER_HELPER->CheckInterceptor())) {
         MMI_HILOGE("Interceptor permission check failed");
         return ERROR_NO_PERMISSION;

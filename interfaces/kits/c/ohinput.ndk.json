@@ -194,5 +194,109 @@
     {
         "first_introduced": "12",
         "name": "OH_Input_CancelInjection"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_CreateTouchPadAxisEvent"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_DestroyTouchPadAxisEvent"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_AddKeyEventMonitor"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_AddMouseEventMonitor"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_AddTouchEventMonitor"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_AddAxisEventMonitor"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_RemoveKeyEventMonitor"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_RemoveMouseEventMonitor"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_RemoveTouchEventMonitor"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_RemoveAxisEventMonitor"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_AddKeyEventInterceptor"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_AddMouseEventInterceptor"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_AddTouchEventInterceptor"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_AddAxisEventInterceptor"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_RemoveKeyEventInterceptor"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_RemoveMouseEventInterceptor"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_RemoveTouchEventInterceptor"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_RemoveAxisEventInterceptor"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_SetPointerStyle"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_GetPointerStyle"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_SetPointerVisible"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_IsPointerVisible"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_SetPointerColor"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_GetPointerColor"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_SetPointerSize"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_GetPointerSize"
     }
 ]

@@ -34,6 +34,7 @@
 #include "uds_server.h"
 #include "nap_process.h"
 #include "infrared_frequency_info.h"
+#include "screen_caputure_monitor_listener.h"
 
 namespace OHOS {
 namespace MMI {
@@ -153,6 +154,10 @@ public:
     int32_t TransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject) override;
     int32_t SetTouchpadScrollRows(int32_t rows) override;
     int32_t GetTouchpadScrollRows(int32_t &rows) override;
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    void SaveScreenCapturePid(int32_t pid);
+    void RemoveScreenCaptureMonitor(int32_t pid);
+#endif
 #ifdef OHOS_BUILD_ENABLE_ANCO
     void InitAncoUds();
     void StopAncoUds();
@@ -251,6 +256,10 @@ private:
     sptr<AppDebugListener> appDebugListener_;
 
     std::atomic_bool threadStatusFlag_ { false };
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    std::vector<int32_t> screenCapturePid_;
+    std::shared_ptr<ScreenCaptureMonitorListener> screenCaptureMonitorListener_ { nullptr };
+#endif
 };
 } // namespace MMI
 } // namespace OHOS

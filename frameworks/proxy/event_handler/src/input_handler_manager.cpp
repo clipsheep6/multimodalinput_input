@@ -384,6 +384,25 @@ void InputHandlerManager::OnConnected()
 }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+int32_t InputHandlerManager::SetRemoveMonitorCallback(std::function<void()> callback)
+{
+    if (callback == nullptr) {
+        return RET_ERR;
+    }
+    removeMonitorCallback_ = callback;
+    return RET_OK;
+}
+
+void InputHandlerManager::OnRemoveMonitor()
+{
+    if (removeMonitorCallback_ == nullptr) {
+        return;
+    }
+    removeMonitorCallback_();
+}
+#endif
+
 bool InputHandlerManager::HasHandler(int32_t handlerId)
 {
     std::lock_guard<std::mutex> guard(mtxHandlers_);

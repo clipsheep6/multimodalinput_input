@@ -43,6 +43,10 @@ public:
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
     void OnConnected();
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    int32_t SetRemoveMonitorCallback(std::function<void()> callback);
+    void OnRemoveMonitor();
+#endif
     bool HasHandler(int32_t handlerId);
     virtual InputHandlerType GetHandlerType() const = 0;
     HandleEventType GetEventType() const;
@@ -95,6 +99,7 @@ private:
     std::function<void(int32_t, int64_t)> monitorCallback_ { nullptr };
     int32_t nextId_ { 1 };
     std::mutex mtxHandlers_;
+    std::function<void()> removeMonitorCallback_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS

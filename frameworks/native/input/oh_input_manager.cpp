@@ -20,6 +20,8 @@
 #include "key_event.h"
 #include "mmi_log.h"
 #include "oh_key_code.h"
+#include "pointer_style.h"
+#include "screen_capture_monitor.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "OHInputManager"
@@ -54,9 +56,44 @@ struct Input_TouchEvent {
     int64_t actionTime { -1 };
 };
 
+struct Input_TouchPadAxisEvent {
+    int32_t action;
+    int32_t displayX;
+    int32_t displayY;
+    std::map<int32_t, float> axisTypes;
+    int64_t actionTime { -1 };
+    int32_t sourceType;
+};
+
 static std::shared_ptr<OHOS::MMI::KeyEvent> g_keyEvent = OHOS::MMI::KeyEvent::Create();
 static std::shared_ptr<OHOS::MMI::PointerEvent> g_mouseEvent = OHOS::MMI::PointerEvent::Create();
 static std::shared_ptr<OHOS::MMI::PointerEvent> g_touchEvent = OHOS::MMI::PointerEvent::Create();
+static std::function<void(std::shared_ptr<OHOS::MMI::KeyEvent>)> g_keyEventMonitor = nullptr;
+static std::function<void(std::shared_ptr<OHOS::MMI::PointerEvent>)> g_mouseEventMonitor = nullptr;
+static std::function<void(std::shared_ptr<OHOS::MMI::PointerEvent>)> g_touchEventMonitor = nullptr;
+static std::function<void(std::shared_ptr<OHOS::MMI::PointerEvent>)> g_axisEventMonitor = nullptr;
+static std::function<void(std::shared_ptr<OHOS::MMI::KeyEvent>)> g_keyEventInterceptor = nullptr;
+static std::function<void(std::shared_ptr<OHOS::MMI::PointerEvent>)> g_mouseEventInterceptor = nullptr;
+static std::function<void(std::shared_ptr<OHOS::MMI::PointerEvent>)> g_touchEventInterceptor = nullptr;
+static std::function<void(std::shared_ptr<OHOS::MMI::PointerEvent>)> g_axisEventInterceptor = nullptr;
+static std::set<Input_KeyEventCallback> g_keyMonitorCallbacks;
+static std::set<Input_MouseEventCallback> g_mouseMonitorCallbacks;
+static std::set<Input_TouchEventCallback> g_touchMonitorCallbacks;
+static std::set<Input_TouchPadAxisEventCallback> g_axisMonitorCallbacks;
+static std::set<Input_KeyEventCallback> g_keyInterceptorCallbacks;
+static std::set<Input_MouseEventCallback> g_mouseInterceptorCallbacks;
+static std::set<Input_TouchEventCallback> g_touchInterceptorCallbacks;
+static std::set<Input_TouchPadAxisEventCallback> g_axisInterceptorCallbacks;
+static std::mutex g_mutex;
+static int32_t g_keyMonitorId = -1;
+static int32_t g_mouseMonitorId = -1;
+static int32_t g_touchMonitorId = -1;
+static int32_t g_axisMonitorId = -1;
+static int32_t g_keyInterceptorId = -1;
+static int32_t g_mouseInterceptorId = -1;
+static int32_t g_touchInterceptorId = -1;
+static int32_t g_axisInterceptorId = -1;
+static bool hasSetRemoveMonitor { false };
 
 Input_Result OH_Input_GetKeyState(struct Input_KeyState* keyState)
 {
@@ -701,4 +738,650 @@ void OH_Input_CancelInjection()
 {
     CALL_DEBUG_ENTER;
     OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().CancelInjection();
+}
+
+void RemoveMonitor()
+{
+    std::lock_guard guard(g_mutex);
+    g_keyMonitorCallbacks.clear();
+    if (g_keyMonitorCallbacks.empty()) {
+        OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().RemoveMonitor(g_keyMonitorId);
+        g_keyMonitorId = -1;
+        g_keyEventMonitor = nullptr;
+    }
+
+    g_mouseMonitorCallbacks.clear();
+    if (g_mouseMonitorCallbacks.empty()) {
+        OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().RemoveMonitor(g_mouseMonitorId);
+        g_mouseMonitorId = -1;
+        g_mouseEventMonitor = nullptr;
+    }
+
+    g_touchMonitorCallbacks.clear();
+    if (g_touchMonitorCallbacks.empty()) {
+        OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().RemoveMonitor(g_touchMonitorId);
+        g_touchMonitorId = -1;
+        g_touchEventMonitor = nullptr;
+    }
+
+    g_axisMonitorCallbacks.clear();
+    if (g_axisMonitorCallbacks.empty()) {
+        OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().RemoveMonitor(g_axisMonitorId);
+        g_axisMonitorId = -1;
+        g_axisEventMonitor = nullptr;
+    }
+}
+
+void SetRemoveMonitorCallback()
+{
+    int32_t ret = OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().SetRemoveMonitorCallback(RemoveMonitor);
+    if (ret != RET_OK) {
+        return;
+    }
+    hasSetRemoveMonitor = true;
+}
+
+void SetTouchPadAxisValue(std::shared_ptr<OHOS::MMI::PointerEvent> event, Input_TouchPadAxisEvent *axisEvent) {
+    float value = event->GetAxisValue(OHOS::MMI::PointerEvent::AXIS_TYPE_SCROLL_VERTICAL);
+    axisEvent->axisTypes.insert(std::make_pair(TOUCHPAD_AXIS_SCROLL_VERTICAL, value));
+    value = event->GetAxisValue(OHOS::MMI::PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL);
+    axisEvent->axisTypes.insert(std::make_pair(TOUCHPAD_AXIS_SCROLL_HORIZONTAL, value));
+    value = event->GetAxisValue(OHOS::MMI::PointerEvent::AXIS_TYPE_PINCH);
+    axisEvent->axisTypes.insert(std::make_pair(TOUCHPAD_AXIS_SCROLL_PINCH, value));
+    value = event->GetAxisValue(OHOS::MMI::PointerEvent::AXIS_TYPE_ROTATE);
+    axisEvent->axisTypes.insert(std::make_pair(TOUCHPAD_AXIS_SCROLL_ROTATE, value));
+}
+
+struct Input_TouchPadAxisEvent* OH_Input_CreateTouchPadAxisEvent()
+{
+    Input_TouchPadAxisEvent* axisEvent = new (std::nothrow) Input_TouchPadAxisEvent();
+    CHKPL(axisEvent);
+    return axisEvent;
+}
+
+void OH_Input_DestroyTouchPadAxisEvent(struct Input_TouchPadAxisEvent** axisEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(axisEvent);
+    CHKPV(*axisEvent);
+    delete *axisEvent;
+    *axisEvent = nullptr;
+}
+
+int32_t OH_Input_AddKeyEventMonitor(Input_KeyEventCallback callback)
+{
+    CALL_DEBUG_ENTER;
+    if (callback == nullptr) {
+        return INPUT_PARAMETER_ERROR;
+    }
+    int32_t pid = ScreenCaptureMonitor::GetInstance()->isScreenCaptureWorking();
+    int32_t callingPid = GetCallingPid();
+    if (callingPid != pid) {
+        return INPUT_NOT_RECORDING;
+    }
+    std::lock_guard guard(g_mutex);
+    if (g_keyEventMonitor == nullptr) {
+        g_keyEventMonitor = [](std::shared_ptr<OHOS::MMI::KeyEvent> event) {
+            Input_KeyEvent* keyEvent = OH_Input_CreateKeyEvent();
+            keyEvent->action = event->GetAction();
+            keyEvent->keyCode = event->GetKeyCode();
+            keyEvent->actionTime = event->GetActionTime();
+            for (auto &callback : g_keyMonitorCallbacks) {
+                callback(keyEvent);
+            }
+            OH_Input_DestroyKeyEvent(&keyEvent);
+        };
+        int32_t ret = OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().AddMonitor(g_keyEventMonitor);
+        if (ret < RET_OK) {
+            return INPUT_SERVICE_EXCEPTION;
+        }
+        g_keyMonitorId = ret;
+        if (!hasSetRemoveMonitor) {
+            SetRemoveMonitorCallback();
+        }
+    }
+    g_keyMonitorCallbacks.insert(callback);
+    return INPUT_SUCCESS;
+}
+
+int32_t OH_Input_AddMouseEventMonitor(Input_MouseEventCallback callback)
+{
+    CALL_DEBUG_ENTER;
+    if (callback == nullptr) {
+        return INPUT_PARAMETER_ERROR;
+    }
+    int32_t pid = ScreenCaptureMonitor::GetInstance()->isScreenCaptureWorking();
+    int32_t callingPid = GetCallingPid();
+    if (callingPid != pid) {
+        return INPUT_NOT_RECORDING;
+    }
+    std::lock_guard guard(g_mutex);
+    if (g_mouseEventMonitor == nullptr) {
+        g_mouseEventMonitor = [](std::shared_ptr<OHOS::MMI::PointerEvent> event) {
+            if (event->GetSourceType() != OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
+                return;
+            }
+            Input_MouseEvent* mouseEvent = OH_Input_CreateMouseEvent();
+            OHOS::MMI::PointerEvent::PointerItem item;
+            if (event->GetPointerItem(event->GetPointerId(), item)) {
+                if (item.GetToolType() != OHOS::MMI::PointerEvent::TOOL_TYPE_MOUSE) {
+                    return;
+                }
+                mouseEvent->displayX = item.GetDisplayX();
+                mouseEvent->displayY = item.GetDisplayY();
+            }
+            mouseEvent->action = event->GetAction();
+            mouseEvent->button = event->GetButtonId();
+            mouseEvent->axisType = OHOS::MMI::PointerEvent::AXIS_TYPE_SCROLL_VERTICAL;
+            mouseEvent->axisValue = event->GetAxisValue(OHOS::MMI::PointerEvent::AXIS_TYPE_SCROLL_VERTICAL);
+            mouseEvent->actionTime = event->GetActionTime();
+            for (auto &callback : g_mouseMonitorCallbacks) {
+                callback(mouseEvent);
+            }
+            OH_Input_DestroyMouseEvent(&mouseEvent);
+        };
+        int32_t ret = OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().AddMonitor(g_mouseEventMonitor);
+        if (ret < RET_OK) {
+            return INPUT_SERVICE_EXCEPTION;
+        }
+        g_mouseMonitorId = ret;
+        if (!hasSetRemoveMonitor) {
+            SetRemoveMonitorCallback();
+        }
+    }
+    g_mouseMonitorCallbacks.insert(callback);
+    return INPUT_SUCCESS;
+}
+
+int32_t OH_Input_AddTouchEventMonitor(Input_TouchEventCallback callback)
+{
+    CALL_DEBUG_ENTER;
+    if (callback == nullptr) {
+        return INPUT_PARAMETER_ERROR;
+    }
+    int32_t pid = ScreenCaptureMonitor::GetInstance()->isScreenCaptureWorking();
+    int32_t callingPid = GetCallingPid();
+    if (callingPid != pid) {
+        return INPUT_NOT_RECORDING;
+    }
+    std::lock_guard guard(g_mutex);
+    if (g_touchEventMonitor == nullptr) {
+        g_touchEventMonitor = [](std::shared_ptr<OHOS::MMI::PointerEvent> event) {
+            if (event->GetSourceType() != OHOS::MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+                return;
+            }
+            Input_TouchEvent* touchEvent = OH_Input_CreateTouchEvent();
+            touchEvent->action = event->GetAction();
+            touchEvent->id = event->GetPointerId();
+            OHOS::MMI::PointerEvent::PointerItem item;
+            if (event->GetPointerItem(touchEvent->id, item)) {
+                touchEvent->displayX = item.GetDisplayX();
+                touchEvent->displayY = item.GetDisplayY();
+            }
+            touchEvent->actionTime = event->GetActionTime();
+            for (auto &callback : g_touchMonitorCallbacks) {
+                callback(touchEvent);
+            }
+            OH_Input_DestroyTouchEvent(&touchEvent);
+        };
+        int32_t ret = OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().AddMonitor(g_touchEventMonitor);
+        if (ret < RET_OK) {
+            return INPUT_SERVICE_EXCEPTION;
+        }
+        g_touchMonitorId = ret;
+        if (!hasSetRemoveMonitor) {
+            SetRemoveMonitorCallback();
+        }
+    }
+    g_touchMonitorCallbacks.insert(callback);
+    return INPUT_SUCCESS;
+}
+
+int32_t OH_Input_AddAxisEventMonitor(Input_TouchPadAxisEventCallback callback)
+{
+    CALL_DEBUG_ENTER;
+    if (callback == nullptr) {
+        return INPUT_PARAMETER_ERROR;
+    }
+    int32_t pid = ScreenCaptureMonitor::GetInstance()->isScreenCaptureWorking();
+    int32_t callingPid = GetCallingPid();
+    if (callingPid != pid) {
+        return INPUT_NOT_RECORDING;
+    }
+    std::lock_guard guard(g_mutex);
+    if (g_axisEventMonitor == nullptr) {
+        g_axisEventMonitor = [](std::shared_ptr<OHOS::MMI::PointerEvent> event) {
+            if (event->GetSourceType() != OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
+                return;
+            }
+            Input_TouchPadAxisEvent* axisEvent = OH_Input_CreateTouchPadAxisEvent();
+            axisEvent->action = event->GetAction();
+            OHOS::MMI::PointerEvent::PointerItem item;
+            if (event->GetPointerItem(event->GetPointerId(), item)) {
+                if (item.GetToolType() != OHOS::MMI::PointerEvent::TOOL_TYPE_TOUCHPAD) {
+                    return;
+                }
+                axisEvent->displayX = item.GetDisplayX();
+                axisEvent->displayY = item.GetDisplayY();
+            }
+            SetTouchPadAxisValue(event, axisEvent);
+            axisEvent->actionTime = event->GetActionTime();
+            axisEvent->sourceType = event->GetSourceType();
+            for (auto &callback : g_axisMonitorCallbacks) {
+                callback(axisEvent);
+            }
+            OH_Input_DestroyTouchPadAxisEvent(&axisEvent);
+        };
+        int32_t ret = OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().AddMonitor(g_axisEventMonitor);
+        if (ret < RET_OK) {
+            return INPUT_SERVICE_EXCEPTION;
+        }
+        g_axisMonitorId = ret;
+        if (!hasSetRemoveMonitor) {
+            SetRemoveMonitorCallback();
+        }
+    }
+    g_axisMonitorCallbacks.insert(callback);
+    return INPUT_SUCCESS;
+}
+
+int32_t OH_Input_RemoveKeyEventMonitor(Input_KeyEventCallback callback)
+{
+    CALL_DEBUG_ENTER;
+    if (callback == nullptr) {
+        return INPUT_PARAMETER_ERROR;
+    }
+    std::lock_guard guard(g_mutex);
+    auto it = g_keyMonitorCallbacks.find(callback);
+    if (it == g_keyMonitorCallbacks.end()) {
+        return INPUT_PARAMETER_ERROR;
+    }
+    g_keyMonitorCallbacks.erase(it);
+    if (g_keyMonitorCallbacks.empty()) {
+        OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().RemoveMonitor(g_keyMonitorId);
+        g_keyMonitorId = -1;
+        g_keyEventMonitor = nullptr;
+    }
+    return INPUT_SUCCESS;
+}
+
+int32_t OH_Input_RemoveMouseEventMonitor(Input_MouseEventCallback callback)
+{
+    CALL_DEBUG_ENTER;
+    if (callback == nullptr) {
+        return INPUT_PARAMETER_ERROR;
+    }
+    std::lock_guard guard(g_mutex);
+    auto it = g_mouseMonitorCallbacks.find(callback);
+    if (it == g_mouseMonitorCallbacks.end()) {
+        return INPUT_PARAMETER_ERROR;
+    }
+    g_mouseMonitorCallbacks.erase(it);
+    if (g_mouseMonitorCallbacks.empty()) {
+        OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().RemoveMonitor(g_mouseMonitorId);
+        g_mouseMonitorId = -1;
+        g_mouseEventMonitor = nullptr;
+    }
+    return INPUT_SUCCESS;
+}
+
+int32_t OH_Input_RemoveTouchEventMonitor(Input_TouchEventCallback callback)
+{
+    CALL_DEBUG_ENTER;
+    if (callback == nullptr) {
+        return INPUT_PARAMETER_ERROR;
+    }
+    std::lock_guard guard(g_mutex);
+    auto it = g_touchMonitorCallbacks.find(callback);
+    if (it == g_touchMonitorCallbacks.end()) {
+        return INPUT_PARAMETER_ERROR;
+    }
+    g_touchMonitorCallbacks.erase(it);
+    if (g_touchMonitorCallbacks.empty()) {
+        OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().RemoveMonitor(g_touchMonitorId);
+        g_touchMonitorId = -1;
+        g_touchEventMonitor = nullptr;
+    }
+    return INPUT_SUCCESS;
+}
+
+int32_t OH_Input_RemoveAxisEventMonitor(Input_TouchPadAxisEventCallback callback)
+{
+    CALL_DEBUG_ENTER;
+    if (callback == nullptr) {
+        return INPUT_PARAMETER_ERROR;
+    }
+    std::lock_guard guard(g_mutex);
+    auto it = g_axisMonitorCallbacks.find(callback);
+    if (it == g_axisMonitorCallbacks.end()) {
+        return INPUT_PARAMETER_ERROR;
+    }
+    g_axisMonitorCallbacks.erase(it);
+    if (g_axisMonitorCallbacks.empty()) {
+        OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().RemoveMonitor(g_axisMonitorId);
+        g_axisMonitorId = -1;
+        g_axisEventMonitor = nullptr;
+    }
+    return INPUT_SUCCESS;
+}
+
+int32_t OH_Input_AddKeyEventInterceptor(Input_KeyEventCallback callback)
+{
+    CALL_DEBUG_ENTER;
+    if (callback == nullptr) {
+        return INPUT_PARAMETER_ERROR;
+    }
+    std::lock_guard guard(g_mutex);
+    if (g_keyEventInterceptor == nullptr) {
+        g_keyEventInterceptor = [](std::shared_ptr<OHOS::MMI::KeyEvent> event) {
+            Input_KeyEvent* keyEvent = OH_Input_CreateKeyEvent();
+            keyEvent->action = event->GetAction();
+            keyEvent->keyCode = event->GetKeyCode();
+            keyEvent->actionTime = event->GetActionTime();
+            for (auto &callback : g_keyInterceptorCallbacks) {
+                callback(keyEvent);
+            }
+            OH_Input_DestroyKeyEvent(&keyEvent);
+        };
+        int32_t ret = OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().AddInterceptor(g_keyEventInterceptor);
+        if (ret < RET_OK) {
+            return INPUT_SERVICE_EXCEPTION;
+        }
+        g_keyInterceptorId = ret;
+    }
+    g_keyInterceptorCallbacks.insert(callback);
+    return INPUT_SUCCESS;
+}
+
+int32_t OH_Input_AddMouseEventInterceptor(Input_MouseEventCallback callback)
+{
+    CALL_DEBUG_ENTER;
+    if (callback == nullptr) {
+        return INPUT_PARAMETER_ERROR;
+    }
+    std::lock_guard guard(g_mutex);
+    if (g_mouseEventInterceptor == nullptr) {
+        g_mouseEventInterceptor = [](std::shared_ptr<OHOS::MMI::PointerEvent> event) {
+            if (event->GetSourceType() != OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
+                return;
+            }
+            Input_MouseEvent* mouseEvent = OH_Input_CreateMouseEvent();
+            OHOS::MMI::PointerEvent::PointerItem item;
+            if (event->GetPointerItem(event->GetPointerId(), item)) {
+                if (item.GetToolType() != OHOS::MMI::PointerEvent::TOOL_TYPE_MOUSE) {
+                    return;
+                }
+                mouseEvent->displayX = item.GetDisplayX();
+                mouseEvent->displayY = item.GetDisplayY();
+            }
+            mouseEvent->action = event->GetAction();
+            mouseEvent->button = event->GetButtonId();
+            mouseEvent->axisType = OHOS::MMI::PointerEvent::AXIS_TYPE_SCROLL_VERTICAL;
+            mouseEvent->axisValue = event->GetAxisValue(OHOS::MMI::PointerEvent::AXIS_TYPE_SCROLL_VERTICAL);
+            mouseEvent->actionTime = event->GetActionTime();
+            for (auto &callback : g_mouseInterceptorCallbacks) {
+                callback(mouseEvent);
+            }
+            OH_Input_DestroyMouseEvent(&mouseEvent);
+        };
+        int32_t ret = OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().AddInterceptor(g_mouseEventInterceptor);
+        if (ret < RET_OK) {
+            return INPUT_SERVICE_EXCEPTION;
+        }
+        g_mouseInterceptorId = ret;
+    }
+    g_mouseInterceptorCallbacks.insert(callback);
+    return INPUT_SUCCESS;
+}
+
+int32_t OH_Input_AddTouchEventInterceptor(Input_TouchEventCallback callback)
+{
+    CALL_DEBUG_ENTER;
+    if (callback == nullptr) {
+        return INPUT_PARAMETER_ERROR;
+    }
+    std::lock_guard guard(g_mutex);
+    if (g_touchEventInterceptor == nullptr) {
+        g_touchEventInterceptor = [](std::shared_ptr<OHOS::MMI::PointerEvent> event) {
+            if (event->GetSourceType() != OHOS::MMI::PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+                return;
+            }
+            Input_TouchEvent* touchEvent = OH_Input_CreateTouchEvent();
+            touchEvent->action = event->GetAction();
+            touchEvent->id = event->GetPointerId();
+            OHOS::MMI::PointerEvent::PointerItem item;
+            if (event->GetPointerItem(touchEvent->id, item)) {
+                touchEvent->displayX = item.GetDisplayX();
+                touchEvent->displayY = item.GetDisplayY();
+            }
+            touchEvent->actionTime = event->GetActionTime();
+            for (auto &callback : g_touchInterceptorCallbacks) {
+                callback(touchEvent);
+            }
+            OH_Input_DestroyTouchEvent(&touchEvent);
+        };
+        int32_t ret = OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().AddInterceptor(g_touchEventInterceptor);
+        if (ret < RET_OK) {
+            return INPUT_SERVICE_EXCEPTION;
+        }
+        g_touchInterceptorId = ret;
+    }
+    g_touchInterceptorCallbacks.insert(callback);
+    return INPUT_SUCCESS;
+}
+
+int32_t OH_Input_AddAxisEventInterceptor(Input_TouchPadAxisEventCallback callback)
+{
+    CALL_DEBUG_ENTER;
+    if (callback == nullptr) {
+        return INPUT_PARAMETER_ERROR;
+    }
+    std::lock_guard guard(g_mutex);
+    if (g_axisEventInterceptor == nullptr) {
+        g_axisEventInterceptor = [](std::shared_ptr<OHOS::MMI::PointerEvent> event) {
+            if (event->GetSourceType() != OHOS::MMI::PointerEvent::SOURCE_TYPE_MOUSE) {
+                return;
+            }
+            Input_TouchPadAxisEvent* axisEvent = OH_Input_CreateTouchPadAxisEvent();
+            axisEvent->action = event->GetAction();
+            OHOS::MMI::PointerEvent::PointerItem item;
+            if (event->GetPointerItem(event->GetPointerId(), item)) {
+                if (item.GetToolType() != OHOS::MMI::PointerEvent::TOOL_TYPE_TOUCHPAD) {
+                    return;
+                }
+                axisEvent->displayX = item.GetDisplayX();
+                axisEvent->displayY = item.GetDisplayY();
+            }
+            SetTouchPadAxisValue(event, axisEvent);
+            axisEvent->actionTime = event->GetActionTime();
+            axisEvent->sourceType = event->GetSourceType();
+            for (auto &callback : g_axisInterceptorCallbacks) {
+                callback(axisEvent);
+            }
+            OH_Input_DestroyTouchPadAxisEvent(&axisEvent);
+        };
+        int32_t ret = OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().AddInterceptor(g_axisEventInterceptor);
+        if (ret < RET_OK) {
+            return INPUT_SERVICE_EXCEPTION;
+        }
+        g_axisInterceptorId = ret;
+    }
+    g_axisInterceptorCallbacks.insert(callback);
+    return INPUT_SUCCESS;
+}
+
+int32_t OH_Input_RemoveKeyEventInterceptor(Input_KeyEventCallback callback)
+{
+    CALL_DEBUG_ENTER;
+    if (callback == nullptr) {
+        return INPUT_PARAMETER_ERROR;
+    }
+    std::lock_guard guard(g_mutex);
+    auto it = g_keyInterceptorCallbacks.find(callback);
+    if (it == g_keyInterceptorCallbacks.end()) {
+        return INPUT_PARAMETER_ERROR;
+    }
+    g_keyInterceptorCallbacks.erase(it);
+    if (g_keyInterceptorCallbacks.empty()) {
+        OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().RemoveInterceptor(g_keyInterceptorId);
+        g_keyInterceptorId = -1;
+        g_keyEventInterceptor = nullptr;
+    }
+    return INPUT_SUCCESS;
+}
+
+int32_t OH_Input_RemoveMouseEventInterceptor(Input_MouseEventCallback callback)
+{
+    CALL_DEBUG_ENTER;
+    if (callback == nullptr) {
+        return INPUT_PARAMETER_ERROR;
+    }
+    std::lock_guard guard(g_mutex);
+    auto it = g_mouseInterceptorCallbacks.find(callback);
+    if (it == g_mouseInterceptorCallbacks.end()) {
+        return INPUT_PARAMETER_ERROR;
+    }
+    g_mouseInterceptorCallbacks.erase(it);
+    if (g_mouseInterceptorCallbacks.empty()) {
+        OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().RemoveInterceptor(g_mouseInterceptorId);
+        g_mouseInterceptorId = -1;
+        g_mouseEventInterceptor = nullptr;
+    }
+    return INPUT_SUCCESS;
+}
+
+int32_t OH_Input_RemoveTouchEventInterceptor(Input_TouchEventCallback callback)
+{
+    CALL_DEBUG_ENTER;
+    if (callback == nullptr) {
+        return INPUT_PARAMETER_ERROR;
+    }
+    std::lock_guard guard(g_mutex);
+    auto it = g_touchInterceptorCallbacks.find(callback);
+    if (it == g_touchInterceptorCallbacks.end()) {
+        return INPUT_PARAMETER_ERROR;
+    }
+    g_touchInterceptorCallbacks.erase(it);
+    if (g_touchInterceptorCallbacks.empty()) {
+        OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().RemoveInterceptor(g_touchInterceptorId);
+        g_touchInterceptorId = -1;
+        g_touchEventInterceptor = nullptr;
+    }
+    return INPUT_SUCCESS;
+}
+
+int32_t OH_Input_RemoveAxisEventInterceptor(Input_TouchPadAxisEventCallback callback)
+{
+    CALL_DEBUG_ENTER;
+    if (callback == nullptr) {
+        return INPUT_PARAMETER_ERROR;
+    }
+    std::lock_guard guard(g_mutex);
+    auto it = g_axisInterceptorCallbacks.find(callback);
+    if (it == g_axisInterceptorCallbacks.end()) {
+        return INPUT_PARAMETER_ERROR;
+    }
+    g_axisInterceptorCallbacks.erase(it);
+    if (g_axisInterceptorCallbacks.empty()) {
+        OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().RemoveInterceptor(g_axisInterceptorId);
+        g_axisInterceptorId = -1;
+        g_axisEventInterceptor = nullptr;
+    }
+    return INPUT_SUCCESS;
+}
+
+int32_t OH_Input_SetPointerStyle(int32_t windowId, int32_t pointerStyle)
+{
+    if (pointerStyle < 0) {
+        return INPUT_PARAMETER_ERROR;
+    }
+    OHOS::MMI::PointerStyle style;
+    style.id = pointerStyle;
+    
+    int32_t ret = OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().SetPointerStyle(windowId, style, false);
+    if (ret != RET_OK) {
+        return INPUT_SERVICE_EXCEPTION;
+    }
+    return INPUT_SUCCESS;
+}
+
+int32_t OH_Input_GetPointerStyle(int32_t windowId, int32_t* pointerStyle)
+{
+    CALL_DEBUG_ENTER;
+    if (pointerStyle == nullptr) {
+        return INPUT_PARAMETER_ERROR;
+    }
+    OHOS::MMI::PointerStyle style;
+    int32_t ret = OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().GetPointerStyle(windowId, style, false);
+    if (ret != RET_OK) {
+        return INPUT_SERVICE_EXCEPTION;
+    }
+    *pointerStyle = style.id;
+    return INPUT_SUCCESS;
+}
+
+int32_t OH_Input_SetPointerVisible(bool visible)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().SetPointerVisible(visible, 0);
+    if (ret == RET_ERR) {
+        return INPUT_SERVICE_EXCEPTION;
+    }
+    return INPUT_SUCCESS;
+}
+
+bool OH_Input_IsPointerVisible()
+{
+    CALL_DEBUG_ENTER;
+    return OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().IsPointerVisible();
+}
+
+int32_t OH_Input_SetPointerColor(int32_t color)
+{
+    CALL_DEBUG_ENTER;
+    if (color < 0) {
+        return INPUT_PARAMETER_ERROR;
+    }
+    int32_t ret = OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().SetPointerColor(color);
+    if (ret != RET_OK) {
+        return INPUT_SERVICE_EXCEPTION;
+    }
+    return INPUT_SUCCESS;
+}
+
+int32_t OH_Input_GetPointerColor(int32_t* color)
+{
+    CALL_DEBUG_ENTER;
+    int32_t tempColor;
+    int32_t ret = OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().GetPointerColor(tempColor);
+    if (ret != RET_OK) {
+        return INPUT_SERVICE_EXCEPTION;
+    }
+    *color = tempColor;
+    return INPUT_SUCCESS;
+}
+
+int32_t OH_Input_SetPointerSize(int32_t size)
+{
+    CALL_DEBUG_ENTER;
+    if (size < 0) {
+        return INPUT_PARAMETER_ERROR;
+    }
+    int32_t ret = OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().SetPointerSize(size);
+    if (ret == RET_ERR) {
+        return INPUT_SERVICE_EXCEPTION;
+    }
+    return INPUT_SUCCESS;
+}
+
+int32_t OH_Input_GetPointerSize(int32_t* size)
+{
+    CALL_DEBUG_ENTER;
+    int32_t tempSize;
+    int32_t ret = OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().GetPointerSize(tempSize);
+    if (ret == RET_ERR) {
+        return INPUT_SERVICE_EXCEPTION;
+    }
+    *size = tempSize;
+    return INPUT_SUCCESS;
 }
