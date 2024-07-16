@@ -45,6 +45,7 @@ config("libmmi_server_config") {
     }
   }
   include_dirs = [
+    "account_manager/include",
     "app_state_manager/include",
     "device_config/include",
     "device_manager/include",
@@ -90,6 +91,7 @@ config("libmmi_server_config") {
     "//third_party/cJSON",
     "${preferences_path}/frameworks/native/include",
     "${graphics_path}/2d_graphics/include",
+    "${mmi_path}/util/napi/include",
   ]
 
   if (input_feature_fingerprint) {
@@ -154,6 +156,7 @@ ohos_shared_library("libmmi-server") {
     debug = false
   }
   sources += [
+    "account_manager/src/account_manager.cpp",
     "window_manager/src/knuckle_divergent_point.cpp",
     "window_manager/src/knuckle_drawing_manager.cpp",
     "window_manager/src/knuckle_dynamic_drawing_manager.cpp",
@@ -297,7 +300,6 @@ ohos_shared_library("libmmi-server") {
     "init:libbeget_proxy",
     "init:libbegetutil",
     "ipc:ipc_single",
-    "napi:ace_napi",
     "preferences:native_preferences",
     "relational_store:native_rdb",
     "safwk:system_ability_fwk",
