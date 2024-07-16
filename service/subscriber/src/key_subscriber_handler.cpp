@@ -22,6 +22,7 @@
 #include "device_event_monitor.h"
 #include "dfx_hisysevent.h"
 #include "error_multimodal.h"
+#include "event_log_helper.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
 #include "net_packet.h"
@@ -100,7 +101,11 @@ int32_t KeySubscriberHandler::SubscribeKeyEvent(
         subscribeId, keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
         keyOption->GetFinalKeyDownDuration(), sess->GetPid());
     auto subscriber = std::make_shared<Subscriber>(subscribeId, sess, keyOption);
-    AddSubscriber(subscriber, keyOption);
+    if (keyGestureMgr_.ShouldIntercept(keyOption)) {
+        AddKeyGestureSubscriber(subscriber, keyOption);
+    } else {
+        AddSubscriber(subscriber, keyOption);
+    }
     InitSessionDeleteCallback();
     return RET_OK;
 }
@@ -109,7 +114,11 @@ int32_t KeySubscriberHandler::UnsubscribeKeyEvent(SessionPtr sess, int32_t subsc
 {
     CHKPR(sess, ERROR_NULL_POINTER);
     MMI_HILOGI("SubscribeId:%{public}d, pid:%{public}d", subscribeId, sess->GetPid());
-    return RemoveSubscriber(sess, subscribeId);
+    int32_t ret = RemoveSubscriber(sess, subscribeId);
+    if (ret != RET_OK) {
+        ret = RemoveKeyGestureSubscriber(sess, subscribeId);
+    }
+    return ret;
 }
 
 int32_t KeySubscriberHandler::RemoveSubscriber(SessionPtr sess, int32_t subscribeId)
@@ -128,6 +137,52 @@ int32_t KeySubscriberHandler::RemoveSubscriber(SessionPtr sess, int32_t subscrib
                 subscribers.erase(it);
                 return RET_OK;
             }
+        }
+    }
+    return RET_ERR;
+}
+
+void KeySubscriberHandler::AddKeyGestureSubscriber(
+    std::shared_ptr<Subscriber> subscriber, std::shared_ptr<KeyOption> keyOption)
+{
+    CALL_INFO_TRACE;
+    CHKPV(subscriber);
+    CHKPV(subscriber->sess_);
+    subscriber->timerId_ = keyGestureMgr_.AddKeyGesture(subscriber->sess_->GetPid(), keyOption,
+        [this, subscriber](std::shared_ptr<KeyEvent> keyEvent) {
+            NotifySubscriber(keyEvent, subscriber);
+        });
+    MMI_HILOGI("Handler(%{public}d) of key gesture was added", subscriber->timerId_);
+    PrintKeyOption(keyOption);
+    for (auto &iter : keyGestures_) {
+        if (IsEqualKeyOption(keyOption, iter.first)) {
+            iter.second.push_back(subscriber);
+            return;
+        }
+    }
+    keyGestures_[keyOption] = { subscriber };
+}
+
+int32_t KeySubscriberHandler::RemoveKeyGestureSubscriber(SessionPtr sess, int32_t subscribeId)
+{
+    CALL_INFO_TRACE;
+    for (auto iter = keyGestures_.begin(); iter != keyGestures_.end(); ++iter) {
+        auto &subscribers = iter->second;
+
+        for (auto innerIter = subscribers.begin(); innerIter != subscribers.end(); ++innerIter) {
+            auto subscriber = *innerIter;
+
+            if ((subscriber->id_ != subscribeId) || (subscriber->sess_ != sess)) {
+                continue;
+            }
+            MMI_HILOGI("Removing handler(%{public}d) of key gesture", subscriber->timerId_);
+            keyGestureMgr_.RemoveKeyGesture(subscriber->timerId_);
+            auto option = subscriber->keyOption_;
+            MMI_HILOGI("SubscribeId:%{public}d, finalKey:%{public}d, isFinalKeyDown:%{public}s,"
+                "finalKeyDownDuration:%{public}d, pid:%{public}d", subscribeId, option->GetFinalKey(),
+                option->IsFinalKeyDown() ? "true" : "false", option->GetFinalKeyDownDuration(), sess->GetPid());
+            subscribers.erase(innerIter);
+            return RET_OK;
         }
     }
     return RET_ERR;
@@ -323,7 +378,11 @@ bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEven
         return false;
     }
     if (IsRepeatedKeyEvent(keyEvent)) {
-        MMI_HILOGD("Repeat KeyEvent, skip");
+        MMI_HILOGI("Repeat KeyEvent, skip");
+        return true;
+    }
+    if (keyGestureMgr_.Intercept(keyEvent)) {
+        MMI_HILOGI("Key gesture recognized");
         return true;
     }
     keyEvent_ = KeyEvent::Clone(keyEvent);
@@ -447,8 +506,10 @@ void KeySubscriberHandler::NotifyKeyDownRightNow(const std::shared_ptr<KeyEvent>
     std::list<std::shared_ptr<Subscriber>> &subscribers, bool &handled)
 {
     CALL_DEBUG_ENTER;
+    MMI_HILOGD("The subscribe list size is %{public}d", subscribers.size());
     for (auto &subscriber : subscribers) {
         CHKPC(subscriber);
+        MMI_HILOGI("Subscribe id : %{public}d", subscriber->id_);
         auto sess = subscriber->sess_;
         CHKPC(sess);
         if (!isForegroundExits_ || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER ||
@@ -464,8 +525,10 @@ void KeySubscriberHandler::NotifyKeyDownDelay(const std::shared_ptr<KeyEvent> &k
     std::list<std::shared_ptr<Subscriber>> &subscribers, bool &handled)
 {
     CALL_DEBUG_ENTER;
+    MMI_HILOGD("The subscribe list size is %{public}d", subscribers.size());
     for (auto &subscriber : subscribers) {
         CHKPC(subscriber);
+        MMI_HILOGI("Subscribe id : %{public}d", subscriber->id_);
         auto sess = subscriber->sess_;
         CHKPC(sess);
         if (!isForegroundExits_ || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER ||
@@ -514,8 +577,12 @@ void KeySubscriberHandler::NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
     CHKPV(sess);
     int32_t fd = sess->GetFd();
     pkt << fd << subscriber->id_;
-    MMI_HILOGI("Notify subscriber id:%{public}d, keycode:%{public}d, pid:%{public}d",
-        subscriber->id_, keyEvent->GetKeyCode(), sess->GetPid());
+    if (!EventLogHelper::IsBetaVersion()) {
+        MMI_HILOGI("Notify subscriber id:%{public}d, pid:%{public}d", subscriber->id_, sess->GetPid());
+    } else {
+        MMI_HILOGI("Notify subscriber id:%{public}d, keycode:%{public}d, pid:%{public}d",
+            subscriber->id_, keyEvent->GetKeyCode(), sess->GetPid());
+    }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write dispatch subscriber failed");
         return;

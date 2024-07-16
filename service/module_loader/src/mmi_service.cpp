@@ -20,6 +20,7 @@
 
 #include <cinttypes>
 #include <csignal>
+#include <cstdlib>
 #include "string_ex.h"
 #ifdef OHOS_RSS_CLIENT
 #include <unordered_map>
@@ -35,6 +36,7 @@
 #include "display_event_monitor.h"
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #include "event_dump.h"
+#include "event_log_helper.h"
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
 #include "fingersense_wrapper.h"
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
@@ -57,7 +59,6 @@
 #include "touch_event_normalize.h"
 #include "util.h"
 #include "util_ex.h"
-#include "util_napi_error.h"
 #include "watchdog_task.h"
 #include "xcollie/watchdog.h"
 #ifdef OHOS_RSS_CLIENT
@@ -79,11 +80,15 @@ const std::string THREAD_NAME { "mmi-service" };
 constexpr int32_t WATCHDOG_INTERVAL_TIME { 30000 };
 constexpr int32_t WATCHDOG_DELAY_TIME { 40000 };
 constexpr int32_t RELOAD_DEVICE_TIME { 2000 };
+constexpr int32_t WATCHDOG_WARNTIME { 6000 };
+constexpr int32_t WATCHDOG_BLOCKTIME { 3000 };
 constexpr int32_t REMOVE_OBSERVER { -2 };
 constexpr int32_t REPEAT_COUNT { 2 };
 constexpr int32_t UNSUBSCRIBED { -1 };
 constexpr int32_t UNOBSERVED { -1 };
 constexpr int32_t SUBSCRIBED { 1 };
+constexpr int32_t DISTRIBUTE_TIME { 1000 }; // 1000ms
+constexpr int32_t COMMON_PARAMETER_ERROR { 401 };
 } // namespace
 
 const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(DelayedSingleton<MMIService>::GetInstance().get());
@@ -336,15 +341,15 @@ void MMIService::OnStart()
     IPointerDrawingManager::GetInstance()->InitPointerObserver();
     PREFERENCES_MGR->InitPreferences();
     TimerMgr->AddTimer(WATCHDOG_INTERVAL_TIME, -1, [this]() {
-        MMI_HILOGD("Set thread status flag to true");
+        MMI_HILOGI("Set thread status flag to true");
         threadStatusFlag_ = true;
     });
     auto taskFunc = [this]() {
         if (threadStatusFlag_) {
-            MMI_HILOGD("Set thread status flag to false");
+            MMI_HILOGI("Set thread status flag to false");
             threadStatusFlag_ = false;
         } else {
-            MMI_HILOGE("Timeout happened");
+            MMI_HILOGI("Mmi-server Timeout");
         }
     };
     HiviewDFX::Watchdog::GetInstance().RunPeriodicalTask("MMIService", taskFunc, WATCHDOG_INTERVAL_TIME,
@@ -524,10 +529,11 @@ int32_t MMIService::SetCustomCursor(int32_t pid, int32_t windowId, int32_t focus
     return RET_OK;
 }
 
-int32_t MMIService::SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap)
+int32_t MMIService::SetMouseIcon(int32_t windowId, void* pixelMap)
 {
     CALL_INFO_TRACE;
 #if defined OHOS_BUILD_ENABLE_POINTER
+    int32_t pid = GetCallingPid();
     int32_t ret = CheckPidPermission(pid);
     if (ret != RET_OK) {
         MMI_HILOGE("Check pid permission failed");
@@ -1397,12 +1403,14 @@ int32_t MMIService::AdaptScreenResolution(std::shared_ptr<PointerEvent> pointerE
         int32_t destY = sourceY * displays_[CURRENT]->GetHeight() / displays_[FIRST]->GetHeight();
         pointerItem.SetDisplayX(destX);
         pointerItem.SetDisplayY(destY);
-        MMI_HILOGI("PointerItem's displayX:%{public}d, displayY:%{public}d when first inject,"
-            "Screen resolution width:%{public}d, height:%{public}d first got,"
-            "Screen resolution width:%{public}d, height:%{public}d current got,"
-            "PointerItem's displayX:%{public}d, displayY:%{public}d after self adaptaion",
-            sourceX, sourceY, displays_[FIRST]->GetWidth(), displays_[FIRST]->GetHeight(),
-            displays_[CURRENT]->GetWidth(), displays_[CURRENT]->GetHeight(), destX, destY);
+        if (EventLogHelper::IsBetaVersion()) {
+            MMI_HILOGI("PointerItem's displayX:%{public}d, displayY:%{public}d when first inject,"
+                "Screen resolution width:%{public}d, height:%{public}d first got,"
+                "Screen resolution width:%{public}d, height:%{public}d current got,"
+                "PointerItem's displayX:%{public}d, displayY:%{public}d after self adaptaion",
+                sourceX, sourceY, displays_[FIRST]->GetWidth(), displays_[FIRST]->GetHeight(),
+                displays_[CURRENT]->GetWidth(), displays_[CURRENT]->GetHeight(), destX, destY);
+        }
     }
     return RET_OK;
 }
@@ -1724,14 +1732,15 @@ void MMIService::OnThread()
             }
             std::shared_ptr<mmi_epoll_event> mmiEd = mmiEdIter->second;
             CHKPC(mmiEd);
+            epoll_event event = ev[i];
             if (mmiEd->event_type == EPOLL_EVENT_INPUT) {
                 libinputAdapter_.EventDispatch(mmiEd->fd);
             } else if (mmiEd->event_type == EPOLL_EVENT_SOCKET) {
-                OnEpollEvent(ev[i]);
+                CalculateFuntionRunningTime([this, &event]() { this->OnEpollEvent(event); }, "EPOLL_EVENT_SOCKET");
             } else if (mmiEd->event_type == EPOLL_EVENT_SIGNAL) {
                 OnSignalEvent(mmiEd->fd);
             } else if (mmiEd->event_type == EPOLL_EVENT_ETASK) {
-                OnDelegateTask(ev[i]);
+                CalculateFuntionRunningTime([this, &event]() { this->OnDelegateTask(event); }, "EPOLL_EVENT_ETASK");
             } else {
                 MMI_HILOGW("Unknown epoll event type:%{public}d", mmiEd->event_type);
             }
@@ -2514,8 +2523,12 @@ int32_t MMIService::SetCurrentUser(int32_t userId)
 int32_t MMIService::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
 {
     CALL_INFO_TRACE;
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&TouchEventNormalize::SetTouchpadThreeFingersTapSwitch,
-                                                        TOUCH_EVENT_HDR, switchFlag));
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [switchFlag] {
+            return ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()->SetTouchpadThreeFingersTapSwitch(
+                switchFlag);
+        }
+        );
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to SetTouchpadThreeFingersTapSwitch status, ret:%{public}d", ret);
     }
@@ -2525,8 +2538,12 @@ int32_t MMIService::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
 int32_t MMIService::GetTouchpadThreeFingersTapSwitch(bool &switchFlag)
 {
     CALL_INFO_TRACE;
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&TouchEventNormalize::GetTouchpadThreeFingersTapSwitch,
-                                                        TOUCH_EVENT_HDR, std::ref(switchFlag)));
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [&switchFlag] {
+            return ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()->GetTouchpadThreeFingersTapSwitch(
+                switchFlag);
+        }
+        );
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to GetTouchpadThreeFingersTapSwitch status, ret:%{public}d", ret);
     }
@@ -2600,6 +2617,63 @@ int32_t MMIService::GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsync
     return RET_OK;
 }
 
+int32_t MMIService::GetPointerSnapshot(void *pixelMapPtr)
+{
+    CALL_INFO_TRACE;
+#if defined OHOS_BUILD_ENABLE_POINTER
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(
+        std::bind(&IPointerDrawingManager::GetPointerSnapshot, IPointerDrawingManager::GetInstance(), pixelMapPtr)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get the pointer snapshot failed, ret: %{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
+}
+
+int32_t MMIService::SetTouchpadScrollRows(int32_t rows)
+{
+    CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [rows] {
+            return ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()->SetTouchpadScrollRows(rows);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set the number of touchpad scrolling rows failed, return %{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
+}
+
+#ifdef OHOS_BUILD_ENABLE_POINTER
+int32_t MMIService::ReadTouchpadScrollRows(int32_t &rows)
+{
+    rows = TOUCH_EVENT_HDR->GetTouchpadScrollRows();
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_POINTER
+
+int32_t MMIService::GetTouchpadScrollRows(int32_t &rows)
+{
+    CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, &rows] {
+            return this->ReadTouchpadScrollRows(rows);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get the number of touchpad scrolling rows failed, return %{public}d, pid:%{public}d", ret,
+            GetCallingPid());
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
+}
+
 #ifdef OHOS_BUILD_ENABLE_ANCO
 int32_t MMIService::AncoAddChannel(sptr<IAncoChannel> channel)
 {
@@ -2623,5 +2697,39 @@ int32_t MMIService::AncoRemoveChannel(sptr<IAncoChannel> channel)
     return ret;
 }
 #endif // OHOS_BUILD_ENABLE_ANCO
+
+int32_t MMIService::TransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject)
+{
+    CALL_DEBUG_ENTER;
+    int32_t pid = GetCallingPid();
+    bool execRet = false;
+    int32_t ret =
+        delegateTasks_.PostSyncTask(
+            [this, pid, binderClientObject, &execRet] {
+                execRet = sMsgHandler_.OnTransferBinderClientSrv(binderClientObject, pid);
+                return execRet;
+            }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("TransferBinderClientSrv failed:%{public}d", ret);
+    }
+    MMI_HILOGE("TransferBinderClientSrv result:%{public}d", execRet);
+    return ret;
+}
+
+void MMIService::CalculateFuntionRunningTime(std::function<void()> func, const std::string &flag)
+{
+    auto startTime = std::chrono::steady_clock::now();
+    func();
+    auto endTime = std::chrono::steady_clock::now();
+    auto duration = endTime - startTime;
+    int64_t durationTime = std::chrono::duration_cast<std::chrono::milliseconds>
+        (duration).count();
+    if (duration > std::chrono::milliseconds(DISTRIBUTE_TIME)) {
+        MMI_HILOGW("BlockMonitor event name: %{public}s, Duration Time: %{public}" PRId64 " ms",
+            flag.c_str(), durationTime);
+    }
+}
+
 } // namespace MMI
 } // namespace OHOS

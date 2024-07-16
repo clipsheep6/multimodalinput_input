@@ -1105,6 +1105,9 @@ bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
         }
         return true;
     }
+    if (key->GetKeyCode() == KeyEvent::KEYCODE_POWER) {
+        MMI_HILOGI("Handle power key DownStart:%{public}d", isDownStart_);
+    }
     if (!isDownStart_) {
         HandleRepeatKeys(key);
         return false;
@@ -1163,6 +1166,7 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
         MMI_HILOGD("Add timer success");
         return true;
     }
+    MMI_HILOGE("Handle event failed");
     return false;
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -1239,9 +1243,11 @@ bool KeyCommandHandler::HandleRepeatKey(const RepeatKey &item, bool &isLaunched,
         if (!statusValue) {
             return false;
         }
+        MMI_HILOGI("Repeat key matched keycode:%{public}d", keyEvent->GetKeyCode());
         BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_REPEAT_KEY, item.ability.bundleName);
         LaunchAbility(item.ability);
         BytraceAdapter::StopLaunchAbility();
+
         launchAbilityCount_ = count_;
         isLaunched = true;
         isDownStart_ = false;
@@ -1898,15 +1904,15 @@ int32_t KeyCommandHandler::UpdateSettingsXml(const std::string &businessId, int3
     CALL_DEBUG_ENTER;
     if (businessId.empty() || businessIds_.empty()) {
         MMI_HILOGE("businessId or businessIds_ is empty");
-        return COMMON_PARAMETER_ERROR;
+        return PARAMETER_ERROR;
     }
     if (std::find(businessIds_.begin(), businessIds_.end(), businessId) == businessIds_.end()) {
         MMI_HILOGE("%{public}s not in the config file", businessId.c_str());
-        return COMMON_PARAMETER_ERROR;
+        return PARAMETER_ERROR;
     }
     if (delay < MIN_SHORT_KEY_DOWN_DURATION || delay > MAX_SHORT_KEY_DOWN_DURATION) {
         MMI_HILOGE("Delay is not in valid range");
-        return COMMON_PARAMETER_ERROR;
+        return PARAMETER_ERROR;
     }
     return PREFERENCES_MGR->SetShortKeyDuration(businessId, delay);
 }
@@ -1952,9 +1958,13 @@ bool KeyCommandHandler::CheckInputMethodArea(const std::shared_ptr<PointerEvent>
     int32_t displayY = item.GetDisplayY();
     int32_t displayId = touchEvent->GetTargetDisplayId();
     auto windows = WIN_MGR->GetWindowGroupInfoByDisplayId(displayId);
+    int32_t tragetWindowId = touchEvent->GetTargetWindowId();
     for (auto window : windows) {
         if (window.windowType != WINDOW_INPUT_METHOD_TYPE) {
             continue;
+        }
+        if (window.id != tragetWindowId) {
+            return false;
         }
         int32_t rightDownX;
         int32_t rightDownY;
@@ -1968,6 +1978,8 @@ bool KeyCommandHandler::CheckInputMethodArea(const std::shared_ptr<PointerEvent>
         }
         if (displayX >= window.area.x && displayX <= rightDownX &&
             displayY >= window.area.y && displayY <= rightDownY) {
+                MMI_HILOGI("In input method area, windowId:%{public}d, windowType:%{public}d",
+                    window.id, window.windowType);
                 return true;
         }
     }

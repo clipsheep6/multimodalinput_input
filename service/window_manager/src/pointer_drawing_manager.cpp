@@ -32,6 +32,7 @@
 #include "ipc_skeleton.h"
 #include "mmi_log.h"
 #include "i_preference_manager.h"
+#include "parameters.h"
 #include "pipeline/rs_recording_canvas.h"
 #include "preferences.h"
 #include "preferences_errno.h"
@@ -40,6 +41,7 @@
 #include "scene_board_judgement.h"
 #include "setting_datashare.h"
 #include "util.h"
+#include "dfx_hisysevent.h"
 #include "timer_manager.h"
 
 #undef MMI_LOG_DOMAIN
@@ -56,6 +58,8 @@ const std::string POINTER_COLOR { "pointerColor" };
 const std::string POINTER_SIZE { "pointerSize" };
 const std::string MAGIC_POINTER_COLOR { "magicPointerColor" };
 const std::string MAGIC_POINTER_SIZE { "magicPointerSize"};
+const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
+constexpr int32_t WINDOW_ROTATE { 0 };
 constexpr int32_t BASELINE_DENSITY { 160 };
 constexpr int32_t CALCULATE_MIDDLE { 2 };
 constexpr int32_t MAGIC_INDEPENDENT_PIXELS { 30 };
@@ -312,8 +316,10 @@ int32_t PointerDrawingManager::SwitchPointerStyle()
         direction, ICON_TYPE(GetIconStyle(MOUSE_ICON(lastMouseStyle_.id)).alignmentWay), physicalX, physicalY);
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     if (HasMagicCursor()) {
+        MAGIC_CURSOR->EnableCursorInversion();
         MAGIC_CURSOR->CreatePointerWindow(displayInfo_.id, physicalX, physicalY, direction, surfaceNode_);
     } else {
+        MAGIC_CURSOR->DisableCursorInversion();
         CreatePointerWindow(displayInfo_.id, physicalX, physicalY, direction);
     }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -346,6 +352,9 @@ void PointerDrawingManager::CreateMagicCursorChangeObserver()
     ErrCode ret =
         SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).RegisterObserver(magicCursorChangeObserver);
     if (ret != ERR_OK) {
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+        DfxHisysevent::ReportMagicCursorFault(dynamicallyKey, "Register setting observer failed");
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
         MMI_HILOGE("Register magic cursor change observer failed, ret:%{public}d", ret);
         magicCursorChangeObserver = nullptr;
     }
@@ -415,6 +424,9 @@ int32_t PointerDrawingManager::CreatePointerSwitchObserver(isMagicCursor& item)
         SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).CreateObserver(item.name, updateFunc);
     ErrCode ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).RegisterObserver(statusObserver);
     if (ret != ERR_OK) {
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+        DfxHisysevent::ReportMagicCursorFault(item.name, "Register setting observer failed");
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
         MMI_HILOGE("Register setting observer failed, ret:%{public}d", ret);
         statusObserver = nullptr;
         return RET_ERR;
@@ -504,7 +516,13 @@ void PointerDrawingManager::DrawLoadingPointerStyle(const MOUSE_ICON mouseStyle)
         Rosen::RSNode::Animate(
             protocol,
             Rosen::RSAnimationTimingCurve::LINEAR,
-            [this]() { RotateDegree(currentDirection_); });
+            [this]() {
+                if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+                    RotateDegree(DIRECTION0);
+                    return;
+                }
+                RotateDegree(currentDirection_);
+            });
         MMI_HILOGE("current pointer is not loading");
         Rosen::RSTransaction::FlushImplicitTransaction();
         return;
@@ -846,7 +864,7 @@ void PointerDrawingManager::FixCursorPosition(int32_t &physicalX, int32_t &physi
         physicalY = 0;
     }
     const int32_t cursorUnit = 16;
-    if (displayInfo_.displayDirection == DIRECTION0) {
+    if (ROTATE_POLICY == WINDOW_ROTATE) {
         if (displayInfo_.direction == DIRECTION0 || displayInfo_.direction == DIRECTION180) {
             if (physicalX > (displayInfo_.width - imageWidth_ / cursorUnit)) {
                 physicalX = displayInfo_.width - imageWidth_ / cursorUnit;
@@ -863,17 +881,11 @@ void PointerDrawingManager::FixCursorPosition(int32_t &physicalX, int32_t &physi
             }
         }
     } else {
-        int32_t width = displayInfo_.width;
-        int32_t height = displayInfo_.height;
-        if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
-            height = displayInfo_.width;
-            width = displayInfo_.height;
+        if (physicalX > (displayInfo_.width - imageWidth_ / cursorUnit)) {
+            physicalX = displayInfo_.width - imageWidth_ / cursorUnit;
         }
-        if (physicalX > (width - imageWidth_ / cursorUnit)) {
-            physicalX = width - imageWidth_ / cursorUnit;
-        }
-        if (physicalY > (height - imageHeight_ / cursorUnit)) {
-            physicalY = height - imageHeight_ / cursorUnit;
+        if (physicalY > (displayInfo_.height - imageHeight_ / cursorUnit)) {
+            physicalY = displayInfo_.height - imageHeight_ / cursorUnit;
         }
     }
 }
@@ -981,6 +993,7 @@ void PointerDrawingManager::DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUS
     if (mouseStyle == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
         MMI_HILOGD("Set mouseicon by userIcon_");
         image = ExtractDrawingImage(userIcon_);
+        SetPixelMap(userIcon_);
     } else {
         if (mouseStyle == MOUSE_ICON::RUNNING) {
             pixelmap = DecodeImageToPixelMap(mouseIcons_[MOUSE_ICON::RUNNING_LEFT].iconPath);
@@ -989,6 +1002,9 @@ void PointerDrawingManager::DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUS
         }
         CHKPV(pixelmap);
         image = ExtractDrawingImage(pixelmap);
+        if (mouseStyle == MOUSE_ICON::DEFAULT) {
+            SetPixelMap(pixelmap);
+        }
         MMI_HILOGI("Set mouseicon to system");
     }
     CHKPV(image);
@@ -997,6 +1013,26 @@ void PointerDrawingManager::DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUS
     canvas.DrawBackground(brush);
     canvas.DrawImage(*image, IMAGE_PIXEL, IMAGE_PIXEL, Rosen::Drawing::SamplingOptions());
     MMI_HILOGD("Canvas draw image, success");
+}
+
+void PointerDrawingManager::SetPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap)
+{
+    pixelMap_ = pixelMap;
+}
+ 
+int32_t PointerDrawingManager::GetPointerSnapshot(void *pixelMapPtr)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<Media::PixelMap> *newPixelMapPtr = static_cast<std::shared_ptr<Media::PixelMap> *>(pixelMapPtr);
+    *newPixelMapPtr = pixelMap_;
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+    if (HasMagicCursor()) {
+        MMI_HILOGE("magic pixelmap");
+        *newPixelMapPtr = MAGIC_CURSOR->GetPixelMap();
+    }
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+    CHKPR(*newPixelMapPtr, ERROR_NULL_POINTER);
+    return RET_OK;
 }
 
 void PointerDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint32_t height, const MOUSE_ICON mouseStyle)
@@ -1117,10 +1153,6 @@ int32_t PointerDrawingManager::SetMouseIcon(int32_t pid, int32_t windowId, void*
     CHKPR(pixelMap, RET_ERR);
     if (windowId < 0) {
         MMI_HILOGE("get invalid windowId, %{public}d", windowId);
-        return RET_ERR;
-    }
-    if (WIN_MGR->CheckWindowIdPermissionByPid(windowId, pid) != RET_OK) {
-        MMI_HILOGE("windowId not in right pid");
         return RET_ERR;
     }
     OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(pixelMap);
@@ -1327,7 +1359,7 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t size)
     MAGIC_CURSOR->SetPointerSize(imageWidth_, imageHeight_);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     Direction direction = DIRECTION0;
-    if (displayInfo_.displayDirection == DIRECTION0) {
+    if (ROTATE_POLICY == WINDOW_ROTATE) {
         direction = displayInfo_.direction;
     }
     AdjustMouseFocus(direction, ICON_TYPE(GetMouseIconPath()[MOUSE_ICON(lastMouseStyle_.id)].alignmentWay),
@@ -1426,7 +1458,7 @@ void PointerDrawingManager::DrawManager()
         WIN_MGR->GetPointerStyle(pid_, windowId_, pointerStyle);
         MMI_HILOGD("get pid %{publid}d with pointerStyle %{public}d", pid_, pointerStyle.id);
         Direction direction = DIRECTION0;
-        if (displayInfo_.displayDirection == DIRECTION0) {
+        if (ROTATE_POLICY == WINDOW_ROTATE) {
             direction = displayInfo_.direction;
         }
         if (lastPhysicalX_ == -1 || lastPhysicalY_ == -1) {
@@ -1770,7 +1802,7 @@ void PointerDrawingManager::DrawPointerStyle(const PointerStyle& pointerStyle)
             Rosen::RSTransaction::FlushImplicitTransaction();
         }
         Direction direction = DIRECTION0;
-        if (displayInfo_.displayDirection == DIRECTION0) {
+        if (ROTATE_POLICY == WINDOW_ROTATE) {
             direction = displayInfo_.direction;
         }
         if (lastPhysicalX_ == -1 || lastPhysicalY_ == -1) {

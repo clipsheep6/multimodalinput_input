@@ -263,12 +263,18 @@ void EventNormalizeHandler::HandlePointerEvent(const std::shared_ptr<PointerEven
             MMI_HILOGE("Get pointer item failed. pointer:%{public}d", pointerEvent->GetPointerId());
             return;
         }
-        MMI_HILOGI("MouseEvent Item Normalization Results, DownTime:%{public}" PRId64 ", IsPressed:%{public}d,"
-            "DisplayX:%{public}d, DisplayY:%{public}d, WindowX:%{public}d, WindowY:%{public}d,"
-            "Width:%{public}d, Height:%{public}d, Pressure:%{public}f, Device:%{public}d",
-            item.GetDownTime(), static_cast<int32_t>(item.IsPressed()), item.GetDisplayX(), item.GetDisplayY(),
-            item.GetWindowX(), item.GetWindowY(), item.GetWidth(), item.GetHeight(), item.GetPressure(),
-            item.GetDeviceId());
+        if (!EventLogHelper::IsBetaVersion()) {
+            MMI_HILOGI("MouseEvent Item Normalization Results, IsPressed:%{public}d, Pressure:%{public}f"
+                       ", Device:%{public}d",
+                static_cast<int32_t>(item.IsPressed()), item.GetPressure(), item.GetDeviceId());
+        } else {
+            MMI_HILOGI("MouseEvent Item Normalization Results, DownTime:%{public}" PRId64 ", IsPressed:%{public}d,"
+                "DisplayX:%{public}d, DisplayY:%{public}d, WindowX:%{public}d, WindowY:%{public}d,"
+                "Width:%{public}d, Height:%{public}d, Pressure:%{public}f, Device:%{public}d",
+                item.GetDownTime(), static_cast<int32_t>(item.IsPressed()), item.GetDisplayX(), item.GetDisplayY(),
+                item.GetWindowX(), item.GetWindowY(), item.GetWidth(), item.GetHeight(), item.GetPressure(),
+                item.GetDeviceId());
+        }
     }
     WIN_MGR->UpdateTargetPointer(pointerEvent);
     nextHandler_->HandlePointerEvent(pointerEvent);
@@ -294,6 +300,7 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
 {
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
     if (FingerprintEventHdr->IsFingerprintEvent(event)) {
+        MMI_HILOGI("The current event is finger");
         return FingerprintEventHdr->HandleFingerprintEvent(event);
     }
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
@@ -310,6 +317,7 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
         MMI_HILOGD("The last repeat button, keyCode:%{public}d", lastPressedKey);
     }
     auto packageResult = KeyEventHdr->Normalize(event, keyEvent);
+    WIN_MGR->HandleKeyEventWindowId(keyEvent);
     LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) {
         MMI_HILOGD("The same event reported by multi_device should be discarded");
@@ -343,6 +351,7 @@ void EventNormalizeHandler::UpdateKeyEventHandlerChain(const std::shared_ptr<Key
     CHKPV(keyEvent);
     int32_t currentShieldMode = KeyEventHdr->GetCurrentShieldMode();
     if (currentShieldMode == SHIELD_MODE::FACTORY_MODE) {
+        MMI_HILOGI("The current mode is factory");
         auto eventDispatchHandler = InputHandler->GetEventDispatchHandler();
         CHKPV(eventDispatchHandler);
         eventDispatchHandler->HandleKeyEvent(keyEvent);
