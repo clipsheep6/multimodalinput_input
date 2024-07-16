@@ -50,6 +50,10 @@ constexpr int32_t TWO_FINGERS_TIME_LIMIT = 150000;
 constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_SLOW = 450000;
 constexpr float DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG = 64.0;
 constexpr int32_t WINDOW_INPUT_METHOD_TYPE = 2105;
+constexpr int32_t REPEAT_KEY_TWO_TIMES = 2;
+constexpr int32_t REPEAT_KEY_FOUR_TIMES = 4;
+constexpr int32_t HANDLER_COUNT = 2;
+constexpr int32_t LAUNCH_COUNT = 2;
 const std::string EXTENSION_ABILITY = "extensionAbility";
 const std::string EXTENSION_ABILITY_ABNORMAL = "extensionAbilityAbnormal";
 const vector<float> CIRCLE_COORDINATES = {
@@ -1852,12 +1856,12 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKeyUpCancel, TestSiz
 }
 
 /**
- * @tc.name: KeyCommandHandlerTest_HandleRepeatKey_001
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKey_006
  * @tc.desc: HandleRepeatKey
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKey_001, TestSize.Level1)
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKey_006, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     KeyCommandHandler handler;
@@ -1865,8 +1869,8 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKey_001, TestS
     bool isLaunched = false;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
-    handler.count_ = 2;
-    repeatKey.times = 2;
+    handler.count_ = HANDLER_COUNT;
+    repeatKey.times = REPEAT_KEY_TWO_TIMES;
     repeatKey.statusConfig = "true";
     repeatKey.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
     Ability ability;
@@ -1879,17 +1883,17 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKey_001, TestS
     repeatKey.ability = ability;
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
-    handler.repeatKeyMaxTimes_.insert(std::make_pair(KeyEvent::KEYCODE_VOLUME_DOWN, 2));
+    handler.repeatKeyMaxTimes_.insert(std::make_pair(KeyEvent::KEYCODE_VOLUME_DOWN, REPEAT_KEY_TWO_TIMES));
     ASSERT_FALSE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
 }
 
 /**
- * @tc.name: KeyCommandHandlerTest_HandleRepeatKey_002
+ * @tc.name: KeyCommandHandlerTest_HandleRepeatKey_005
  * @tc.desc: HandleRepeatKey
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKey_002, TestSize.Level1)
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKey_005, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     KeyCommandHandler handler;
@@ -1897,8 +1901,8 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKey_002, TestS
     bool isLaunched = false;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
-    handler.count_ = 2;
-    repeatKey.times = 2;
+    handler.count_ = HANDLER_COUNT;
+    repeatKey.times = REPEAT_KEY_TWO_TIMES;
     repeatKey.statusConfig = "";
     Ability ability;
     ability.deviceId = "deviceId";
@@ -1911,7 +1915,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKey_002, TestS
     repeatKey.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
-    handler.repeatKeyMaxTimes_.insert(std::make_pair(KeyEvent::KEYCODE_VOLUME_DOWN, 4));
+    handler.repeatKeyMaxTimes_.insert(std::make_pair(KeyEvent::KEYCODE_VOLUME_DOWN, REPEAT_KEY_FOUR_TIMES));
     ASSERT_TRUE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
 }
 
@@ -1929,8 +1933,8 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKey_003, TestS
     bool isLaunched = false;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
-    handler.count_ = 2;
-    repeatKey.times = 2;
+    handler.count_ = HANDLER_COUNT;
+    repeatKey.times = REPEAT_KEY_TWO_TIMES;
     repeatKey.statusConfig = "";
     Ability ability;
     ability.deviceId = "deviceId";
@@ -1943,7 +1947,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKey_003, TestS
     repeatKey.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-    handler.repeatKeyMaxTimes_.insert(std::make_pair(KeyEvent::KEYCODE_VOLUME_DOWN, 4));
+    handler.repeatKeyMaxTimes_.insert(std::make_pair(KeyEvent::KEYCODE_VOLUME_DOWN, REPEAT_KEY_FOUR_TIMES));
     int32_t timerId = 1;
     handler.repeatKeyTimerIds_.insert(std::make_pair(KeyEvent::KEYCODE_VOLUME_DOWN, timerId));
     ASSERT_TRUE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
@@ -1963,8 +1967,8 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKey_004, TestS
     bool isLaunched = false;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
-    handler.count_ = 2;
-    repeatKey.times = 2;
+    handler.count_ = HANDLER_COUNT;
+    repeatKey.times = REPEAT_KEY_TWO_TIMES;
     repeatKey.statusConfig = "";
     Ability ability;
     ability.deviceId = "deviceId";
@@ -1977,7 +1981,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKey_004, TestS
     repeatKey.keyCode = KeyEvent::KEYCODE_VOLUME_DOWN;
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
-    handler.repeatKeyMaxTimes_.insert(std::make_pair(KeyEvent::KEYCODE_VOLUME_DOWN, 2));
+    handler.repeatKeyMaxTimes_.insert(std::make_pair(KeyEvent::KEYCODE_VOLUME_DOWN, REPEAT_KEY_TWO_TIMES));
     ASSERT_TRUE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
 }
 
@@ -1995,8 +1999,8 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyAbility_001
     bool isLaunched = false;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
-    handler.count_ = 2;
-    repeatKey.times = 2;
+    handler.count_ = HANDLER_COUNT;
+    repeatKey.times = REPEAT_KEY_TWO_TIMES;
     repeatKey.statusConfig = "";
     Ability ability;
     ability.deviceId = "deviceId";
@@ -2026,9 +2030,9 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyAbility_002
     bool isLaunched = false;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
-    handler.count_ = 2;
+    handler.count_ = HANDLER_COUNT;
     handler.launchAbilityCount_ = 0;
-    repeatKey.times = 2;
+    repeatKey.times = REPEAT_KEY_TWO_TIMES;
     repeatKey.statusConfig = "";
     Ability ability;
     ability.deviceId = "deviceId";
@@ -2058,9 +2062,9 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKeyAbility_003
     bool isLaunched = false;
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
-    handler.count_ = 2;
-    handler.launchAbilityCount_ = 2;
-    repeatKey.times = 2;
+    handler.count_ = HANDLER_COUNT;
+    handler.launchAbilityCount_ = LAUNCH_COUNT;
+    repeatKey.times = REPEAT_KEY_TWO_TIMES;
     repeatKey.statusConfig = "";
     Ability ability;
     ability.deviceId = "deviceId";

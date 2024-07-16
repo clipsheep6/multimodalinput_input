@@ -60,6 +60,7 @@ constexpr float MIN_LETTER_GESTURE_SQUARENESS { 0.15f };
 constexpr int32_t EVEN_NUMBER { 2 };
 constexpr int64_t NO_DELAY { 0 };
 constexpr int64_t FREQUENCY = 1000;
+constexpr int32_t REPEAT_COUNT = 1;
 const std::string AIBASE_BUNDLE_NAME { "com.hmos.aibase" };
 const std::string WAKEUP_ABILITY_NAME { "WakeUpExtAbility" };
 const std::string SCREENSHOT_BUNDLE_NAME { "com.hmos.screenshot" };
@@ -851,7 +852,7 @@ bool KeyCommandHandler::ParseJson(const std::string &configFile)
     bool isParseDoubleKnuckleGesture = IsParseKnuckleGesture(parser, DOUBLE_KNUCKLE_ABILITY, doubleKnuckleGesture_);
     bool isParseMultiFingersTap = ParseMultiFingersTap(parser, TOUCHPAD_TRIP_TAP_ABILITY, threeFingersTap_);
     bool isParseRepeatKeys = ParseRepeatKeys(parser, repeatKeys_, repeatKeyMaxTimes_);
-    singleKnuckleGesture_.statusConfig = SETTING_KNUCKLE_SWITCH;
+    knuckleSwitch_.statusConfig = SETTING_KNUCKLE_SWITCH;
     if (!isParseShortKeys && !isParseSequences && !isParseTwoFingerGesture && !isParseSingleKnuckleGesture &&
         !isParseDoubleKnuckleGesture && !isParseMultiFingersTap && !isParseRepeatKeys) {
         MMI_HILOGE("Parse configFile failed");
@@ -1166,6 +1167,7 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
         MMI_HILOGD("Add timer success");
         return true;
     }
+    MMI_HILOGE("Handle event failed");
     return false;
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -1228,15 +1230,17 @@ bool KeyCommandHandler::HandleRepeatKey(const RepeatKey &item, bool &isLaunched,
         return false;
     }
     if (count_ == item.times) {
-        if (item.times < repeatKeyMaxTimes_[item.keyCode] &&
+        if (repeatKeyMaxTimes_.find(item.keyCode) != repeatKeyMaxTimes_.end() &&
             repeatKeyTimerIds_.find(item.keyCode) != repeatKeyTimerIds_.end()) {
-            if (repeatKeyTimerIds_[item.keyCode] != 0) {
-                int32_t timerId = repeatKeyTimerIds_[item.keyCode];
+            int32_t timerId = repeatKeyTimerIds_[item.keyCode];
+            if (item.times < repeatKeyMaxTimes_[item.keyCode] && timerId != 0) {
+                launchAbilityCount_ = count_;
                 TimerMgr->RemoveTimer(timerId);
                 repeatKeyTimerIds_[item.keyCode] = 0;
                 return true;
             }
         }
+
         if (!item.statusConfig.empty()) {
             bool statusValue = true;
             auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
@@ -1250,11 +1254,12 @@ bool KeyCommandHandler::HandleRepeatKey(const RepeatKey &item, bool &isLaunched,
                 return false;
             }
         }
-
-        if (item.times < repeatKeyMaxTimes_[item.keyCode]) {
-            return HandleRepeatKeyAbility(item, isLaunched, keyEvent, false);
+        if (repeatKeyMaxTimes_.find(item.keyCode) != repeatKeyMaxTimes_.end()) {
+            if (item.times < repeatKeyMaxTimes_[item.keyCode]) {
+                return HandleRepeatKeyAbility(item, isLaunched, keyEvent, false);
+            }
+            return HandleRepeatKeyAbility(item, isLaunched, keyEvent, true);
         }
-        return HandleRepeatKeyAbility(item, isLaunched, keyEvent, true);
     }
     return true;
 }
@@ -1264,7 +1269,7 @@ bool KeyCommandHandler::HandleRepeatKeyAbility(const RepeatKey &item, bool &isLa
 {
     if (!isMaxTimes) {
         int32_t timerId = TimerMgr->AddTimer(
-            intervalTime_ / SECONDS_SYSTEM, 1, [this, item, &isLaunched, keyEvent] () {
+            intervalTime_ / SECONDS_SYSTEM, REPEAT_COUNT, [this, item, &isLaunched, keyEvent] () {
             LaunchRepeatKeyAbility(item, isLaunched, keyEvent);
             if (repeatKeyTimerIds_.find(item.keyCode) != repeatKeyTimerIds_.end()) {
                 repeatKeyTimerIds_[item.keyCode] = 0;
@@ -1275,7 +1280,7 @@ bool KeyCommandHandler::HandleRepeatKeyAbility(const RepeatKey &item, bool &isLa
         }
         if (repeatTimerId_ >= 0) {
             TimerMgr->RemoveTimer(repeatTimerId_);
-            repeatTimerId_ = TimerMgr->AddTimer(intervalTime_ / SECONDS_SYSTEM, 1, [this] () {
+            repeatTimerId_ = TimerMgr->AddTimer(intervalTime_ / SECONDS_SYSTEM, REPEAT_COUNT, [this] () {
                 SendKeyEvent();
             });
             if (repeatTimerId_ < 0) {
@@ -1376,6 +1381,9 @@ void KeyCommandHandler::SendKeyEvent()
     if (!isHandleSequence_) {
         for (int32_t i = launchAbilityCount_; i < count_; i++) {
             int32_t keycode = repeatKey_.keyCode;
+            if (count_ == repeatKeyMaxTimes_.[item.keyCode] - REPEAT_COUNT && keycode == KeyEvent::KEYCODE_POWER) {
+                break;
+            }
             if (IsSpecialType(keycode, SpecialType::KEY_DOWN_ACTION)) {
                 HandleSpecialKeys(keycode, KeyEvent::KEY_ACTION_UP);
             }
@@ -1965,15 +1973,15 @@ int32_t KeyCommandHandler::UpdateSettingsXml(const std::string &businessId, int3
     CALL_DEBUG_ENTER;
     if (businessId.empty() || businessIds_.empty()) {
         MMI_HILOGE("businessId or businessIds_ is empty");
-        return COMMON_PARAMETER_ERROR;
+        return PARAMETER_ERROR;
     }
     if (std::find(businessIds_.begin(), businessIds_.end(), businessId) == businessIds_.end()) {
         MMI_HILOGE("%{public}s not in the config file", businessId.c_str());
-        return COMMON_PARAMETER_ERROR;
+        return PARAMETER_ERROR;
     }
     if (delay < MIN_SHORT_KEY_DOWN_DURATION || delay > MAX_SHORT_KEY_DOWN_DURATION) {
         MMI_HILOGE("Delay is not in valid range");
-        return COMMON_PARAMETER_ERROR;
+        return PARAMETER_ERROR;
     }
     return PREFERENCES_MGR->SetShortKeyDuration(businessId, delay);
 }
