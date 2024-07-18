@@ -111,6 +111,11 @@ void KeyCommandHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> poi
     nextHandler_->HandleTouchEvent(pointerEvent);
 }
 
+bool KeyCommandHandler::GetKnuckleSwitchValue()
+{
+    return knuckleSwitch_.statusConfigValue;
+}
+
 void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> touchEvent)
 {
     CALL_DEBUG_ENTER;
@@ -132,6 +137,10 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> t
         distanceLongConfig_ = DOUBLE_CLICK_DISTANCE_LONG_CONFIG * VPR_CONFIG;
         SetKnuckleDoubleTapDistance(distanceDefaultConfig_);
         isDistanceConfig_ = true;
+    }
+    if (!isKnuckleSwitchConfig_) {
+        CreateStatusConfigObserver(knuckleSwitch_);
+        isKnuckleSwitchConfig_ = true;
     }
 
     switch (touchEvent->GetPointerAction()) {
@@ -170,7 +179,6 @@ void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<Point
     doubleKnuckleGesture_.state = false;
     switch (toolType) {
         case PointerEvent::TOOL_TYPE_FINGER: {
-            isKnuckleState_ = false;
             HandleFingerGestureDownEvent(touchEvent);
             break;
         }
@@ -180,7 +188,6 @@ void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<Point
             break;
         }
         default: {
-            isKnuckleState_ = false;
             MMI_HILOGD("Current touch event tool type:%{public}d", toolType);
             break;
         }
@@ -284,7 +291,7 @@ void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<Poin
         MMI_HILOGW("Touch event tool type:%{public}d not knuckle", item.GetToolType());
         return;
     }
-    if (singleKnuckleGesture_.statusConfigValue) {
+    if (knuckleSwitch_.statusConfigValue) {
         MMI_HILOGI("Knuckle switch closed");
         return;
     }
@@ -340,7 +347,6 @@ void KeyCommandHandler::KnuckleGestureProcessor(std::shared_ptr<PointerEvent> to
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
-    isKnuckleState_ = true;
     if (knuckleGesture.lastPointerDownEvent == nullptr) {
         MMI_HILOGI("Knuckle gesture first down Event");
         knuckleGesture.lastPointerDownEvent = touchEvent;
@@ -564,13 +570,18 @@ void KeyCommandHandler::HandleKnuckleGestureEvent(std::shared_ptr<PointerEvent> 
     PointerEvent::PointerItem item;
     touchEvent->GetPointerItem(id, item);
     if (item.GetToolType() != PointerEvent::TOOL_TYPE_KNUCKLE ||
-        touchEvent->GetPointerIds().size() != SINGLE_KNUCKLE_SIZE) {
+        touchEvent->GetPointerIds().size() != SINGLE_KNUCKLE_SIZE ||
+        singleKnuckleGesture_.state) {
         MMI_HILOGD("Touch tool type is:%{public}d", item.GetToolType());
         ResetKnuckleGesture();
         return;
     }
+    if (knuckleSwitch_.statusConfigValue) {
+        MMI_HILOGI("Knuckle switch closed");
+        return;
+    }
     int32_t touchAction = touchEvent->GetPointerAction();
-    if (IsValidAction(touchAction) && !singleKnuckleGesture_.state) {
+    if (IsValidAction(touchAction)) {
         switch (touchAction) {
             case PointerEvent::POINTER_ACTION_CANCEL:
             case PointerEvent::POINTER_ACTION_UP: {
@@ -607,6 +618,7 @@ void KeyCommandHandler::HandleKnuckleGestureTouchDown(std::shared_ptr<PointerEve
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
+    ResetKnuckleGesture();
     int32_t id = touchEvent->GetPointerId();
     PointerEvent::PointerItem item;
     touchEvent->GetPointerItem(id, item);
@@ -682,7 +694,6 @@ void KeyCommandHandler::HandleKnuckleGestureTouchUp(std::shared_ptr<PointerEvent
             break;
         }
     }
-    ResetKnuckleGesture();
 }
 
 void KeyCommandHandler::ProcessKnuckleGestureTouchUp(NotifyType type)
@@ -1003,7 +1014,6 @@ void KeyCommandHandler::ParseStatusConfigObserver()
         }
         CreateStatusConfigObserver<ShortcutKey>(shortcutKey);
     }
-    CreateStatusConfigObserver<KnuckleGesture>(singleKnuckleGesture_);
 }
 
 template <class T>
