@@ -35,6 +35,7 @@ public:
 private:
     bool isEnableState_ { false };
     bool isEnable_ { false };
+    bool isDeviceChange_ { false };
     uint32_t devId_ { 0 };
     sptr<OHOS::HDI::Display::Composer::V1_2::IDisplayComposerInterface> powerInterface_ = nullptr;
 };
