@@ -82,7 +82,7 @@ public:
         bool isUiExtension = false) override;
     int32_t SetPointerSize(int32_t size) override;
     int32_t GetPointerSize() override;
-    void DrawPointerStyle(const PointerStyle& pointerStyle) override;
+    void DrawPointerStyle(const PointerStyle& pointerStyle, bool removeResult = false) override;
     bool IsPointerVisible() override;
     void SetPointerLocation(int32_t x, int32_t y) override;
     void AdjustMouseFocus(Direction direction, ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
@@ -97,6 +97,7 @@ public:
     bool HasMagicCursor();
     int32_t DrawCursor(const MOUSE_ICON mouseStyle);
     int32_t SwitchPointerStyle() override;
+    void DestoryPointerWindow();
     void DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY) override;
     void Dump(int32_t fd, const std::vector<std::string> &args) override;
     void AttachToDisplay();
@@ -168,6 +169,7 @@ private:
     int32_t imageHeight_ { 0 };
     int32_t canvasWidth_ = 64;
     int32_t canvasHeight_ = 64;
+    int32_t lastDispalyId_ { -1 };
     std::map<MOUSE_ICON, IconStyle> mouseIcons_;
     std::list<PidInfo> pidInfos_;
     bool mouseDisplayState_ { false };
