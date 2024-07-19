@@ -19,6 +19,7 @@
 #include <iostream>
 #include <list>
 
+#include "common/rs_thread_handler.h"
 #include "draw/canvas.h"
 #include "nocopyable.h"
 #include "pixel_map.h"
@@ -146,7 +147,16 @@ private:
     Rosen::Drawing::AlphaType AlphaTypeToAlphaType(Media::AlphaType alphaType);
     std::shared_ptr<Rosen::Drawing::Image> ExtractDrawingImage(std::shared_ptr<Media::PixelMap> pixelMap);
     void DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUSE_ICON mouseStyle);
-    bool SetHardWareLocation(int32_t displayId, int32_t physicalX, int32_t physicalY);
+    float CalculatePhysicalXOffset(ICON_TYPE iconType);
+    float CalculatePhysicalYOffset(ICON_TYPE iconType);
+    bool SetHardWareLocation(int32_t displayId, int32_t physicalX, int32_t physicalY, ICON_TYPE iconType);
+    void CreateCanvasNode();
+    void PostTask(Rosen::RSTaskMessage::RSTask task);
+    void DoHardwareCursorDraw();
+    void OnVsync(uint64_t timestamp);
+    void RenderThreadLoop();
+    int32_t RequestNextVSync(const MOUSE_ICON mouseStyle = MOUSE_ICON::DEFAULT);
+    int32_t FlushBuffer();
     void SetPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap);
     void ForceClearPointerVisiableStatus() override;
 
@@ -183,7 +193,23 @@ private:
     Direction currentDirection_ { DIRECTION0 };
     isMagicCursor hasMagicCursor_;
     bool hasInitObserver_ { false };
+    bool hasStyleState_ { false };
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    int32_t frameCount_ { 30 };
+    int32_t currentFrame_ { 0 };
+    bool hasHardwareCursorAnimate_ { false };
+    bool hasLoadingPointerStyle_ { false };
+    sptr<OHOS::Surface> layer_ { nullptr };
+    sptr<OHOS::SurfaceBuffer> buffer_ { nullptr };
+    uint8_t *addr_ { nullptr };
+    MOUSE_ICON mouseStyle_ { MOUSE_ICON::DEFAULT };
+    int32_t displayId_ { -1 };
+    std::shared_ptr<AppExecFwk::EventRunner> runner_ { nullptr };
+    std::shared_ptr<AppExecFwk::EventHandler> handler_ { nullptr };
+    std::shared_ptr<Rosen::VSyncReceiver> receiver_ { nullptr };
+    std::atomic_bool hasSkipVsync_ = { false };
+    std::atomic<bool> isRenderRuning_{ false };
+    std::unique_ptr<std::thread> renderThread_;
     std::shared_ptr<HardwareCursorPointerManager> hardwareCursorPointerManager_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     std::shared_ptr<OHOS::Media::PixelMap> pixelMap_ { nullptr };
