@@ -171,7 +171,7 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
         if (fd < 0) {
             auto udsServer = InputHandler->GetUDSServer();
             CHKPV(udsServer);
-            udsServer->GetClientFd(windowInfo->id);
+            udsServer->GetClientFd(windowInfo->pid);
         }
         pointerEvent->SetTargetWindowId(windowId);
         pointerEvent->SetAgentWindowId(windowInfo->agentWindowId);
@@ -200,7 +200,7 @@ void EventDispatchHandler::HandleMultiWindowPointerEvent(std::shared_ptr<Pointer
 void EventDispatchHandler::NotifyPointerEventToRS(int32_t pointAction, const std::string& programName,
     uint32_t pid, int32_t pointCnt)
 {
-    OHOS::Rosen::RSInterfaces::GetInstance().NotifyTouchEvent(pointAction, programName, pid, pointCnt);
+    OHOS::Rosen::RSInterfaces::GetInstance().NotifyTouchEvent(pointAction, pointCnt);
 }
 
 bool EventDispatchHandler::AcquireEnableMark(std::shared_ptr<PointerEvent> event)
@@ -301,6 +301,8 @@ int32_t EventDispatchHandler::DispatchKeyEventPid(UDSServer& udsServer, std::sha
     CALL_DEBUG_ENTER;
     CHKPR(key, PARAM_INPUT_INVALID);
     int32_t ret = RET_OK;
+    // 1.Determine whether the key event is a focus type event or an operation type event,
+    // 2.Determine whether the current focus window has a safety sub window.
     auto vecTarget = WIN_MGR->UpdateTarget(key);
     for (const auto &item : vecTarget) {
         key->ClearFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE);

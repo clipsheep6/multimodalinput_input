@@ -4226,64 +4226,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateAndAdjustMouseLo
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_OnFoldStatusChanged
- * @tc.desc: Test UpdateAndAdjustMouseLocation
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_OnFoldStatusChanged, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputWindowsManager::FoldStatusLisener foldStatusLisener(*g_instance);
-    Rosen::FoldStatus foldStatus = Rosen::FoldStatus::UNKNOWN;
-    EXPECT_NO_FATAL_FAILURE(foldStatusLisener.OnFoldStatusChanged(foldStatus));
-    foldStatus = Rosen::FoldStatus::EXPAND;
-    WIN_MGR->lastPointerEventForFold_ = nullptr;
-    EXPECT_NO_FATAL_FAILURE(foldStatusLisener.OnFoldStatusChanged(foldStatus));
-    WIN_MGR->lastPointerEventForFold_ = PointerEvent::Create();
-    ASSERT_NE(WIN_MGR->lastPointerEventForFold_, nullptr);
-    InputHandler->eventNormalizeHandler_ = std::make_shared<EventNormalizeHandler>();
-    EXPECT_NO_FATAL_FAILURE(foldStatusLisener.OnFoldStatusChanged(foldStatus));
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_UnregisterFoldStatusListener
- * @tc.desc: Test UnregisterFoldStatusListener
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UnregisterFoldStatusListener, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputWindowsManager inputWindowsManager;
-    inputWindowsManager.foldStatusListener_ = new (std::nothrow) InputWindowsManager::FoldStatusLisener(*g_instance);
-    ASSERT_NE(inputWindowsManager.foldStatusListener_, nullptr);
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.UnregisterFoldStatusListener());
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_OnFoldStatusChanged_001
- * @tc.desc: Test UpdateAndAdjustMouseLocation
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_OnFoldStatusChanged_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputWindowsManager inputWindowsManager;
-    Rosen::FoldStatus foldStatus = Rosen::FoldStatus::UNKNOWN;
-    inputWindowsManager.lastPointerEventForFold_ = PointerEvent::Create();
-    ASSERT_NE(inputWindowsManager.lastPointerEventForFold_, nullptr);
-    PointerEvent::PointerItem item;
-    item.SetPressed(false);
-    inputWindowsManager.lastPointerEventForFold_->AddPointerItem(item);
-    item.SetPressed(true);
-    item.SetPointerId(1);
-    inputWindowsManager.lastPointerEventForFold_->AddPointerItem(item);
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.OnFoldStatusChanged(foldStatus));
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_FoldScreenRotation
  * @tc.desc: Test FoldScreenRotation
  * @tc.type: FUNC
@@ -4720,6 +4662,150 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_PrintChangedWindowByEv
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.PrintChangedWindowByEvent(eventType, newWindowInfo));
     newWindowInfo.id = 1;
     EXPECT_NO_FATAL_FAILURE(inputWindowsManager.PrintChangedWindowByEvent(eventType, newWindowInfo));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetUIExtentionWindowInfo
+ * @tc.desc: Test the funcation GetUIExtentionWindowInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetUIExtentionWindowInfo, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWinMgr;
+    WindowInfo windowInfo;
+    windowInfo.id = 5;
+    std::vector<WindowInfo> uiExtentionWindowInfo;
+    int32_t windowId = 10;
+    WindowInfo *touchWindow;
+    bool isUiExtentionWindow = false;
+    uiExtentionWindowInfo.push_back(windowInfo);
+    windowInfo.id = 10;
+    uiExtentionWindowInfo.push_back(windowInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWinMgr.GetUIExtentionWindowInfo(uiExtentionWindowInfo, windowId,
+        &touchWindow, isUiExtentionWindow));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_CheckUIExtentionWindowDefaultHotArea
+ * @tc.desc: Test the funcation CheckUIExtentionWindowDefaultHotArea
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CheckUIExtentionWindowDefaultHotArea, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWinMgr;
+    int32_t logicalX = 150;
+    int32_t logicalY = 150;
+    std::vector<WindowInfo> windowInfos;
+    int32_t winId = 10;
+    WindowInfo windowInfo;
+    Rect rect;
+    rect.x = INT32_MAX;
+    rect.width = 100;
+    windowInfo.defaultHotAreas.push_back(rect);
+    windowInfos.push_back(windowInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWinMgr.CheckUIExtentionWindowDefaultHotArea(logicalX, logicalY, windowInfos, winId));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_CheckUIExtentionWindowDefaultHotArea_001
+ * @tc.desc: Test the funcation CheckUIExtentionWindowDefaultHotArea
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CheckUIExtentionWindowDefaultHotArea_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWinMgr;
+    int32_t logicalX = 150;
+    int32_t logicalY = 150;
+    std::vector<WindowInfo> windowInfos;
+    int32_t winId = 10;
+    WindowInfo windowInfo;
+    Rect rect;
+    rect.x = 100;
+    rect.y = 100;
+    rect.width = 200;
+    rect.height = 200;
+    windowInfo.defaultHotAreas.push_back(rect);
+    windowInfos.push_back(windowInfo);
+    EXPECT_NO_FATAL_FAILURE(inputWinMgr.CheckUIExtentionWindowDefaultHotArea(logicalX, logicalY, windowInfos, winId));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsKeyPressed
+ * @tc.desc: Test the funcation IsKeyPressed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsKeyPressed, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWinMgr;
+    KeyEvent::KeyItem item;
+    int32_t pressedKey = 2024;
+    std::vector<KeyEvent::KeyItem> keyItems;
+    item.SetKeyCode(2018);
+    item.SetPressed(false);
+    keyItems.push_back(item);
+    EXPECT_FALSE(inputWinMgr.IsKeyPressed(pressedKey, keyItems));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsKeyPressed_001
+ * @tc.desc: Test the funcation IsKeyPressed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsKeyPressed_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWinMgr;
+    KeyEvent::KeyItem item;
+    int32_t pressedKey = 2024;
+    std::vector<KeyEvent::KeyItem> keyItems;
+    item.SetKeyCode(2024);
+    item.SetPressed(true);
+    keyItems.push_back(item);
+    EXPECT_TRUE(inputWinMgr.IsKeyPressed(pressedKey, keyItems));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsOnTheWhitelist
+ * @tc.desc: Test the funcation IsOnTheWhitelist
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsOnTheWhitelist, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputWinMgr;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    KeyEvent::KeyItem item;
+    SwitchFocusKey switchFocusKey;
+    switchFocusKey.keyCode = 2024;
+    switchFocusKey.pressedKey = -1;
+    inputWinMgr.vecWhiteList_.push_back(switchFocusKey);
+    keyEvent->SetKeyCode(2024);
+    item.SetPressed(true);
+    item.SetKeyCode(2024);
+    keyEvent->AddKeyItem(item);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    EXPECT_TRUE(inputWinMgr.IsOnTheWhitelist(keyEvent));
+
+    inputWinMgr.vecWhiteList_[0].pressedKey = 2024;
+    keyEvent->AddKeyItem(item);
+    EXPECT_TRUE(inputWinMgr.IsOnTheWhitelist(keyEvent));
+
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    EXPECT_FALSE(inputWinMgr.IsOnTheWhitelist(keyEvent));
+
+    keyEvent->SetKeyCode(2018);
+    EXPECT_FALSE(inputWinMgr.IsOnTheWhitelist(keyEvent));
 }
 } // namespace MMI
 } // namespace OHOS

@@ -64,6 +64,10 @@ public:
     std::string ConvertPointerEventToStr(const std::shared_ptr<PointerEvent> pointerEvent);
     std::string ConvertSwitchEventToStr(const std::shared_ptr<SwitchEvent> switchEvent);
     std::string ConvertTimeToStr(int64_t timestamp);
+#ifdef OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
+    int32_t SetMoveEventFilters(bool flag);
+#endif // OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
+
 private:
     int32_t OnEventDeviceAdded(libinput_event *event);
     int32_t OnEventDeviceRemoved(libinput_event *event);
@@ -81,7 +85,12 @@ private:
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void UpdateKeyEventHandlerChain(const std::shared_ptr<KeyEvent> keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+#ifdef OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
+    bool HandleTouchEventWithFlag(const std::shared_ptr<PointerEvent> pointerEvent);
+    double CalcTouchOffset(const std::shared_ptr<PointerEvent> touchMoveEvent);
+#endif // OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
     int32_t SetOriginPointerId(std::shared_ptr<PointerEvent> pointerEvent);
+    void TouchEventSetPressedKeys(std::shared_ptr<PointerEvent> pointerEvent);
 
 private:
     static std::queue<std::string> eventQueue_;
@@ -93,6 +102,10 @@ private:
     int32_t timerId_ { -1 };
     bool isShield_ { false };
     std::set<int32_t> buttonIds_ {};
+#ifdef OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
+    bool moveEventFilterFlag_ { false };
+    std::list<PointerEvent::PointerItem> lastTouchDownItems_;
+#endif // OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
     void ResetTouchUpEvent(std::shared_ptr<PointerEvent> pointerEvent, struct libinput_event *event);
     bool ProcessNullEvent(libinput_event *event, int64_t frameTime);
     void RestoreTouchPadStatus();

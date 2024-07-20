@@ -371,6 +371,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_PIXEL_MAP_DATA):
             ret = StubSetPixelMapData(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_MOVE_EVENT_FILTERS):
+            ret = StubSetMoveEventFilters(data, reply);
+            break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_CURRENT_USERID):
             ret = StubSetCurrentUser(data, reply);
             break;
@@ -2206,6 +2209,10 @@ int32_t MultimodalInputConnectStub::StubAuthorize(MessageParcel& data, MessagePa
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
+    if (!PER_HELPER->CheckAuthorize()) {
+        MMI_HILOGE("input authorize permission check failed");
+        return ERROR_NO_PERMISSION;
+    }
     bool isAuthorize { false };
     READBOOL(data, isAuthorize, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = Authorize(isAuthorize);
@@ -2325,6 +2332,26 @@ int32_t MultimodalInputConnectStub::StubSetPixelMapData(MessageParcel& data, Mes
     int32_t ret = SetPixelMapData(infoId, static_cast<void*>(pixelMap));
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to call SetPixelMapData, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectStub::StubSetMoveEventFilters(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("StubSetMoveEventFilters Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    bool flag = false;
+    READBOOL(data, flag, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetMoveEventFilters(flag);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SetMoveEventFilters failed, ret:%{public}d", ret);
     }
     return ret;
 }
