@@ -1514,6 +1514,13 @@ ohos_unittest("EventHandlerEXTest") {
     "-Dprotected=public",
   ]
 
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   sources = [ "event_handler/test/event_normalize_handler_ex_test.cpp" ]
 
   deps = [
