@@ -1222,6 +1222,12 @@ std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::DecodeImageToPixel
 {
     CALL_DEBUG_ENTER;
     OHOS::Media::SourceOptions opts;
+    std::string circlePath = IMAGE_POINTER_DEFAULT_PATH + "Cursor_Circle.png"
+    if (imagePath == circlePath) {
+        opts.formatHint = "image/png";
+    } else {
+        opts.formatHint = "image/svg+xml";
+    }
     uint32_t ret = 0;
     auto imageSource = OHOS::Media::ImageSource::CreateImageSource(imagePath, opts, ret);
     CHKPP(imageSource);
