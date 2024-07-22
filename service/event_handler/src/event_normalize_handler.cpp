@@ -922,6 +922,7 @@ std::string EventNormalizeHandler::ConvertPointerEventToStr(const std::shared_pt
     if (pointerAction == PointerEvent::POINTER_ACTION_MOVE ||
         pointerEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE) ||
         !EventLogHelper::IsBetaVersion()) {
+        MMI_HILOGD("PointEvent is filtered");
         return "";
     }
     std::string eventStr = ",actionTime:" + std::to_string(pointerEvent->GetActionTime());
@@ -1041,7 +1042,6 @@ void EventNormalizeHandler::Dump(int32_t fd, const std::vector<std::string> &arg
     for (auto it = dumperEventList_.begin(); it != dumperEventList_.end(); it++) {
         mprintf(fd, (*it).c_str());
     }
-    mprintf(fd, "more event please view .dmp file at %s", EVENT_FILE_PATH.c_str());
 }
 } // namespace MMI
 } // namespace OHOS
