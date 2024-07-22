@@ -884,9 +884,9 @@ int32_t EventNormalizeHandler::InitEventString(int32_t eventType)
     std::time_t timeT = std::chrono::system_clock::to_time_t(nowTime);
     auto milsecsCount = std::chrono::duration_cast<std::chrono::milliseconds>(nowTime.time_since_epoch()).count();
     std::string handleTime = ConvertTimeToStr(static_cast<int64_t>(timeT));
-    int32_t milsecI = milsecsCount % 1000;
+    int32_t milsec = milsecsCount % 1000;
     std::stringstream strStream;
-    strStream << std::left << std::setw(STRING_WIDTH) << milsecI;
+    strStream << std::left << std::setw(STRING_WIDTH) << milsec;
     std::string milsecStr(strStream.str());
     handleTime += "." + milsecStr;
     eventString_ = "{" + handleTime + ",eventType:" + std::to_string(eventType);
