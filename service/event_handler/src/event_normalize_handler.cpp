@@ -101,7 +101,7 @@ std::queue<std::string> EventNormalizeHandler::eventQueue_;
 std::list<std::string> EventNormalizeHandler::dumperEventList_;
 std::mutex EventNormalizeHandler::queueMutex_;
 std::condition_variable EventNormalizeHandler::queueCondition_;
-bool EventNormalizeHandler::runningSignal_ = true;
+bool EventNormalizeHandler::runningSignal_ = false;
 std::string EventNormalizeHandler::eventString_;
 
 void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime)
@@ -134,7 +134,7 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
         }
     }
     BytraceAdapter::StartHandleInput(static_cast<int32_t>(type));
-    InitEventString(static_cast<int32_t>(type));
+    int32_t eventStrLen = InitEventString(static_cast<int32_t>(type));
     switch (type) {
         case LIBINPUT_EVENT_DEVICE_ADDED: {
             OnEventDeviceAdded(event);
@@ -205,8 +205,10 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
             break;
         }
     }
-    eventString_ += "}";
-    PushEventStr();
+    if (eventString_.length() > eventStrLen) {
+        eventString_ += "}";
+        PushEventStr();
+    }
     BytraceAdapter::StopHandleInput();
     DfxHisysevent::ReportDispTimes();
 }
@@ -876,7 +878,7 @@ void EventNormalizeHandler::TerminateAxis(libinput_event* event)
     }
 }
 
-void EventNormalizeHandler::InitEventString(int32_t eventType)
+int32_t EventNormalizeHandler::InitEventString(int32_t eventType)
 {
     auto nowTime = std::chrono::system_clock::now();
     std::time_t timeT = std::chrono::system_clock::to_time_t(nowTime);
@@ -888,6 +890,7 @@ void EventNormalizeHandler::InitEventString(int32_t eventType)
     std::string milsecStr(strStream.str());
     handleTime += "." + milsecStr;
     eventString_ = "{" + handleTime + ",eventType:" + std::to_string(eventType);
+    return eventString_.length();
 }
 
 std::string EventNormalizeHandler::ConvertKeyEventToStr(const std::shared_ptr<KeyEvent> keyEvent)
@@ -923,13 +926,17 @@ std::string EventNormalizeHandler::ConvertKeyEventToStr(const std::shared_ptr<Ke
 
 std::string EventNormalizeHandler::ConvertPointerEventToStr(const std::shared_ptr<PointerEvent> pointerEvent)
 {
+    int32_t pointerAction = pointerEvent->GetPointerAction();
+    if (pointerAction == PointerEvent::POINTER_ACTION_MOVE ||
+        pointerEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+        return "";
+    }
     int64_t actionTime = pointerEvent->GetActionTime();
     int32_t deviceId = pointerEvent->GetDeviceId();
     int32_t pointerId = pointerEvent->GetPointerId();
     std::list<PointerEvent::PointerItem> pointers = pointerEvent->GetAllPointerItems();
     std::set<int32_t> pressedButtons = pointerEvent->GetPressedButtons();
     int32_t sourceType = pointerEvent->GetSourceType();
-    int32_t pointerAction = pointerEvent->GetPointerAction();
     int32_t buttonId = pointerEvent->GetButtonId();
     std::string eventStr = ",actionTime:" + std::to_string(actionTime);
     eventStr += ",deviceId:" + std::to_string(deviceId);
@@ -1007,8 +1014,10 @@ void EventNormalizeHandler::PushEventStr()
     if (dumperEventList_.size() > EVENT_OUT_SIZE) {
         dumperEventList_.pop_front();
     }
-    eventQueue_.push(eventString_);
-    queueCondition_.notify_all();
+    if (runningSignal_) {
+        eventQueue_.push(eventString_);
+        queueCondition_.notify_all();
+    }
 }
 
 std::string EventNormalizeHandler::PopEventStr()
