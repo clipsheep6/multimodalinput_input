@@ -895,27 +895,19 @@ int32_t EventNormalizeHandler::InitEventString(int32_t eventType)
 
 std::string EventNormalizeHandler::ConvertKeyEventToStr(const std::shared_ptr<KeyEvent> keyEvent)
 {
-    int64_t actionTime = keyEvent->GetActionTime();
-    int32_t deviceId = keyEvent->GetDeviceId();
-    int32_t keyCode = keyEvent->GetKeyCode();
-    int32_t keyAction = keyEvent->GetKeyAction();
-    std::vector<KeyEvent::KeyItem> keyItems = keyEvent->GetKeyItems();
-    std::string eventStr = ",actionTime:" + std::to_string(actionTime);
-    eventStr += ",deviceId:" + std::to_string(deviceId);
-    eventStr += ",keyCode:" + std::to_string(keyCode);
-    eventStr += ",keyAction:" + std::to_string(keyAction);
+    std::string eventStr = ",actionTime:" + std::to_string(keyEvent->GetActionTime());
+    eventStr += ",deviceId:" + std::to_string(keyEvent->GetDeviceId());
+    eventStr += ",keyCode:" + std::to_string(keyEvent->GetKeyCode());
+    eventStr += ",keyAction:" + std::to_string(keyEvent->GetKeyAction());
     eventStr += ",keyItems:[";
+    std::vector<KeyEvent::KeyItem> keyItems = keyEvent->GetKeyItems();
     for (size_t i = 0; i < keyItems.size(); i++) {
         int32_t pressed = keyItems[i].IsPressed() ? 1 : 0;
-        int32_t deviceId = keyItems[i].GetDeviceId();
-        int32_t keyCode = keyItems[i].GetKeyCode();
-        int64_t downTime = keyItems[i].GetDownTime();
-        uint32_t unicode = keyItems[i].GetUnicode();
         eventStr += "{pressed:" + std::to_string(pressed);
-        eventStr += ",deviceId:" + std::to_string(deviceId);
-        eventStr += ",keyCode:" + std::to_string(keyCode);
-        eventStr += ",downTime:" + std::to_string(downTime);
-        eventStr += ",unicode:" + std::to_string(unicode) + "}";
+        eventStr += ",deviceId:" + std::to_string(keyItems[i].GetDeviceId());
+        eventStr += ",keyCode:" + std::to_string(keyItems[i].GetKeyCode());
+        eventStr += ",downTime:" + std::to_string(keyItems[i].GetDownTime());
+        eventStr += ",unicode:" + std::to_string(keyItems[i].GetUnicode()) + "}";
         if (i != keyItems.size() - 1) {
             eventStr += ",";
         }
@@ -928,45 +920,34 @@ std::string EventNormalizeHandler::ConvertPointerEventToStr(const std::shared_pt
 {
     int32_t pointerAction = pointerEvent->GetPointerAction();
     if (pointerAction == PointerEvent::POINTER_ACTION_MOVE ||
-        pointerEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+        pointerEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE) ||
+        !EventLogHelper::IsBetaVersion()) {
         return "";
     }
-    int64_t actionTime = pointerEvent->GetActionTime();
-    int32_t deviceId = pointerEvent->GetDeviceId();
-    int32_t pointerId = pointerEvent->GetPointerId();
-    std::list<PointerEvent::PointerItem> pointers = pointerEvent->GetAllPointerItems();
-    std::set<int32_t> pressedButtons = pointerEvent->GetPressedButtons();
-    int32_t sourceType = pointerEvent->GetSourceType();
-    int32_t buttonId = pointerEvent->GetButtonId();
-    std::string eventStr = ",actionTime:" + std::to_string(actionTime);
-    eventStr += ",deviceId:" + std::to_string(deviceId);
-    eventStr += ",pointerId:" + std::to_string(pointerId);
-    eventStr += ",sourceType:" + std::to_string(sourceType);
+    std::string eventStr = ",actionTime:" + std::to_string(pointerEvent->GetActionTime());
+    eventStr += ",deviceId:" + std::to_string(pointerEvent->GetDeviceId());
+    eventStr += ",pointerId:" + std::to_string(pointerEvent->GetPointerId());
+    eventStr += ",sourceType:" + std::to_string(pointerEvent->GetSourceType());
     eventStr += ",pointerAction:" + std::to_string(pointerAction);
-    eventStr += ",buttonId:" + std::to_string(buttonId);
+    eventStr += ",buttonId:" + std::to_string(pointerEvent->GetButtonId());
     eventStr += ",pointers:[";
+    std::list<PointerEvent::PointerItem> pointers = pointerEvent->GetAllPointerItems();
     size_t pointerSize = 0;
     for (auto it = pointers.begin(); it != pointers.end(); it++) {
         pointerSize++;
-        int32_t displayX = (*it).GetDisplayX();
-        int32_t displayY = (*it).GetDisplayY();
-        int32_t windowX = (*it).GetWindowX();
-        int32_t windowY = (*it).GetWindowY();
-        int32_t targetWindowId = (*it).GetTargetWindowId();
-        int32_t longAxis = (*it).GetLongAxis();
-        int32_t shortAxis = (*it).GetShortAxis();
-        eventStr += "{displayX:" + std::to_string(displayX);
-        eventStr += ",displayY:" + std::to_string(displayY);
-        eventStr += ",windowX:" + std::to_string(windowX);
-        eventStr += ",windowY:" + std::to_string(windowY);
-        eventStr += ",targetWindowId:" + std::to_string(targetWindowId);
-        eventStr += ",longAxis:" + std::to_string(longAxis);
-        eventStr += ",shortAxis:" + std::to_string(shortAxis) + "}";
+        eventStr += "{displayX:" + std::to_string((*it).GetDisplayX());
+        eventStr += ",displayY:" + std::to_string((*it).GetDisplayY());
+        eventStr += ",windowX:" + std::to_string((*it).GetWindowX());
+        eventStr += ",windowY:" + std::to_string((*it).GetWindowY());
+        eventStr += ",targetWindowId:" + std::to_string((*it).GetTargetWindowId());
+        eventStr += ",longAxis:" + std::to_string((*it).GetLongAxis());
+        eventStr += ",shortAxis:" + std::to_string((*it).GetShortAxis()) + "}";
         if (pointerSize != pointers.size()) {
             eventStr += ",";
         }
     }
     eventStr += "],pressedButtons:[";
+    std::set<int32_t> pressedButtons = pointerEvent->GetPressedButtons();
     size_t buttonsSize = 0;
     for (auto it = pressedButtons.begin(); it != pressedButtons.end(); it++) {
         buttonsSize++;
@@ -981,16 +962,11 @@ std::string EventNormalizeHandler::ConvertPointerEventToStr(const std::shared_pt
 
 std::string EventNormalizeHandler::ConvertSwitchEventToStr(const std::shared_ptr<SwitchEvent> switchEvent)
 {
-    int64_t actionTime = switchEvent->GetActionTime();
-    int32_t deviceId = switchEvent->GetDeviceId();
-    int32_t switchValue = switchEvent->GetSwitchValue();
-    int32_t updateSwitchMask = switchEvent->GetSwitchMask();
-    int32_t switchType = switchEvent->GetSwitchType();
-    std::string eventStr = ",actionTime:" + std::to_string(actionTime);
-    eventStr += ",deviceId:" + std::to_string(deviceId);
-    eventStr += ",switchValue:" + std::to_string(switchValue);
-    eventStr += ",updateSwitchMask:" + std::to_string(updateSwitchMask);
-    eventStr += ",switchType:" + std::to_string(switchType);
+    std::string eventStr = ",actionTime:" + std::to_string(switchEvent->GetActionTime());
+    eventStr += ",deviceId:" + std::to_string(switchEvent->GetDeviceId());
+    eventStr += ",switchValue:" + std::to_string(switchEvent->GetSwitchValue());
+    eventStr += ",updateSwitchMask:" + std::to_string(switchEvent->GetSwitchMask());
+    eventStr += ",switchType:" + std::to_string(switchEvent->GetSwitchType());
     return eventStr;
 }
 
