@@ -102,7 +102,7 @@ std::list<std::string> EventNormalizeHandler::dumperEventList_;
 std::mutex EventNormalizeHandler::queueMutex_;
 std::condition_variable EventNormalizeHandler::queueCondition_;
 bool EventNormalizeHandler::runningSignal_ = false;
-std::string EventNormalizeHandler::eventString_;
+std::string EventNormalizeHandler::eventString_ = "";
 
 void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime)
 {
