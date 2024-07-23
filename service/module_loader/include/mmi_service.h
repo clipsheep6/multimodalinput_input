@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,6 +24,7 @@
 #include "system_ability.h"
 
 #include "app_debug_listener.h"
+#include "delegate_interface.h"
 #include "delegate_tasks.h"
 #include "display_manager.h"
 #include "input_event_handler.h"
@@ -269,6 +270,7 @@ private:
     DelegateTasks delegateTasks_;
     sptr<AppDebugListener> appDebugListener_;
     std::atomic_bool threadStatusFlag_ { false };
+    std::shared_ptr<DelegateInterface> delegateInterface_ {nullptr};
     sptr<Rosen::DisplayManager::IFoldStatusListener> foldStatusListener_ { nullptr };
 };
 } // namespace MMI
