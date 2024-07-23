@@ -184,7 +184,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetMouseIcon_01, TestSize.Level1)
     ASSERT_NE(pixelMap, nullptr);
 
     int32_t ret = InputManager::GetInstance()->SetMouseIcon(windowId, (void *)pixelMap.get());
-    EXPECT_EQ(ret, RET_ERR);
+    EXPECT_EQ(ret, RET_OK);
 }
 
 /**
@@ -3017,7 +3017,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetCurrentUser_001, TestSize.Level1)
 {
     int32_t userId = 10;
     int32_t ret = InputManager::GetInstance()->SetCurrentUser(userId);
-    EXPECT_TRUE(ret == RET_OK);
+    EXPECT_FALSE(ret == RET_OK);
 }
 
 /**
@@ -3164,6 +3164,18 @@ HWTEST_F(InputManagerTest, InputManagerTest_TouchpadScrollRows_002, TestSize.Lev
     result = InputManager::GetInstance()->GetTouchpadScrollRows(rows);
     ASSERT_EQ(rows, 100);
     ASSERT_EQ(result, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_GetPointerSnapshot
+ * @tc.desc: Test GetPointerSnapshot
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetPointerSnapshot, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    void *pixelMap = nullptr;
+    EXPECT_NE(InputManager::GetInstance()->GetPointerSnapshot(pixelMap), RET_OK);
 }
 } // namespace MMI
 } // namespace OHOS

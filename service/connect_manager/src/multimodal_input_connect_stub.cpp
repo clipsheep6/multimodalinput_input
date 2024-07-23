@@ -42,6 +42,7 @@ constexpr int32_t MAX_AXIS_INFO { 64 };
 constexpr int32_t MIN_ROWS { 1 };
 constexpr int32_t MAX_ROWS { 100 };
 constexpr int32_t TOUCHPAD_SCROLL_ROWS { 3 };
+constexpr int32_t UID_TRANSFORM_DIVISOR { 200000 };
 
 int32_t g_parseInputDevice(MessageParcel &data, std::shared_ptr<InputDevice> &inputDevice)
 {
@@ -370,6 +371,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_PIXEL_MAP_DATA):
             ret = StubSetPixelMapData(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_MOVE_EVENT_FILTERS):
+            ret = StubSetMoveEventFilters(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_CURRENT_USERID):
             ret = StubSetCurrentUser(data, reply);
@@ -2206,6 +2210,10 @@ int32_t MultimodalInputConnectStub::StubAuthorize(MessageParcel& data, MessagePa
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
+    if (!PER_HELPER->CheckAuthorize()) {
+        MMI_HILOGE("input authorize permission check failed");
+        return ERROR_NO_PERMISSION;
+    }
     bool isAuthorize { false };
     READBOOL(data, isAuthorize, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = Authorize(isAuthorize);
@@ -2329,6 +2337,26 @@ int32_t MultimodalInputConnectStub::StubSetPixelMapData(MessageParcel& data, Mes
     return ret;
 }
 
+int32_t MultimodalInputConnectStub::StubSetMoveEventFilters(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("StubSetMoveEventFilters Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    bool flag = false;
+    READBOOL(data, flag, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetMoveEventFilters(flag);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SetMoveEventFilters failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
 int32_t MultimodalInputConnectStub::StubSetCurrentUser(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
@@ -2338,6 +2366,15 @@ int32_t MultimodalInputConnectStub::StubSetCurrentUser(MessageParcel& data, Mess
     }
     int32_t userId = 0;
     READINT32(data, userId, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t callingUid = GetCallingUid();
+    if (callingUid < UID_TRANSFORM_DIVISOR) {
+        MMI_HILOGE("CallingUid is not within the range:%{public}d", callingUid);
+        return RET_ERR;
+    }
+    if (callingUid / UID_TRANSFORM_DIVISOR != userId) {
+        MMI_HILOGE("Invalid CallingUid:%{public}d", callingUid);
+        return RET_ERR;
+    }
     int32_t ret = SetCurrentUser(userId);
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to call SetCurrentUser ret:%{public}d", ret);

@@ -707,31 +707,6 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerVisible_00
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_DrawLoadingPointerStyle_002
- * @tc.desc: Test the funcation DrawLoadingPointerStyle
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawLoadingPointerStyle_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager manager;
-    MOUSE_ICON mouseStyle = WEST;
-    manager.surfaceNode_ = nullptr;
-    ASSERT_NO_FATAL_FAILURE(manager.DrawLoadingPointerStyle(mouseStyle));
-    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
-    surfaceNodeConfig.SurfaceNodeName = "pointer window";
-    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
-    manager.surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
-    ASSERT_TRUE(manager.surfaceNode_ != nullptr);
-    ASSERT_NO_FATAL_FAILURE(manager.DrawLoadingPointerStyle(mouseStyle));
-    mouseStyle = LOADING;
-    ASSERT_NO_FATAL_FAILURE(manager.DrawLoadingPointerStyle(mouseStyle));
-    mouseStyle = DEFAULT;
-    ASSERT_NO_FATAL_FAILURE(manager.DrawLoadingPointerStyle(mouseStyle));
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_AttachToDisplay_001
  * @tc.desc: Test the funcation AttachToDisplay
  * @tc.type: FUNC
@@ -1746,6 +1721,20 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_InitPointerObserver_
     std::shared_ptr<PointerDrawingManager> pointerDrawingManager =
         std::static_pointer_cast<PointerDrawingManager>(IPointerDrawingManager::GetInstance());
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager->InitPointerObserver());
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_SetPixelMap
+ * @tc.desc: Test SetPixelMap
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPixelMap, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager manager;
+    std::shared_ptr<OHOS::Media::PixelMap> pixelMap = nullptr;
+    ASSERT_NO_FATAL_FAILURE(manager.SetPixelMap(pixelMap));
 }
 } // namespace MMI
 } // namespace OHOS

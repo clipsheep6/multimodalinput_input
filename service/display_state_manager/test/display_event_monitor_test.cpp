@@ -65,50 +65,5 @@ HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_InitCommonEventSubscri
     displayEventMonitor.hasInit_ = false;
     EXPECT_NO_FATAL_FAILURE(displayEventMonitor.InitCommonEventSubscriber());
 }
-
-/**
- * @tc.name: DisplayEventMonitorTest_UpdateShieldStatusOnScreenOn
- * @tc.desc: Test UpdateShieldStatusOnScreenOn
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_UpdateShieldStatusOnScreenOn, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    DisplayEventMonitor displayEventMonitor;
-    displayEventMonitor.shieldModeBeforeSreenOff_ = SHIELD_MODE::FACTORY_MODE;
-    EXPECT_NO_FATAL_FAILURE(displayEventMonitor.UpdateShieldStatusOnScreenOn());
-
-    displayEventMonitor.shieldModeBeforeSreenOff_ = SHIELD_MODE::UNSET_MODE;
-    EXPECT_NO_FATAL_FAILURE(displayEventMonitor.UpdateShieldStatusOnScreenOn());
-}
-
-/**
- * @tc.name: DisplayEventMonitorTest_UpdateShieldStatusOnScreenOff
- * @tc.desc: Cover if (shieldModeBeforeSreenOff_ != SHIELD_MODE::UNSET_MODE) branch
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_UpdateShieldStatusOnScreenOff, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, GetCurrentShieldMode()).WillRepeatedly(Return(SHIELD_MODE::FACTORY_MODE));
-    DisplayEventMonitor displayEventMonitor;
-    EXPECT_NO_FATAL_FAILURE(displayEventMonitor.UpdateShieldStatusOnScreenOff());
-}
-
-/**
- * @tc.name: DisplayEventMonitorTest_UpdateShieldStatusOnScreenOff_001
- * @tc.desc: Cover the else branch of if (shieldModeBeforeSreenOff_ != SHIELD_MODE::UNSET_MODE)
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(DisplayEventMonitorTest, DisplayEventMonitorTest_UpdateShieldStatusOnScreenOff_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    EXPECT_CALL(*messageParcelMock_, GetCurrentShieldMode()).WillRepeatedly(Return(SHIELD_MODE::UNSET_MODE));
-    DisplayEventMonitor displayEventMonitor;
-    EXPECT_NO_FATAL_FAILURE(displayEventMonitor.UpdateShieldStatusOnScreenOff());
-}
 } // namespace MMI
 } // namespace OHOS

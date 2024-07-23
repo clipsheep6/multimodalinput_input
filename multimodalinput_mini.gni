@@ -11,6 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build/config/components/multimodalinput/cursor_config.gni")
 import("//build/ohos.gni")
 
 mmi_part_name = "input"
@@ -24,6 +25,7 @@ c_utils_root = "//commonlibrary/c_utils"
 hilog_root = "//base/hiviewdfx/hilog"
 
 declare_args() {
+  call_manager_service_enabled = false
   resource_schedule_service_enabled = false
   input_feature_product = "default"
   input_feature_enable_pgo = false
@@ -45,8 +47,13 @@ declare_args() {
   input_ext_feature_gesturesense = true
   input_feature_fingerprint = false
   input_feature_crown = true
-  input_ext_feature_magiccursor = false
   input_feature_infrared_emitter = true
+  input_feature_move_event_filters = false
+
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.telephony_call_manager)) {
+    call_manager_service_enabled = true
+  }
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
@@ -164,7 +171,9 @@ declare_args() {
     root_out_dir + "/diff_libinput_mmi/src/evdev-tablet-pad.c",
     root_out_dir + "/diff_libinput_mmi/src/evdev-tablet.c",
     root_out_dir + "/diff_libinput_mmi/src/evdev-totem.c",
+    root_out_dir + "/diff_libinput_mmi/src/evdev-wheel.c",
     root_out_dir + "/diff_libinput_mmi/src/evdev.c",
+    root_out_dir + "/diff_libinput_mmi/src/filter-custom.c",
     root_out_dir + "/diff_libinput_mmi/src/filter-flat.c",
     root_out_dir + "/diff_libinput_mmi/src/filter-low-dpi.c",
     root_out_dir + "/diff_libinput_mmi/src/filter-mouse.c",
@@ -172,6 +181,7 @@ declare_args() {
     root_out_dir + "/diff_libinput_mmi/src/filter-touchpad-flat.c",
     root_out_dir + "/diff_libinput_mmi/src/filter-touchpad-x230.c",
     root_out_dir + "/diff_libinput_mmi/src/filter-touchpad.c",
+    root_out_dir + "/diff_libinput_mmi/src/filter-trackpoint-flat.c",
     root_out_dir + "/diff_libinput_mmi/src/filter-trackpoint.c",
     root_out_dir + "/diff_libinput_mmi/src/filter.c",
     root_out_dir + "/diff_libinput_mmi/src/libinput-util.c",
@@ -274,6 +284,7 @@ print("input_feature_touchscreen = ${input_feature_touchscreen}")
 print("input_feature_input_device = ${input_feature_input_device}")
 print("input_feature_short_key = ${input_feature_short_key}")
 print("input_feature_infrared_emitter = ${input_feature_infrared_emitter}")
+print("input_feature_move_event_filters = ${input_feature_move_event_filters}")
 
 input_default_defines = []
 
@@ -340,6 +351,10 @@ if (input_ext_feature_gesturesense) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER" ]
 }
 
+if (input_feature_move_event_filters) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS" ]
+}
+
 if (input_ext_feature_anco) {
   mmi_ext_path = "//vendor/huawei/foundation/multimodalinput/input_ext"
   input_default_defines += [ "OHOS_BUILD_ENABLE_ANCO" ]
@@ -371,6 +386,7 @@ if (input_ext_feature_magiccursor) {
     "${mmi_ext_path}/magic_cursor/src/dfx_hisysevent_ext.cpp",
     "${mmi_ext_path}/magic_cursor/src/lru_cache.cpp",
     "${mmi_ext_path}/magic_cursor/src/magic_pointer_drawing_manager.cpp",
+    "${mmi_ext_path}/magic_cursor/src/magic_pointer_drawing_manager_ext.cpp",
     "${mmi_ext_path}/magic_cursor/src/magic_pointer_velocity_tracker.cpp",
     "${mmi_ext_path}/magic_cursor/src/render_context_gl.cpp",
   ]

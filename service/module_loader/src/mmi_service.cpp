@@ -61,6 +61,8 @@
 #include "util_ex.h"
 #include "watchdog_task.h"
 #include "xcollie/watchdog.h"
+#include "xcollie/xcollie.h"
+#include "xcollie/xcollie_define.h"
 #ifdef OHOS_RSS_CLIENT
 #include "res_sched_client.h"
 #include "res_type.h"
@@ -75,6 +77,8 @@
 namespace OHOS {
 namespace MMI {
 namespace {
+std::mutex g_instanceMutex;
+MMIService* g_MMIService;
 const std::string DEF_INPUT_SEAT { "seat0" };
 const std::string THREAD_NAME { "mmi-service" };
 constexpr int32_t WATCHDOG_INTERVAL_TIME { 30000 };
@@ -91,7 +95,7 @@ constexpr int32_t DISTRIBUTE_TIME { 1000 }; // 1000ms
 constexpr int32_t COMMON_PARAMETER_ERROR { 401 };
 } // namespace
 
-const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(DelayedSingleton<MMIService>::GetInstance().get());
+const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(MMIService::GetInstance());
 
 template <class... Ts> void CheckDefineOutput(const char *fmt, Ts... args)
 {
@@ -131,7 +135,25 @@ static void CheckDefine()
 
 MMIService::MMIService() : SystemAbility(MULTIMODAL_INPUT_CONNECT_SERVICE_ID, true) {}
 
-MMIService::~MMIService() {}
+MMIService::~MMIService()
+{
+    if (g_MMIService != nullptr) {
+        g_MMIService = nullptr;
+    }
+    MMI_HILOGI("~MMIService");
+}
+
+MMIService* MMIService::GetInstance()
+{
+    if (g_MMIService == nullptr) {
+        std::lock_guard<std::mutex> lock(g_instanceMutex);
+        if (g_MMIService == nullptr) {
+            MMI_HILOGI("new MMIService");
+            g_MMIService = new MMIService();
+        }
+    }
+    return g_MMIService;
+}
 
 int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
 {
@@ -191,6 +213,65 @@ int32_t MMIService::DelEpoll(EpollEventType type, int32_t fd)
 bool MMIService::IsRunning() const
 {
     return (state_ == ServiceRunningState::STATE_RUNNING);
+}
+
+void MMIService::RegisterFoldStatusListener()
+{
+    CALL_INFO_TRACE;
+    if (!Rosen::DisplayManager::GetInstance().IsFoldable()) {
+        MMI_HILOG_HANDLERW("No need register fold status listener");
+        return;
+    }
+    foldStatusListener_ = sptr<FoldStatusLisener>::MakeSptr(this);
+    CHKPV(foldStatusListener_);
+    auto ret = Rosen::DisplayManager::GetInstance().RegisterFoldStatusListener(foldStatusListener_);
+    if (ret != Rosen::DMError::DM_OK) {
+        MMI_HILOG_HANDLERE("Failed to register fold status listener");
+        foldStatusListener_ = nullptr;
+    } else {
+        MMI_HILOG_HANDLERI("Register fold status listener successed");
+    }
+}
+
+void MMIService::UnregisterFoldStatusListener()
+{
+    CALL_INFO_TRACE;
+    CHKPV(foldStatusListener_);
+    auto ret = Rosen::DisplayManager::GetInstance().UnregisterFoldStatusListener(foldStatusListener_);
+    if (ret != Rosen::DMError::DM_OK) {
+        MMI_HILOG_HANDLERE("Failed to unregister fold status listener");
+    }
+}
+
+MMIService::FoldStatusLisener::~FoldStatusLisener()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    server_ = nullptr;
+}
+
+void MMIService::FoldStatusLisener::OnFoldStatusChanged(Rosen::FoldStatus foldStatus)
+{
+    MMI_HILOG_HANDLERI("currentFoldStatus:%{public}d, lastFoldStatus:%{public}d", foldStatus, lastFoldStatus_);
+    if (lastFoldStatus_ == foldStatus) {
+        MMI_HILOG_HANDLERD("No need to set foldStatus");
+        return;
+    }
+    lastFoldStatus_ = foldStatus;
+    std::lock_guard<std::mutex> lock(mutex_);
+    CHKPV(server_);
+    server_->OnFoldStatusChanged(foldStatus);
+}
+
+void MMIService::OnFoldStatusChanged(Rosen::FoldStatus foldStatus)
+{
+    int32_t ret = delegateTasks_.PostSyncTask([foldStatus]() {
+        WIN_MGR->OnFoldStatusChanged(foldStatus);
+        return RET_OK;
+    });
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to report the cancel event during the fold status change, ret: %{public}d",
+            ret);
+    }
 }
 
 bool MMIService::InitLibinputService()
@@ -335,11 +416,12 @@ void MMIService::OnStart()
     APP_OBSERVER_MGR->InitAppStateObserver();
     MMI_HILOGI("Add app manager service listener end");
     AddAppDebugListener();
+    AddSystemAbilityListener(DISPLAY_MANAGER_SERVICE_SA_ID);
 #ifdef OHOS_BUILD_ENABLE_ANCO
     InitAncoUds();
 #endif // OHOS_BUILD_ENABLE_ANCO
     IPointerDrawingManager::GetInstance()->InitPointerObserver();
-    PREFERENCES_MGR->InitPreferences();
+    InitPreferences();
     TimerMgr->AddTimer(WATCHDOG_INTERVAL_TIME, -1, [this]() {
         MMI_HILOGI("Set thread status flag to true");
         threadStatusFlag_ = true;
@@ -374,6 +456,8 @@ void MMIService::OnStop()
     RemoveSystemAbilityListener(APP_MGR_SERVICE_ID);
     RemoveSystemAbilityListener(RENDER_SERVICE);
     RemoveAppDebugListener();
+    RemoveSystemAbilityListener(DISPLAY_MANAGER_SERVICE_SA_ID);
+    UnregisterFoldStatusListener();
 #ifdef OHOS_BUILD_ENABLE_ANCO
     StopAncoUds();
 #endif // OHOS_BUILD_ENABLE_ANCO
@@ -1423,7 +1507,6 @@ int32_t MMIService::InjectPointerEvent(const std::shared_ptr<PointerEvent> point
     int32_t ret;
     int32_t pid = GetCallingPid();
     bool isShell = PER_HELPER->RequestFromShell();
-    AdaptScreenResolution(pointerEvent);
 #ifdef OHOS_BUILD_ENABLE_ANCO
     ret = InjectPointerEventExt(pointerEvent, pid, isNativeInject, isShell);
 #else
@@ -1479,6 +1562,10 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
     if (systemAbilityId == RENDER_SERVICE) {
         MMI_HILOGI("Init render service state observer start");
         IPointerDrawingManager::GetInstance()->InitPointerCallback();
+    }
+    if (systemAbilityId == DISPLAY_MANAGER_SERVICE_SA_ID) {
+        MMI_HILOGI("Init render service state observer start");
+        RegisterFoldStatusListener();
     }
 }
 
@@ -1736,11 +1823,11 @@ void MMIService::OnThread()
             if (mmiEd->event_type == EPOLL_EVENT_INPUT) {
                 libinputAdapter_.EventDispatch(mmiEd->fd);
             } else if (mmiEd->event_type == EPOLL_EVENT_SOCKET) {
-                CalculateFuntionRunningTime([this, &event]() { this->OnEpollEvent(event); }, "EPOLL_EVENT_SOCKET");
+                CalculateFuntionRunningTime([this, &event]() { this->OnEpollEvent(event); }, "MMI:EPOLL_EVENT_SOCKET");
             } else if (mmiEd->event_type == EPOLL_EVENT_SIGNAL) {
                 OnSignalEvent(mmiEd->fd);
             } else if (mmiEd->event_type == EPOLL_EVENT_ETASK) {
-                CalculateFuntionRunningTime([this, &event]() { this->OnDelegateTask(event); }, "EPOLL_EVENT_ETASK");
+                CalculateFuntionRunningTime([this, &event]() { this->OnDelegateTask(event); }, "MMI:EPOLL_EVENT_ETASK");
             } else {
                 MMI_HILOGW("Unknown epoll event type:%{public}d", mmiEd->event_type);
             }
@@ -2505,6 +2592,31 @@ int32_t MMIService::SetPixelMapData(int32_t infoId, void* pixelMap)
     return RET_OK;
 }
 
+void MMIService::InitPreferences()
+{
+    PREFERENCES_MGR->InitPreferences();
+#ifdef OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
+    int32_t ret = SetMoveEventFilters(PREFERENCES_MGR->GetBoolValue("moveEventFilterFlag", false));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to read moveEventFilterFlag, ret:%{public}d", ret);
+    }
+#endif // OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
+}
+
+int32_t MMIService::SetMoveEventFilters(bool flag)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&InputEventHandler::SetMoveEventFilters, InputHandler, flag));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to set move event filter flag, ret:%{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
+    return RET_OK;
+}
+
 int32_t MMIService::SetCurrentUser(int32_t userId)
 {
     CALL_DEBUG_ENTER;
@@ -2719,16 +2831,9 @@ int32_t MMIService::TransferBinderClientSrv(const sptr<IRemoteObject> &binderCli
 
 void MMIService::CalculateFuntionRunningTime(std::function<void()> func, const std::string &flag)
 {
-    auto startTime = std::chrono::steady_clock::now();
+    int32_t id = HiviewDFX::XCollie::GetInstance().SetTimer(flag, 1, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_NOOP);
     func();
-    auto endTime = std::chrono::steady_clock::now();
-    auto duration = endTime - startTime;
-    int64_t durationTime = std::chrono::duration_cast<std::chrono::milliseconds>
-        (duration).count();
-    if (duration > std::chrono::milliseconds(DISTRIBUTE_TIME)) {
-        MMI_HILOGW("BlockMonitor event name: %{public}s, Duration Time: %{public}" PRId64 " ms",
-            flag.c_str(), durationTime);
-    }
+    HiviewDFX::XCollie::GetInstance().CancelTimer(id);
 }
 
 } // namespace MMI
