@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -58,6 +58,7 @@ int32_t KeyEventNormalize::Normalize(struct libinput_event *event, std::shared_p
     int32_t keyCode = static_cast<int32_t>(libinput_event_keyboard_get_key(data));
     MMI_HILOGD("The linux input keyCode:%{public}d", keyCode);
     keyCode = KeyMapMgr->TransferDeviceKeyValue(device, keyCode);
+    keyCode = TransferFunctionKeyValue(keyCode, keyEvent);
     int32_t keyAction = (libinput_event_keyboard_get_key_state(data) == 0) ?
         (KeyEvent::KEY_ACTION_UP) : (KeyEvent::KEY_ACTION_DOWN);
     auto preAction = keyEvent->GetAction();
@@ -93,6 +94,24 @@ int32_t KeyEventNormalize::Normalize(struct libinput_event *event, std::shared_p
     int32_t keyIntention = KeyItemsTransKeyIntention(keyEvent->GetKeyItems());
     keyEvent->SetKeyIntention(keyIntention);
     return RET_OK;
+}
+
+int32_t KeyEventNormalize::TransferFunctionKeyValue(int32_t keyCode, std::shared_ptr<KeyEvent> keyEvent)
+{
+    MMI_HILOGD("The input oh keyCode:%{public}d", keyCode);
+    if (keyCode == KeyEvent::KEYCODE_CTRL_RIGHT) {
+        return KeyEvent::KEYCODE_WISDOM;
+    }
+    std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
+    auto it = std::find(pressedKeys.begin(), pressedKeys.end(), KeyEvent::KEYCODE_FN);
+    if (it != pressedKeys.end()) {
+        MMI_HILOGD("FN pressing,The input oh keyCode:%{public}d", keyCode);
+        return keyCode;
+    } else {
+        keyCode = KeyMapMgr->TransferDefaultHotKeyValue(keyCode);
+        MMI_HILOGD("FN not pressing,The input oh keyCode:%{public}d", keyCode);
+        return keyCode;
+    }
 }
 
 void KeyEventNormalize::HandleKeyAction(struct libinput_device* device, KeyEvent::KeyItem &item,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -36,6 +36,7 @@ public:
     std::string GetKeyEventFileName(struct libinput_device *device);
     int32_t GetDefaultKeyId();
     int32_t TransferDefaultKeyValue(int32_t inputKey);
+    int32_t TransferDefaultHotKeyValue(int32_t inputKey);
     int32_t TransferDeviceKeyValue(struct libinput_device *device, int32_t inputKey);
     std::vector<int32_t> InputTransferKeyValue(int32_t deviceId, int32_t keyCode);
 private:

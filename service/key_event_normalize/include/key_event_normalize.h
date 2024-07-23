@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -36,6 +36,7 @@ public:
     void SetCurrentShieldMode(int32_t shieldMode);
     int32_t GetCurrentShieldMode();
 private:
+    int32_t TransferFunctionKeyValue(int32_t keyCode, std::shared_ptr<KeyEvent> keyEvent);
     void HandleKeyAction(struct libinput_device* device, KeyEvent::KeyItem &item, std::shared_ptr<KeyEvent> keyEvent);
 
 private:

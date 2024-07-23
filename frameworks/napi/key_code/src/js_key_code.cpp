@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -393,6 +393,11 @@ napi_value JsKeyCode::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_PROPERTY("KEYCODE_BTN_7", GetNapiInt32(env, KeyEvent::KEYCODE_BTN_7)),
         DECLARE_NAPI_STATIC_PROPERTY("KEYCODE_BTN_8", GetNapiInt32(env, KeyEvent::KEYCODE_BTN_8)),
         DECLARE_NAPI_STATIC_PROPERTY("KEYCODE_BTN_9", GetNapiInt32(env, KeyEvent::KEYCODE_BTN_9)),
+        DECLARE_NAPI_STATIC_PROPERTY("KEYCODE_VOICE", GetNapiInt32(env, KeyEvent::KEYCODE_VOICE)),
+        DECLARE_NAPI_STATIC_PROPERTY("KEYCODE_WIRELESS_SCREEN_PROJECTION",
+            GetNapiInt32(env, KeyEvent::KEYCODE_WIRELESS_SCREEN_PROJECTION)),
+        DECLARE_NAPI_STATIC_PROPERTY("KEYCODE_SCREEN_RECORDING", GetNapiInt32(env, KeyEvent::KEYCODE_SCREEN_RECORDING)),
+        DECLARE_NAPI_STATIC_PROPERTY("KEYCODE_KEY_WISDOM", GetNapiInt32(env, KeyEvent::KEYCODE_WISDOM)),
         DECLARE_NAPI_STATIC_PROPERTY("KEYCODE_CALL_NOTIFICATION_CENTER",
             GetNapiInt32(env, KeyEvent::KEYCODE_CALL_NOTIFICATION_CENTER)),
         DECLARE_NAPI_STATIC_PROPERTY("KEYCODE_CALL_CONTROL_CENTER",
