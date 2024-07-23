@@ -225,7 +225,7 @@ ErrCode SettingDataShare::PutStringValue(
     bucket.Put(SETTING_COLUMN_VALUE, valueObj);
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(SETTING_COLUMN_KEYWORD, key);
-    Uri uri(AssembleUri(key));
+    Uri uri(AssembleUri(key, strUri));
     auto [errCode, status] = helper->Update(uri, predicates, bucket);
     if (errCode == 0) {
         MMI_HILOGD("data exist, helper updata success, status = %{public}d", status);
