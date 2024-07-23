@@ -88,9 +88,9 @@ const std::vector<int32_t> ALL_EVENT_TYPES = {
     static_cast<int32_t>(LIBINPUT_EVENT_JOYSTICK_AXIS),
     static_cast<int32_t>(LIBINPUT_EVENT_SWITCH_TOGGLE)
 };
-const std::string EVENT_FILE_PATH = "/data/service/el1/public/multimodalinput/";
-const std::string EVENT_FILE_NAME = "/data/service/el1/public/multimodalinput/multimodal_event.dmp";
-const std::string EVENT_FILE_NAME_HISTORY = "/data/service/el1/public/multimodalinput/multimodal_event_history.dmp";
+const std::string_view EVENT_FILE_PATH = "/data/service/el1/public/multimodalinput/";
+const std::string_view EVENT_FILE_NAME = EVENT_FILE_PATH + "multimodal_event.dmp";
+const std::string_view EVENT_FILE_NAME_HISTORY = EVENT_FILE_PATH + "multimodal_event_history.dmp";
 const int32_t FILE_MAX_SIZE = 100 * 1024 * 1024;
 const int32_t EVENT_OUT_SIZE = 30;
 const int32_t FUNC_EXE_OK = 0;
