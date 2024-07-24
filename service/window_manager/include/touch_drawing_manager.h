@@ -36,7 +36,12 @@
 
 namespace OHOS {
 namespace MMI {
-
+enum class EventActionType : uint32_t {
+    UNKNOW_ACTION = 0,
+    DOWN_ACTION = 1,
+    MOVE_ACTION = 2,
+    UP_ACTION = 3,
+};
 class TouchDrawingManager {
 private:
 struct Bubble {
@@ -93,9 +98,10 @@ private:
     void CreatePointerObserver(T& item);
     template <class T>
     std::string FormatNumber(T number, int32_t precision);
-    bool IsValidAction(const int32_t action);
+    bool IsValidEvent(std::shared_ptr<PointerEvent> pointerEvent);
     void Snapshot();
     bool IsWindowRotation();
+    EventActionType GetActionType(int32_t action);
 private:
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode_ { nullptr };
     std::shared_ptr<Rosen::RSCanvasNode> bubbleCanvasNode_ { nullptr };

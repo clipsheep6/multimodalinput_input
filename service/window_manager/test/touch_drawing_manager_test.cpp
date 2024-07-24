@@ -127,29 +127,95 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_GetOriginalTouchScreen
 }
 
 /**
- * @tc.name: TouchDrawingManagerTest_IsValidAction_001
+ * @tc.name: TouchDrawingManagerTest_IsValidEvent_001
  * @tc.desc: Test is valid action
  * @tc.type: Function
  * @tc.require:
  */
-HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_IsValidAction_001, TestSize.Level1)
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_IsValidEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
+    TouchDrawingManager manager;
+    bool ret = manager.IsValidEvent(pointerEvent);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_IsValidEvent_002
+ * @tc.desc: Test is valid action
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_IsValidEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
+    TouchDrawingManager manager;
+    bool ret = manager.IsValidEvent(pointerEvent);
+    EXPECT_FALSE(ret);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
+    ret = manager.IsValidEvent(pointerEvent);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_IsValidEvent_003
+ * @tc.desc: Test is valid action
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_IsValidEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    EXPECT_NE(pointerEvent, nullptr);
+    TouchDrawingManager manager;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+    bool ret = manager.IsValidEvent(pointerEvent);
+    EXPECT_TRUE(ret);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    ret = manager.IsValidEvent(pointerEvent);
+    EXPECT_TRUE(ret);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    ret = manager.IsValidEvent(pointerEvent);
+    EXPECT_TRUE(ret);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_MOVE);
+    ret = manager.IsValidEvent(pointerEvent);
+    EXPECT_TRUE(ret);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    ret = manager.IsValidEvent(pointerEvent);
+    EXPECT_TRUE(ret);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_PULL_UP);
+    ret = manager.IsValidEvent(pointerEvent);
+    EXPECT_TRUE(ret);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_HOVER_MOVE);
+    ret = manager.IsValidEvent(pointerEvent);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_GetActionType_001
+ * @tc.desc: Test get action type
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_GetActionType_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     TouchDrawingManager manager;
-    bool ret = manager.IsValidAction(PointerEvent::POINTER_ACTION_DOWN);
-    EXPECT_TRUE(ret);
-    ret = manager.IsValidAction(PointerEvent::POINTER_ACTION_PULL_DOWN);
-    EXPECT_TRUE(ret);
-    ret = manager.IsValidAction(PointerEvent::POINTER_ACTION_MOVE);
-    EXPECT_TRUE(ret);
-    ret = manager.IsValidAction(PointerEvent::POINTER_ACTION_PULL_MOVE);
-    EXPECT_TRUE(ret);
-    ret = manager.IsValidAction(PointerEvent::POINTER_ACTION_UP);
-    EXPECT_TRUE(ret);
-    ret = manager.IsValidAction(PointerEvent::POINTER_ACTION_PULL_UP);
-    EXPECT_TRUE(ret);
-    ret = manager.IsValidAction(100);
-    EXPECT_FALSE(ret);
+    auto ret = manager.GetActionType(PointerEvent::POINTER_ACTION_CANCEL);
+    EXPECT_EQ(ret, EventActionType::UP_ACTION);
+    ret = manager.GetActionType(PointerEvent::POINTER_ACTION_PULL_DOWN);
+    EXPECT_EQ(ret, EventActionType::UP_ACTION);
+    ret = manager.GetActionType(PointerEvent::POINTER_ACTION_HOVER_MOVE);
+    EXPECT_EQ(ret, EventActionType::MOVE_ACTION);
+    ret = manager.GetActionType(PointerEvent::POINTER_ACTION_FINGERPRINT_UP);
+    EXPECT_EQ(ret, EventActionType::UNKNOW_ACTION);
 }
 
 /**

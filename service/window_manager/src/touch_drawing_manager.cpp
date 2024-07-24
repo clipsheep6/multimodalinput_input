@@ -120,6 +120,9 @@ void TouchDrawingManager::TouchDrawHandler(std::shared_ptr<PointerEvent> pointer
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
+    if (!IsValidEvent(pointerEvent)) {
+        return;
+    }
     pointerEvent_ = pointerEvent;
     CreateObserver();
     if (bubbleMode_.isShow) {
@@ -127,12 +130,11 @@ void TouchDrawingManager::TouchDrawHandler(std::shared_ptr<PointerEvent> pointer
         AddCanvasNode(bubbleCanvasNode_, false);
         DrawBubbleHandler();
     }
-    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP
-        && pointerEvent->GetAllPointerItems().size() == 1) {
+    auto action = pointerEvent_->GetPointerAction();
+    if (GetActionType(action) == EventActionType::UP_ACTION && pointerEvent->GetAllPointerItems().size() == 1) {
         lastPointerItem_.clear();
     }
-    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN
-        && pointerEvent->GetAllPointerItems().size() == 1) {
+    if (GetActionType(action) == EventActionType::DOWN_ACTION && pointerEvent->GetAllPointerItems().size() == 1) {
         stopRecord_ = false;
     }
     if (pointerMode_.isShow && !stopRecord_) {
@@ -449,11 +451,7 @@ void TouchDrawingManager::CreateTouchWindow()
 void TouchDrawingManager::DrawBubbleHandler()
 {
     CALL_DEBUG_ENTER;
-    CHKPV(pointerEvent_);
-    auto pointerAction = pointerEvent_->GetPointerAction();
-    if (IsValidAction(pointerAction)) {
-        DrawBubble();
-    }
+    DrawBubble();
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
 
@@ -464,13 +462,10 @@ void TouchDrawingManager::DrawBubble()
     auto canvas = static_cast<RosenCanvas *>(bubbleCanvasNode_->BeginRecording(scaleW_, scaleH_));
     CHKPV(canvas);
     auto pointerIdList = pointerEvent_->GetPointerIds();
+    auto action = pointerEvent_->GetPointerAction();
     for (auto pointerId : pointerIdList) {
-        if ((pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_UP ||
-            pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP ||
-            pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_CANCEL) &&
-            pointerEvent_->GetPointerId() == pointerId) {
-            MMI_HILOGI("Continue bubble draw, pointerAction:%{public}d, pointerId:%{public}d",
-                pointerEvent_->GetPointerAction(), pointerEvent_->GetPointerId());
+        if (GetActionType(action) == EventActionType::UP_ACTION && pointerEvent_->GetPointerId() == pointerId) {
+            MMI_HILOGI("Continue bubble draw, pointerAction:%{public}d, pointerId:%{public}d", action, pointerId);
             continue;
         }
         PointerEvent::PointerItem pointerItem;
@@ -497,11 +492,9 @@ void TouchDrawingManager::DrawBubble()
         canvas->AttachBrush(brush);
         canvas->DrawCircle(centerPt, bubble_.innerCircleRadius);
         canvas->DetachBrush();
-        if (pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN &&
-            pointerEvent_->GetPointerId() == pointerId) {
+        if (GetActionType(action) == EventActionType::DOWN_ACTION && pointerEvent_->GetPointerId() == pointerId) {
             MMI_HILOGI("Bubble is draw success, pointerAction:%{public}d, pointerId:%{public}d, physicalX:%{public}d,"
-                " physicalY:%{public}d", pointerEvent_->GetPointerAction(), pointerEvent_->GetPointerId(),
-                physicalX, physicalY);
+                " physicalY:%{public}d", action, pointerId, physicalX, physicalY);
         }
     }
     bubbleCanvasNode_->FinishRecording();
@@ -527,7 +520,7 @@ void TouchDrawingManager::DrawPointerPositionHandler()
         int32_t displayX = pointerItem.GetDisplayX();
         int32_t displayY = pointerItem.GetDisplayY();
         DrawTracker(displayX, displayY, pointerId);
-        if (pointerEvent_->GetPointerAction() != PointerEvent::POINTER_ACTION_UP) {
+        if (GetActionType(pointerEvent_->GetPointerAction()) != EventActionType::UP_ACTION) {
             DrawCrosshairs(canvas, displayX, displayY);
             UpdateLastPointerItem(pointerItem);
         }
@@ -584,6 +577,33 @@ bool TouchDrawingManager::IsWindowRotation()
         FOLDABLE_DEVICE_POLICY[0] == ROTATE_WINDOW_ROTATE) ||
         (displayInfo_.displayMode == DisplayMode::FULL &&
         FOLDABLE_DEVICE_POLICY[FOLDABLE_DEVICE] == ROTATE_WINDOW_ROTATE))));
+}
+
+EventActionType TouchDrawingManager::GetActionType(int32_t action)
+{
+    EventActionType ret = EventActionType::UNKNOW_ACTION;
+    switch (action) {
+        case PointerEvent::POINTER_ACTION_DOWN:
+        case PointerEvent::POINTER_ACTION_PULL_DOWN:
+        case PointerEvent::POINTER_ACTION_HOVER_ENTER:
+            ret = EventActionType::DOWN_ACTION;
+            break;
+        case PointerEvent::POINTER_ACTION_MOVE:
+        case PointerEvent::POINTER_ACTION_PULL_MOVE:
+        case PointerEvent::POINTER_ACTION_HOVER_MOVE:
+            ret = EventActionType::MOVE_ACTION;
+            break;
+        case PointerEvent::POINTER_ACTION_UP:
+        case PointerEvent::POINTER_ACTION_PULL_UP:
+        case PointerEvent::POINTER_ACTION_HOVER_EXIT:
+        case PointerEvent::POINTER_ACTION_CANCEL:
+        case PointerEvent::POINTER_ACTION_HOVER_CANCEL:
+            ret = EventActionType::UP_ACTION;
+            break;
+        default:
+            break;
+    }
+    return ret;
 }
 
 void TouchDrawingManager::DrawTracker(int32_t x, int32_t y, int32_t pointerId)
@@ -718,14 +738,14 @@ void TouchDrawingManager::UpdatePointerPosition()
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent_);
-    int32_t pointerAction = pointerEvent_->GetPointerAction();
+    int32_t action = pointerEvent_->GetPointerAction();
     int32_t pointerId = pointerEvent_->GetPointerId();
-    if (pointerAction == PointerEvent::POINTER_ACTION_DOWN) {
+    if (GetActionType(action) == EventActionType::DOWN_ACTION) {
         if (lastPointerItem_.empty()) {
             InitLabels();
         }
         maxPointerCount_ = ++currentPointerCount_;
-    } else if (pointerAction == PointerEvent::POINTER_ACTION_UP) {
+    } else if (GetActionType(action) == EventActionType::UP_ACTION) {
         isDownAction_ = false;
         isFirstDownAction_ = false;
         for (auto it = lastPointerItem_.begin(); it != lastPointerItem_.end(); it++) {
@@ -807,15 +827,15 @@ void TouchDrawingManager::InitLabels()
     yVelocity_ = 0.0;
 }
 
-bool TouchDrawingManager::IsValidAction(const int32_t action)
+bool TouchDrawingManager::IsValidEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    if (action == PointerEvent::POINTER_ACTION_DOWN || action == PointerEvent::POINTER_ACTION_PULL_DOWN ||
-        action == PointerEvent::POINTER_ACTION_MOVE || action == PointerEvent::POINTER_ACTION_PULL_MOVE ||
-        action == PointerEvent::POINTER_ACTION_UP || action == PointerEvent::POINTER_ACTION_PULL_UP ||
-        action == PointerEvent::POINTER_ACTION_CANCEL) {
-        return true;
+    if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
+        return false;
     }
-    return false;
+    if (GetActionType(pointerEvent->GetPointerAction()) == EventActionType::UNKNOW_ACTION) {
+        return false;
+    }
+    return true;
 }
 
 void TouchDrawingManager::Dump(int32_t fd, const std::vector<std::string> &args)
