@@ -612,5 +612,15 @@ int32_t InputManager::AncoRemoveConsumer(std::shared_ptr<IAncoConsumer> consumer
 {
     return InputMgrImpl.AncoRemoveChannel(consumer);
 }
+
+int32_t InputManager::SetPointerSwitch()
+{
+    return InputMgrImpl.SetPointerSwitch();
+}
+
+int32_t InputManager::SetPointerSmartChangeSwitch()
+{
+    return InputMgrImpl.SetPointerSmartChangeSwitch();
+}
 } // namespace MMI
 } // namespace OHOS
