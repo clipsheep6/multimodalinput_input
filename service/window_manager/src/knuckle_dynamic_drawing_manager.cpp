@@ -62,7 +62,7 @@ constexpr float VPR_CONFIG { 3.25f };
 constexpr int32_t POW_SQUARE { 2 };
 constexpr int32_t IN_DRAWING_TIME { 23000 };
 constexpr uint64_t FOLD_SCREEN_MAIN_ID { 5 };
-constexpr std::string SCREEN_READ_ENABLE { "1" };
+constexpr std::string_view SCREEN_READ_ENABLE { "1" };
 } // namespace
 
 KnuckleDynamicDrawingManager::KnuckleDynamicDrawingManager()
@@ -142,7 +142,6 @@ bool KnuckleDynamicDrawingManager::IsSingleKnuckle(std::shared_ptr<PointerEvent>
             isStop_ = true;
             isDrawing_ = true;
             DestoryWindow();
-            Rosen::RSTransaction::FlushImplicitTransaction();
         } else if (isRotate_) {
             isRotate_ = false;
             if (item.GetToolType() == PointerEvent::TOOL_TYPE_KNUCKLE) {
@@ -157,9 +156,9 @@ bool KnuckleDynamicDrawingManager::IsSingleKnuckle(std::shared_ptr<PointerEvent>
 bool KnuckleDynamicDrawingManager::CheckPointerAction(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
-    if (KnuckleDrawingManager::GetScreenReadState() == SCREEN_READ_ENABLE) {
+    CHKPF(knuckleDrawMgr_);
+    if (knuckleDrawMgr_->GetScreenReadState() == SCREEN_READ_ENABLE) {
         DestoryWindow();
-        Rosen::RSTransaction::FlushImplicitTransaction();
     }
     size_t size = pointerEvent->GetPointerIds().size();
     if (size > MIN_POINT_SIZE) {
@@ -217,7 +216,6 @@ void KnuckleDynamicDrawingManager::ProcessUpAndCancelEvent(std::shared_ptr<Point
     }
     isDrawing_ = true;
     DestoryWindow();
-    Rosen::RSTransaction::FlushImplicitTransaction();
 }
 
 void KnuckleDynamicDrawingManager::ProcessDownEvent(std::shared_ptr<PointerEvent> pointerEvent)
@@ -318,6 +316,12 @@ void KnuckleDynamicDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayI
     displayInfo_ = displayInfo;
 }
 
+void KnuckleDynamicDrawingManager::SetKnuckleDrawingManager(std::shared_ptr<KnuckleDrawingManager> knuckleDrawMgr)
+{
+    CALL_DEBUG_ENTER;    
+    knuckleDrawMgr_ = knuckleDrawMgr;
+}
+
 int32_t KnuckleDynamicDrawingManager::DrawGraphic(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
@@ -380,8 +384,9 @@ void KnuckleDynamicDrawingManager::CreateTouchWindow(const int32_t displayId)
     }
     MMI_HILOGI("screenId_: %{public}" PRIu64, screenId_);
     surfaceNode_->AttachToDisplay(screenId_);
-    if (KnuckleDrawingManager::CheckRotatePolicy(displayInfo_)) {
-        KnuckleDrawingManager::RotationCanvasNode(canvasNode_, displayInfo_);
+    CHKPV(knuckleDrawMgr_);
+    if (knuckleDrawMgr_->CheckRotatePolicy(displayInfo_)) {
+        knuckleDrawMgr_->RotationCanvasNode(canvasNode_, displayInfo_);
     }
     canvasNode_->ResetSurface(scaleW_, scaleH_);
     Rosen::RSTransaction::FlushImplicitTransaction();
@@ -426,6 +431,7 @@ void KnuckleDynamicDrawingManager::DestoryWindow()
     canvasNode_.reset();
     CHKPV(surfaceNode_);
     surfaceNode_.reset();
+    Rosen::RSTransaction::FlushImplicitTransaction();
 }
 } // namespace MMI
 } // namespace OHOS
