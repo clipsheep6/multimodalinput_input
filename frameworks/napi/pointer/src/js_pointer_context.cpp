@@ -1717,6 +1717,32 @@ napi_value JsPointerContext::GetTouchpadScrollRows(napi_env env, napi_callback_i
     return jsPointerMgr->GetTouchpadScrollRows(env, argv[0]);
 }
 
+napi_value JsPointerContext::SetPointerSwitch(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
+    auto func = [jsPointerMgr] (napi_env env) -> napi_value {
+        return jsPointerMgr->SetPointerSwitch(env);
+    };
+    return jsPointerMgr->SetPointerSwitch(env);
+}
+
+napi_value JsPointerContext::SetPointerSmartChangeSwitch(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
+    auto func = [jsPointerMgr] (napi_env env) -> napi_value {
+        return jsPointerMgr->SetPointerSmartChangeSwitch(env);
+    };
+    return jsPointerMgr->SetPointerSmartChangeSwitch(env);
+}
+
 napi_value JsPointerContext::Export(napi_env env, napi_value exports)
 {
     CALL_DEBUG_ENTER;
@@ -1780,6 +1806,8 @@ napi_value JsPointerContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("getHardwareCursorStats", GetHardwareCursorStats),
         DECLARE_NAPI_STATIC_FUNCTION("setTouchpadScrollRows", SetTouchpadScrollRows),
         DECLARE_NAPI_STATIC_FUNCTION("getTouchpadScrollRows", GetTouchpadScrollRows),
+        DECLARE_NAPI_STATIC_FUNCTION("setPointerSwitch", SetPointerSwitch),
+        DECLARE_NAPI_STATIC_FUNCTION("setPointerSmartChangeSwitch", SetPointerSmartChangeSwitch),
     };
     CHKRP(napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
     if (CreatePointerStyle(env, exports) == nullptr) {
