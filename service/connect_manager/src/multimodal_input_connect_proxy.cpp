@@ -2364,7 +2364,8 @@ int32_t MultimodalInputConnectProxy::SetPointerSmartChangeSwitch()
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(
-        static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_POINTER_SMART_CHANGE_SWITCH), data, reply, option);
+        static_cast<uint32_t>(
+            MultimodalinputConnectInterfaceCode::SET_POINTER_SMART_CHANGE_SWITCH), data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
     }

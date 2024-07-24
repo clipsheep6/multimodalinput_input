@@ -7438,7 +7438,8 @@ HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetP
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetPointerSmartChangeSwitch, TestSize.Level1)
+HWTEST_F(
+    MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetPointerSmartChangeSwitch, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();

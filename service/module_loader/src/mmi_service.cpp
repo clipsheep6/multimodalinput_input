@@ -2852,7 +2852,7 @@ int32_t MMIService::SetPointerSmartChangeSwitch()
 {
     CALL_DEBUG_ENTER;
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(std::bind(&IPointerDrawingManager::SetPointerSmartChangeSwitch,
-       IPointerDrawingManager::GetInstance())));
+        IPointerDrawingManager::GetInstance())));
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to set current user, ret:%{public}d", ret);
         return ret;
