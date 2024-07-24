@@ -300,6 +300,7 @@ ohos_shared_library("libmmi-server") {
     "init:libbegetutil",
     "ipc:ipc_single",
     "libinput:libinput-third-mmi",
+    "player_framework:media_client",
     "preferences:native_preferences",
     "relational_store:native_rdb",
     "safwk:system_ability_fwk",

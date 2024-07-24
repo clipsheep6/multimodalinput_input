@@ -63,6 +63,7 @@ ohos_source_set("mmi_connect_manager_service") {
     "hilog:libhilog",
     "image_framework:image_native",
     "ipc:ipc_single",
+    "player_framework:media_client",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "window_manager:libdm",

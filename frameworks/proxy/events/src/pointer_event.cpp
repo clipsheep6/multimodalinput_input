@@ -771,6 +771,16 @@ std::vector<int32_t> PointerEvent::GetPressedKeys() const
     return pressedKeys_;
 }
 
+int32_t PointerEvent::GetAxisEventType() const
+{
+    return axisEventType_;
+}
+
+void PointerEvent::SetAxisEventType(int32_t axisEventType)
+{
+    axisEventType_ = axisEventType;
+}
+
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 void PointerEvent::SetEnhanceData(const std::vector<uint8_t> enhanceData)
 {
@@ -844,6 +854,8 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
     WRITEDOUBLE(out, fingerprintDistanceX_);
     WRITEDOUBLE(out, fingerprintDistanceY_);
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
+
+    WRITEINT32(out, axisEventType_);
     return true;
 }
 
@@ -908,6 +920,7 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
     READDOUBLE(in, fingerprintDistanceX_);
     READDOUBLE(in, fingerprintDistanceY_);
 #endif // OHOS_BUILD_ENABLE_FINGERPRINT
+    READINT32(in, axisEventType_);
     return true;
 }
 

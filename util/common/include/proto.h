@@ -36,6 +36,7 @@ enum class MmiMessageId : int32_t {
     WINDOW_AREA_INFO,
     NOTIFY_BUNDLE_NAME,
     WINDOW_INFO,
+    REMOVE_MONITOR,
 };
 
 enum TokenType : int32_t {
