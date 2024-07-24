@@ -87,6 +87,7 @@ bool TouchTransformProcessor::OnEventTouchDown(struct libinput_event *event)
     pointerEvent_->SetDeviceId(deviceId_);
     pointerEvent_->AddPointerItem(item);
     pointerEvent_->SetPointerId(seatSlot);
+    pointerEvent_->ClearFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY);
     return true;
 }
 
