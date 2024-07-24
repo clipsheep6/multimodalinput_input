@@ -1093,5 +1093,19 @@ napi_value JsPointerManager::GetTouchpadScrollRows(napi_env env, napi_value hand
     AsyncCallbackWork(asyncContext);
     return promise;
 }
+
+napi_value JsPointerManager::SetPointerSwitch(napi_env env)
+{
+    CALL_DEBUG_ENTER;
+    InputManager::GetInstance()->SetPointerSwitch();
+    return nullptr;
+}
+
+napi_value JsPointerManager::SetPointerSmartChangeSwitch(napi_env env)
+{
+    CALL_DEBUG_ENTER;
+    InputManager::GetInstance()->SetPointerSmartChangeSwitch();
+    return nullptr;
+}
 } // namespace MMI
 } // namespace OHOS

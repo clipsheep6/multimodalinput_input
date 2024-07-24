@@ -929,6 +929,20 @@ public:
      */
     int32_t RemoveVirtualInputDevice(int32_t deviceId);
 
+    /**
+    * @brief 修改光标风格切换
+    * @return 返回0表示接口调用成功，否则，表示接口调用失败。
+    * @since 12
+    */
+    int32_t SetPointerSwitch();
+
+    /**
+    * @brief 修改智能变化
+    * @return 返回0表示接口调用成功，否则，表示接口调用失败。
+    * @since 12
+    */
+    int32_t SetPointerSmartChangeSwitch();
+
     int32_t AncoAddConsumer(std::shared_ptr<IAncoConsumer> consumer);
     int32_t AncoRemoveConsumer(std::shared_ptr<IAncoConsumer> consumer);
 
