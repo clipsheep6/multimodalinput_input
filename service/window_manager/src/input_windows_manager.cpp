@@ -2417,7 +2417,7 @@ void InputWindowsManager::UpdateTransformDisplayXY(std::shared_ptr<PointerEvent>
         }
         if (!displayInfo.transform.empty() &&
             pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_UP && !isNavigationWindow) {
-            auto displayXY = TransformDisplayXY(*displayInfo, physicalX, physicalY);
+            auto displayXY = TransformDisplayXY(displayInfo, physicalX, physicalY);
             physicalX = displayXY.first;
             physicalY = displayXY.second;
         }
