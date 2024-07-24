@@ -105,6 +105,8 @@ public:
     int32_t GetPointerSnapshot(void *pixelMapPtr) override;
     void InitPointerCallback() override;
     void InitPointerObserver() override;
+    int32_t SetPointerSwitch() override;
+    int32_t SetPointerSmartChangeSwitch() override;
 
 private:
     IconStyle GetIconType(MOUSE_ICON mouseIcon);
