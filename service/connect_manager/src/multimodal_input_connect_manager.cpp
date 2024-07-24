@@ -855,5 +855,17 @@ int32_t MultimodalInputConnectManager::AncoRemoveChannel(sptr<IAncoChannel> chan
     return multimodalInputConnectService_->AncoRemoveChannel(channel);
 }
 #endif // OHOS_BUILD_ENABLE_ANCO
+
+int32_t MultimodalInputConnectManager::SetPointerSwitch()
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->SetPointerSwitch();
+}
+
+int32_t MultimodalInputConnectManager::SetPointerSmartChangeSwitch()
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->SetPointerSmartChangeSwitch();
+}
 } // namespace MMI
 } // namespace OHOS

@@ -139,6 +139,8 @@ public:
     int32_t RemoveVirtualInputDevice(int32_t deviceId);
     int32_t SetTouchpadScrollRows(int32_t rows);
     int32_t GetTouchpadScrollRows(int32_t &rows);
+    int32_t SetPointerSwitch();
+    int32_t SetPointerSmartChangeSwitch();
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
     int32_t AncoAddChannel(sptr<IAncoChannel> channel);
