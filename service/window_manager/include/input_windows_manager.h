@@ -225,7 +225,7 @@ bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
     int32_t UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent);
     bool IsValidNavigationWindow(const WindowInfo& touchWindow, double physicalX, double physicalY);
     void UpdateTransformDisplayXY(std::shared_ptr<PointerEvent> pointerEvent, std::vector<WindowInfo>& windowsInfo,
-        const DisplayInfo& displayInfo)
+        const DisplayInfo& displayInfo);
     void PullEnterLeaveEvent(int32_t logicalX, int32_t logicalY,
         const std::shared_ptr<PointerEvent> pointerEvent, const WindowInfo* touchWindow);
     void DispatchTouch(int32_t pointerAction);
