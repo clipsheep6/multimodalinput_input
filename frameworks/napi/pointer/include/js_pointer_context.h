@@ -84,6 +84,8 @@ public:
     static napi_value GetHardwareCursorStats(napi_env env, napi_callback_info info);
     static napi_value SetTouchpadScrollRows(napi_env env, napi_callback_info info);
     static napi_value GetTouchpadScrollRows(napi_env env, napi_callback_info info);
+    static napi_value SetPointerSwitch(napi_env env, napi_callback_info info);
+    static napi_value SetPointerSmartChangeSwitch(napi_env env, napi_callback_info info);
 
 private:
     static napi_value SetTouchpadBoolData(napi_env env, napi_callback_info info, SetTouchpadBoolDataFunc func);
