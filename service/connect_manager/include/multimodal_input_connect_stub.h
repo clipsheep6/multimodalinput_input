@@ -142,6 +142,8 @@ protected:
     int32_t StubAncoRemoveChannel(MessageParcel& data, MessageParcel& reply);
 #endif // OHOS_BUILD_ENABLE_ANCO
     int32_t StubTransferBinderClientService(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetPointerSwitch(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetPointerSmartChangeSwitch(MessageParcel& data, MessageParcel& reply);
 
 private:
     int32_t VerifyTouchPadSetting(void);
