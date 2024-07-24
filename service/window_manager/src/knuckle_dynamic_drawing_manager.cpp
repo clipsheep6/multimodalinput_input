@@ -318,7 +318,7 @@ void KnuckleDynamicDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayI
 
 void KnuckleDynamicDrawingManager::SetKnuckleDrawingManager(std::shared_ptr<KnuckleDrawingManager> knuckleDrawMgr)
 {
-    CALL_DEBUG_ENTER;    
+    CALL_DEBUG_ENTER;
     knuckleDrawMgr_ = knuckleDrawMgr;
 }
 
