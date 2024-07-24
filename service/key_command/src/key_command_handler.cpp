@@ -605,6 +605,9 @@ void KeyCommandHandler::DrawKnuckleGraphic(std::shared_ptr<PointerEvent> touchEv
     }
     if (knuckleDynamicDrawingManager_ == nullptr) {
         knuckleDynamicDrawingManager_ = std::make_shared<KnuckleDynamicDrawingManager>();
+        if (knuckleDrawMgr_ != nullptr) {
+            knuckleDynamicDrawingManager_->SetKnuckleDrawingManager(knuckleDrawMgr_);
+        }
     }
     auto displayId = touchEvent->GetTargetDisplayId();
     if (!WIN_MGR->UpdateDisplayId(displayId)) {

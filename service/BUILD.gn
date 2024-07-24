@@ -1465,6 +1465,7 @@ ohos_unittest("InterceptorExTest") {
 
   external_deps = [
     "data_share:datashare_consumer",
+    "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "init:libbegetutil",
     "libinput:libinput-third-mmi",
