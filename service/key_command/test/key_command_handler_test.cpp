@@ -3756,5 +3756,101 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckAndUpdateTappingCount
     ASSERT_NO_FATAL_FAILURE(handler.CheckAndUpdateTappingCountAtDown(touchEvent));
     ASSERT_EQ(handler.tappingCount_, 3);
 }
+
+/**
+ * @tc.name: KeyCommandHandlerTest_DrawKnuckleGraphic_001
+ * @tc.desc: Test the funcation DrawKnuckleGraphic
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_DrawKnuckleGraphic_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    handler.knuckleDrawMgr_ = nullptr;
+    EXPECT_NO_FATAL_FAILURE(handler.DrawKnuckleGraphic(touchEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_DrawKnuckleGraphic_002
+ * @tc.desc: Test the funcation DrawKnuckleGraphic
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_DrawKnuckleGraphic_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    handler.knuckleDrawMgr_ = std::make_shared<KnuckleDrawingManager>();
+    ASSERT_NE(handler.knuckleDrawMgr_, nullptr);
+    handler.knuckleDynamicDrawingManager_ = nullptr;
+    EXPECT_NO_FATAL_FAILURE(handler.DrawKnuckleGraphic(touchEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_DrawKnuckleGraphic_003
+ * @tc.desc: Test the funcation DrawKnuckleGraphic
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_DrawKnuckleGraphic_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    handler.knuckleDrawMgr_ = std::make_shared<KnuckleDrawingManager>();
+    ASSERT_NE(handler.knuckleDrawMgr_, nullptr);
+
+    handler.knuckleDynamicDrawingManager_ = std::make_shared<KnuckleDynamicDrawingManager>();
+    ASSERT_NE(handler.knuckleDynamicDrawingManager_, nullptr);
+    EXPECT_NO_FATAL_FAILURE(handler.DrawKnuckleGraphic(touchEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_DrawKnuckleGraphic_004
+ * @tc.desc: Test the funcation DrawKnuckleGraphic
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_DrawKnuckleGraphic_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    handler.knuckleDrawMgr_ = std::make_shared<KnuckleDrawingManager>();
+    ASSERT_NE(handler.knuckleDrawMgr_, nullptr);
+
+    handler.knuckleDynamicDrawingManager_ = std::make_shared<KnuckleDynamicDrawingManager>();
+    ASSERT_NE(handler.knuckleDynamicDrawingManager_, nullptr);
+    handler.knuckleSwitch_.statusConfigValue = true;
+    EXPECT_NO_FATAL_FAILURE(handler.DrawKnuckleGraphic(touchEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_DrawKnuckleGraphic_005
+ * @tc.desc: Test the funcation DrawKnuckleGraphic
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_DrawKnuckleGraphic_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    handler.knuckleDrawMgr_ = std::make_shared<KnuckleDrawingManager>();
+    ASSERT_NE(handler.knuckleDrawMgr_, nullptr);
+
+    handler.knuckleDynamicDrawingManager_ = std::make_shared<KnuckleDynamicDrawingManager>();
+    ASSERT_NE(handler.knuckleDynamicDrawingManager_, nullptr);
+    handler.knuckleSwitch_.statusConfigValue = false;
+    EXPECT_NO_FATAL_FAILURE(handler.DrawKnuckleGraphic(touchEvent));
+}
 } // namespace MMI
 } // namespace OHOS

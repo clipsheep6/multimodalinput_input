@@ -112,11 +112,6 @@ void KeyCommandHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> poi
     nextHandler_->HandleTouchEvent(pointerEvent);
 }
 
-bool KeyCommandHandler::GetKnuckleSwitchValue()
-{
-    return knuckleSwitch_.statusConfigValue;
-}
-
 void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> touchEvent)
 {
     CALL_DEBUG_ENTER;
@@ -163,6 +158,7 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> t
             break;
     }
 #ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+    DrawKnuckleGraphic(touchEvent);
     HandleKnuckleGestureEvent(touchEvent);
 #endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
 }
@@ -591,6 +587,32 @@ void KeyCommandHandler::HandleKnuckleGestureEvent(std::shared_ptr<PointerEvent> 
                 MMI_HILOGD("Unknown pointer action:%{public}d", touchAction);
                 break;
         }
+    }
+}
+
+void KeyCommandHandler::DrawKnuckleGraphic(std::shared_ptr<PointerEvent> touchEvent)
+{
+    if (knuckleDrawMgr_ == nullptr) {
+        knuckleDrawMgr_ = std::make_shared<KnuckleDrawingManager>();
+    }
+    if (knuckleDynamicDrawingManager_ == nullptr) {
+        knuckleDynamicDrawingManager_ = std::make_shared<KnuckleDynamicDrawingManager>();
+        if (knuckleDrawMgr_ != nullptr) {
+            knuckleDynamicDrawingManager_->SetKnuckleDrawingManager(knuckleDrawMgr_);
+        }
+    }
+    auto displayId = touchEvent->GetTargetDisplayId();
+    if (!WIN_MGR->UpdateDisplayId(displayId)) {
+        MMI_HILOGE("This display is not exist");
+        return;
+    }
+    auto physicDisplayInfo = WIN_MGR->GetPhysicalDisplay(displayId);
+    CHKPV(physicDisplayInfo);
+    if (!knuckleSwitch_.statusConfigValue) {
+        knuckleDrawMgr_->UpdateDisplayInfo(*physicDisplayInfo);
+        knuckleDrawMgr_->KnuckleDrawHandler(touchEvent);
+        knuckleDynamicDrawingManager_->UpdateDisplayInfo(*physicDisplayInfo);
+        knuckleDynamicDrawingManager_->KnuckleDynamicDrawHandler(touchEvent);
     }
 }
 

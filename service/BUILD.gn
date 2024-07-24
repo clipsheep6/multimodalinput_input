@@ -1114,6 +1114,7 @@ ohos_unittest("SubscriberTest") {
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "data_share:datashare_consumer",
+    "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "init:libbegetutil",
     "libinput:libinput-third-mmi",
@@ -1381,6 +1382,7 @@ ohos_unittest("StylusKeyTest") {
 
   external_deps = [
     "c_utils:utils",
+    "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "libinput:libinput-third-mmi",
   ]
@@ -1465,6 +1467,7 @@ ohos_unittest("InterceptorExTest") {
 
   external_deps = [
     "data_share:datashare_consumer",
+    "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "init:libbegetutil",
     "libinput:libinput-third-mmi",

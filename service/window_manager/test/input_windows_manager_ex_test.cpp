@@ -2194,69 +2194,6 @@ HWTEST_F(InputWindowsManagerTest, HandleWindowInputType_012, TestSize.Level1)
 }
 
 /**
- * @tc.name: DrawTouchGraphic_001
- * @tc.desc: Test the function DrawTouchGraphic
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, DrawTouchGraphic_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<InputWindowsManager> inputWindowsManager =
-        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
-    ASSERT_NE(inputWindowsManager, nullptr);
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-
-    inputWindowsManager->knuckleDrawMgr_ = nullptr;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DrawTouchGraphic(pointerEvent));
-}
-
-/**
- * @tc.name: DrawTouchGraphic_002
- * @tc.desc: Test the function DrawTouchGraphic
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, DrawTouchGraphic_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<InputWindowsManager> inputWindowsManager =
-        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
-    ASSERT_NE(inputWindowsManager, nullptr);
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-
-    inputWindowsManager->knuckleDrawMgr_ = std::make_shared<KnuckleDrawingManager>();
-    ASSERT_NE(inputWindowsManager->knuckleDrawMgr_, nullptr);
-    inputWindowsManager->knuckleDynamicDrawingManager_ = nullptr;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DrawTouchGraphic(pointerEvent));
-}
-
-/**
- * @tc.name: DrawTouchGraphic_003
- * @tc.desc: Test the function DrawTouchGraphic
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, DrawTouchGraphic_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<InputWindowsManager> inputWindowsManager =
-        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
-    ASSERT_NE(inputWindowsManager, nullptr);
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-
-    inputWindowsManager->knuckleDrawMgr_ = std::make_shared<KnuckleDrawingManager>();
-    ASSERT_NE(inputWindowsManager->knuckleDrawMgr_, nullptr);
-
-    inputWindowsManager->knuckleDynamicDrawingManager_ = std::make_shared<KnuckleDynamicDrawingManager>();
-    ASSERT_NE(inputWindowsManager->knuckleDynamicDrawingManager_, nullptr);
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager->DrawTouchGraphic(pointerEvent));
-}
-
-/**
  * @tc.name: FoldScreenRotation_001
  * @tc.desc: Test the function FoldScreenRotation
  * @tc.type: FUNC
