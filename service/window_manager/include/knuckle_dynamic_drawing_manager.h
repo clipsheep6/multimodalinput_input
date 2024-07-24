@@ -36,6 +36,7 @@ public:
     ~KnuckleDynamicDrawingManager() = default;
     void KnuckleDynamicDrawHandler(std::shared_ptr<PointerEvent> pointerEvent);
     void UpdateDisplayInfo(const DisplayInfo& displayInfo);
+    void SetKnuckleDrawingManager(std::shared_ptr<KnuckleDrawingManager> knuckleDrawMgr);
 
 private:
     void StartTouchDraw(std::shared_ptr<PointerEvent> pointerEvent);
@@ -79,6 +80,7 @@ private:
     int32_t scaleH_ { 0 };
     int64_t firstDownTime_ { 0 };
     int64_t isInDrawingTime_ { 0 };
+    std::shared_ptr<KnuckleDrawingManager> knuckleDrawMgr_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS
