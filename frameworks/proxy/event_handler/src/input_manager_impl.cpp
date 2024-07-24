@@ -2321,5 +2321,17 @@ int32_t InputManagerImpl::AncoRemoveChannel(std::shared_ptr<IAncoConsumer> consu
     MMI_HILOGI("AncoRemoveChannel function does not support");
     return ERROR_UNSUPPORT;
 }
+
+int32_t InputManagerImpl::SetPointerSwitch()
+{
+    CALL_DEBUG_ENTER;
+    return MULTIMODAL_INPUT_CONNECT_MGR->SetPointerSwitch();
+}
+
+int32_t InputManagerImpl::SetPointerSmartChangeSwitch()
+{
+    CALL_DEBUG_ENTER;
+    return MULTIMODAL_INPUT_CONNECT_MGR->SetPointerSmartChangeSwitch();
+}
 } // namespace MMI
 } // namespace OHOS

@@ -214,6 +214,8 @@ public:
     int32_t RemoveVirtualInputDevice(int32_t deviceId);
     int32_t AncoAddChannel(std::shared_ptr<IAncoConsumer> consumer);
     int32_t AncoRemoveChannel(std::shared_ptr<IAncoConsumer> consumer);
+    int32_t SetPointerSwitch();
+    int32_t SetPointerSmartChangeSwitch();
 
 private:
     int32_t PackWindowInfo(NetPacket &pkt);
