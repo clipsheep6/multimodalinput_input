@@ -2228,8 +2228,6 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     windowY = static_cast<int32_t>(windowY);
     pointerItem.SetWindowX(windowX);
     pointerItem.SetWindowY(windowY);
-    pointerItem.SetDisplayX(physicalX);
-    pointerItem.SetDisplayY(physicalY);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
     if ((extraData_.appended && (extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE)) ||
         (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP)) {
