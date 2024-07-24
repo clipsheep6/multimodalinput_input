@@ -2836,5 +2836,29 @@ void MMIService::CalculateFuntionRunningTime(std::function<void()> func, const s
     HiviewDFX::XCollie::GetInstance().CancelTimer(id);
 }
 
+int32_t MMIService::SetPointerSwitch()
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(std::bind(&IPointerDrawingManager::SetPointerSwitch,
+        IPointerDrawingManager::GetInstance())));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to set current user, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::SetPointerSmartChangeSwitch()
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(std::bind(&IPointerDrawingManager::SetPointerSmartChangeSwitch,
+       IPointerDrawingManager::GetInstance())));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to set current user, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
 } // namespace MMI
 } // namespace OHOS
