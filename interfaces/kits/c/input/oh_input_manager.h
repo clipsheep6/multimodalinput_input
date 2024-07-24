@@ -37,6 +37,7 @@
 
 #include <stdint.h>
 
+#include "oh_axis_type.h"
 #include "oh_key_code.h"
 
 #ifdef __cplusplus
@@ -102,12 +103,12 @@ typedef enum {
  *
  * @since 12
  */
-typedef enum {
+enum InputEvent_MouseAxis {
     /** Vertical scroll axis */
     MOUSE_AXIS_SCROLL_VERTICAL = 0,
     /** Horizontal scroll axis */
     MOUSE_AXIS_SCROLL_HORIZONTAL = 1,
-} InputEvent_MouseAxis;
+};
 
 /**
  * @brief Enumerated values of mouse event button.
@@ -175,6 +176,13 @@ struct Input_MouseEvent;
 struct Input_TouchEvent;
 
 /**
+ * @brief 轴事件
+ *
+ * @since 12
+ */
+struct Input_AxisEvent;
+
+/**
  * @brief Enumerates the error codes.
  *
  * @since 12
@@ -187,8 +195,52 @@ typedef enum {
     /** Non-system application */
     INPUT_NOT_SYSTEM_APPLICATION = 202,
     /** Parameter check failed */
-    INPUT_PARAMETER_ERROR = 401
+    INPUT_PARAMETER_ERROR = 401,
+    /** @服务异常 */
+    INPUT_SERVICE_EXCEPTION = 3800001,
+    /** @应用已经创建过拦截后重复创建 */
+    INPUT_REPEAT_INTERCEPTOR = 4200001
 } Input_Result;
+
+/**
+ * @brief 定义一个回调函数用于回调鼠标事件，keyEvent的生命周期为回调函数内，出了回调函数会被销毁
+ * @since 12
+ */
+typedef void (*Input_KeyEventCallback)(const struct Input_KeyEvent* keyEvent);
+
+/**
+ * @brief 定义一个回调函数用于回调鼠标事件，mouseEvent的生命周期为回调函数内，出了回调函数会被销毁。
+ * @since 12
+ */
+typedef void (*Input_MouseEventCallback)(const struct Input_MouseEvent* mouseEvent);
+
+/**
+ * @brief 定义一个回调函数用于回调触摸事件，touchEvent的生命周期为回调函数内，出了回调函数会被销毁。
+ * @since 12
+ */
+typedef void (*Input_TouchEventCallback)(const struct Input_TouchEvent* touchEvent);
+
+/**
+ * @brief 定义一个回调函数用于回调轴事件，axisEvent的生命周期为回调函数内，出了回调函数会被销毁。
+ * @since 12
+ */
+typedef void (*Input_AxisEventCallback)(const struct Input_AxisEvent* axisEvent);
+
+/**
+ * @brief 定义一个用于回调事件拦截的结构体，包含鼠标，触屏和轴事件
+ * @since 12
+ */
+struct Input_InterceptorEventCallback {
+    Input_MouseEventCallback mouseCallback;
+    Input_TouchEventCallback touchCallback;
+    Input_AxisEventCallback axisCallback;
+};
+
+/**
+ * @brief 事件拦截选项
+ * @since 12
+ */
+struct Input_InterceptorOptions;
 
 /**
  * @brief Queries the key state.
@@ -681,6 +733,372 @@ int64_t OH_Input_GetTouchEventActionTime(const struct Input_TouchEvent* touchEve
  */
 void OH_Input_CancelInjection();
 
+/**
+ * @brief 创建轴事件对象实例.
+ *
+ * @return 成功返回一个{@Link Input_AxisEvent}对象实例，失败则返回null
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+struct Input_AxisEvent* OH_Input_CreateAxisEvent(void);
+
+/**
+ * @brief 销毁轴事件对象实例.
+ * 
+ * @param axisEvent 轴事件对象实例的指针.
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_DestroyAxisEvent(struct Input_AxisEvent** axisEvent);
+
+/**
+ * @brief 设置轴事件的动作.
+ *
+ * @param axisEvent 轴事件对象，请参考{@Link Input_AxisEvent}
+ * @param action 轴事件动作，取值定义在{@link InputEvent_AxisAction}中
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_SetAxisEventAction(struct Input_AxisEvent* axisEvent, InputEvent_AxisAction action);
+
+/**
+ * @brief 获取轴事件的动作.
+ *
+ * @param axisEvent 轴事件对象，请参考{@Link Input_AxisEvent}.
+ * @param action 出参，返回轴事件动作，取值定义在{@link InputEvent_AxisAction}中
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_GetAxisEventAction(const struct Input_AxisEvent* axisEvent, InputEvent_AxisAction *action);
+
+/**
+ * @brief 设置轴事件的X坐标
+ *
+ * @param axisEvent 轴事件对象，请参考{@Link Input_AxisEvent}.
+ * @param displayX 轴事件X坐标.
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_SetAxisEventDisplayX(struct Input_AxisEvent* axisEvent, float displayX);
+
+/**
+ * @brief 获取轴事件的X坐标
+ *
+ * @param axisEvent 轴事件对象，请参考{@Link Input_AxisEvent}.
+ * @param displayX 出参，返回轴事件X坐标.
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_GetAxisEventDisplayX(const struct Input_AxisEvent* axisEvent, float* displayX);
+
+/**
+ * @brief 设置轴事件的Y坐标
+ *
+ * @param axisEvent 轴事件对象，请参考{@Link Input_AxisEvent}.
+ * @param displayY 轴事件Y坐标.
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_SetAxisEventDisplayY(struct Input_AxisEvent* axisEvent, float displayY);
+
+/**
+ * @brief 获取轴事件的Y坐标
+ *
+ * @param axisEvent 轴事件对象，请参考{@Link Input_AxisEvent}.
+ * @param displayY 出参，返回轴事件Y坐标.
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_GetAxisEventDisplayY(const struct Input_AxisEvent* axisEvent, float* displayY);
+
+/**
+ * @brief 设置轴事件指定轴类型的轴值
+ *
+ * @param axisEvent 轴事件对象，请参考{@Link Input_AxisEvent}.
+ * @param axisType 轴类型，取值定义在{@link InputEvent_AxisType}中.
+ * @param axisValue 轴事件轴值
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_SetAxisEventAxisValue(struct Input_AxisEvent* axisEvent,
+                                            InputEvent_AxisType axisType, double axisValue);
+
+/**
+ * @brief 获取轴事件指定轴类型的轴值
+ *
+ * @param axisEvent 轴事件对象，请参考{@Link Input_AxisEvent}.
+ * @param axisType 轴类型，取值定义在{@link InputEvent_AxisType}中.
+ * @param axisValue 出参，返回轴事件轴值
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_GetAxisEventAxisValue(const struct Input_AxisEvent* axisEvent,
+                                            InputEvent_AxisType axisType, double* axisValue);
+
+/**
+ * @brief 设置轴事件发生的时间.
+ *
+ * @param axisEvent 轴事件对象，请参考{@Link Input_AxisEvent}.
+ * @param actionTime 轴事件发生的时间.
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_SetAxisEventActionTime(struct Input_AxisEvent* axisEvent, int64_t actionTime);
+
+/**
+ * @brief 获取轴事件发生的时间.
+ *
+ * @param axisEvent 轴事件对象，请参考{@Link Input_AxisEvent}.
+ * @param actionTime 出参，返回轴事件发生的时间.
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_GetAxisEventActionTime(const struct Input_AxisEvent* axisEvent, int64_t* actionTime);
+
+/**
+ * @brief 设置轴事件类型.
+ *
+ * @param axisEvent 轴事件对象，请参考{@Link Input_AxisEvent}.
+ * @param axisEventType 轴事件类型，取值定义在{@link InputEvent_AxisEventType}
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_SetAxisEventType(struct Input_AxisEvent* axisEvent, InputEvent_AxisEventType axisEventType);
+
+/**
+ * @brief 获取轴事件类型.
+ *
+ * @param axisEvent 轴事件对象.
+ * @param axisEventType 出参，返回轴事件类型，取值定义在{@link InputEvent_AxisEventType}中
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_GetAxisEventType(const struct Input_AxisEvent* axisEvent,
+                                       InputEvent_AxisEventType* axisEventType);
+
+/**
+ * @brief 设置轴事件源类型.
+ *
+ * @param axisEvent 轴事件对象.
+ * @param sourceType 轴事件源类型,取值定义在{@link InputEvent_SourceType}中.
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_SetAxisEventSourceType(struct Input_AxisEvent* axisEvent, InputEvent_SourceType sourceType);
+
+/**
+ * @brief 获取轴事件源类型.
+ *
+ * @param axisEvent 轴事件对象.
+ * @param sourceType 出参，返回轴事件源类型，取值定义在{@link InputEvent_SourceType}中
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_GetAxisEventSourceType(const struct Input_AxisEvent* axisEvent,
+                                             InputEvent_SourceType* sourceType);
+
+/**
+ * @brief 添加按键事件监听。
+ *
+ * @permission ohos.permission.INPUT_MONITORING
+ * @param callback - 回调函数，用于接收按键事件
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_AddKeyEventMonitor(Input_KeyEventCallback callback);
+
+/**
+ * @brief 添加鼠标事件监听,包含鼠标点击，移动，不包含滚轮事件，滚轮事件归属于轴事件。
+ *
+ * @permission ohos.permission.INPUT_MONITORING
+ * @param callback - 回调函数，用于接收鼠标事件
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_AddMouseEventMonitor(Input_MouseEventCallback callback);
+
+/**
+ * @brief 添加触屏事件监听。
+ *
+ * @permission ohos.permission.INPUT_MONITORING
+ * @param callback - 回调函数，用于接收触屏事件
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_AddTouchEventMonitor(Input_TouchEventCallback callback);
+
+/**
+ * @brief 添加所有类型轴事件监听，轴事件类型定义在{@Link InputEvent_AxisEventType}中。
+ *
+ * @permission ohos.permission.INPUT_MONITORING
+ * @param callback - 回调函数，用于接收轴事件
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_AddAxisEventMonitorAll(Input_AxisEventCallback callback);
+
+/**
+ * @brief 添加指定类型的轴事件监听，轴事件类型定义在{@link InputEvent_AxisEventType}中
+ *
+ * @permission ohos.permission.INPUT_MONITORING
+ * @param axisEventType - 要监听的轴事件类型，轴事件类型定义在{@Link InputEvent_AxisEventType}中。
+ * @param callback - 回调函数，用于接收指定类型的轴事件
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_AddAxisEventMonitor(InputEvent_AxisEventType axisEventType, Input_AxisEventCallback callback);
+
+/**
+ * @brief 移除按键事件监听。
+ *
+ * @permission ohos.permission.INPUT_MONITORING
+ * @param callback - 指定要被移除的用于按键事件监听的回调函数
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_RemoveKeyEventMonitor(Input_KeyEventCallback callback);
+
+/**
+ * @brief 移除鼠标事件监听。
+ *
+ * @permission ohos.permission.INPUT_MONITORING
+ * @param callback - 指定要被移除的用于鼠标事件监听的回调函数
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_RemoveMouseEventMonitor(Input_MouseEventCallback callback);
+
+/**
+ * @brief 移除触屏事件监听。
+ *
+ * @permission ohos.permission.INPUT_MONITORING
+ * @param callback - 指定要被移除的用于触屏事件监听的回调函数
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_RemoveTouchEventMonitor(Input_TouchEventCallback callback);
+
+/**
+ * @brief 移除所有类型轴事件监听
+ *
+ * @permission ohos.permission.INPUT_MONITORING
+ * @param callback - 指定要被移除的用于所有类型轴事件监听的回调函数
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_RemoveAxisEventMonitorAll(Input_AxisEventCallback callback);
+
+/**
+ * @brief 移除指定类型轴事件监听，轴事件类型定义在{@Link InputEvent_AxisEventType}中。
+ *
+ * @permission ohos.permission.INPUT_MONITORING
+ * @param axisEventType - 指定要移除监听的轴事件类型，轴事件类型定义在{@Link InputEvent_AxisEventType}中。
+ * @param callback - 指定要被移除的用于指定类型轴事件监听的回调函数
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_RemoveAxisEventMonitor(InputEvent_AxisEventType axisEventType, Input_AxisEventCallback callback);
+
+/**
+ * @brief 添加按键事件的拦截,重复添加只有第一次生效.
+ *
+ * @permission ohos.permission.INTERCEPT_INPUT_EVENT
+ * @param callback - 回调函数，用于接收按键事件
+ * @param option - 输入事件拦截的可选项，传null则使用默认值。
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_AddKeyEventInterceptor(Input_KeyEventCallback callback, struct Input_InterceptorOptions *option);
+
+/**
+ * @brief 添加输入事件拦截，包括鼠标、触屏和轴事件，重复添加只有第一次生效
+ *
+ * @permission ohos.permission.INTERCEPT_INPUT_EVENT
+ * @param callback - 用于回调输入事件的结构体指针，请参考定义{@Link Input_InterceptorEventCallback}。
+ * @param option - 输入事件拦截的可选项，传null则使用默认值。
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_AddInputEventInterceptor(struct Input_InterceptorEventCallback *callback
+                                               struct Input_InterceptorOptions *option);
+
+/**
+ * @brief 移除按键事件拦截
+ *
+ * @permission ohos.permission.INTERCEPT_INPUT_EVENT
+ * @param callback - 指定要被移除的用于拦截按键事件的回调函数
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_RemoveKeyEventInterceptor(Input_KeyEventCallback callback);
+
+/**
+ * @brief 移除输入事件拦截，包括鼠标、触屏和轴事件
+ *
+ * @permission ohos.permission.INTERCEPT_INPUT_EVENT
+ * @param callback - 指定要被移除的用于拦截输入事件的结构体指针，请参考定义{@Link Input_InterceptorEventCallback}。
+ * @return 成功时返回<b>INPUT_SUCCESS</b>，失败时返回{@link Input_Result}
+ * 中定义的错误码
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 12
+ */
+Input_Result OH_Input_RemoveInputEventInterceptor(struct Input_InterceptorEventCallback *callback);
 #ifdef __cplusplus
 }
 #endif

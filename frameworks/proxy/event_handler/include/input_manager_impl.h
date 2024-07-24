@@ -99,6 +99,7 @@ public:
     int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> consumer,
         HandleEventType eventType = HANDLE_EVENT_TYPE_ALL);
 
+    int32_t SetRemoveMonitorCallback(std::function<void()> callback);
     void RemoveMonitor(int32_t monitorId);
     void MarkConsumed(int32_t monitorId, int32_t eventId);
     void MoveMouse(int32_t offsetX, int32_t offsetY);

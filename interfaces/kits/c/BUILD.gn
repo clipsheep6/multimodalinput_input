@@ -20,6 +20,7 @@ ohos_ndk_headers("ohinput_header") {
   sources = [
     "./input/oh_input_manager.h",
     "./input/oh_key_code.h",
+    "./input/oh_axis_type.h"
   ]
 }
 
@@ -31,5 +32,6 @@ ohos_ndk_library("libohinput_ndk") {
   system_capability_headers = [
     "multimodalinput/oh_input_manager.h",
     "multimodalinput/oh_key_code.h",
+    "multimodalinput/oh_axis_type.h",
   ]
 }
