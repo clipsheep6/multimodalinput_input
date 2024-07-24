@@ -33,6 +33,8 @@
 
 #include "i_input_event_handler.h"
 #include "key_event.h"
+#include "knuckle_drawing_manager.h"
+#include "knuckle_dynamic_drawing_manager.h"
 #include "struct_multimodal.h"
 
 namespace OHOS {
@@ -183,7 +185,6 @@ public:
     void HandlePointerActionUpEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void SetKnuckleDoubleTapIntervalTime(int64_t interval);
     void SetKnuckleDoubleTapDistance(float distance);
-    bool GetKnuckleSwitchValue();
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     bool OnHandleEvent(const std::shared_ptr<KeyEvent> keyEvent);
@@ -297,6 +298,7 @@ private:
     void ReportRegionGesture();
     void ReportLetterGesture();
     void ReportGestureInfo();
+    void DrawKnuckleGraphic(std::shared_ptr<PointerEvent> touchEvent);
 #endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
 
 private:
@@ -360,6 +362,8 @@ private:
     int32_t drawSSuccessCount_ { 0 };
     int64_t drawOFailTimestamp_ { 0 };
     int64_t drawOSuccTimestamp_ { 0 };
+    std::shared_ptr<KnuckleDrawingManager> knuckleDrawMgr_ { nullptr };
+    std::shared_ptr<KnuckleDynamicDrawingManager> knuckleDynamicDrawingManager_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
 };
 } // namespace MMI

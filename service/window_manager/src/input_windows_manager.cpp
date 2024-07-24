@@ -2973,12 +2973,6 @@ void InputWindowsManager::DrawTouchGraphic(std::shared_ptr<PointerEvent> pointer
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
-    if (knuckleDrawMgr_ == nullptr) {
-        knuckleDrawMgr_ = std::make_shared<KnuckleDrawingManager>();
-    }
-    if (knuckleDynamicDrawingManager_ == nullptr) {
-        knuckleDynamicDrawingManager_ = std::make_shared<KnuckleDynamicDrawingManager>();
-    }
     auto displayId = pointerEvent->GetTargetDisplayId();
     if (!UpdateDisplayId(displayId)) {
         MMI_HILOGE("This display is not exist");
@@ -2986,14 +2980,6 @@ void InputWindowsManager::DrawTouchGraphic(std::shared_ptr<PointerEvent> pointer
     }
     auto physicDisplayInfo = GetPhysicalDisplay(displayId);
     CHKPV(physicDisplayInfo);
-    std::shared_ptr<OHOS::MMI::InputEventHandler> inputHandler = InputHandler;
-    auto knuckleSwitch = InputHandler->GetKeyCommandHandler()->GetKnuckleSwitchValue();
-    if (!knuckleSwitch) {
-        knuckleDrawMgr_->UpdateDisplayInfo(*physicDisplayInfo);
-        knuckleDrawMgr_->KnuckleDrawHandler(pointerEvent);
-        knuckleDynamicDrawingManager_->UpdateDisplayInfo(*physicDisplayInfo);
-        knuckleDynamicDrawingManager_->KnuckleDynamicDrawHandler(pointerEvent);
-    }
 
     TOUCH_DRAWING_MGR->UpdateDisplayInfo(*physicDisplayInfo);
     TOUCH_DRAWING_MGR->TouchDrawHandler(pointerEvent);

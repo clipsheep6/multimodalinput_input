@@ -26,8 +26,6 @@
 #include "i_input_windows_manager.h"
 #include "input_display_bind_helper.h"
 #include "input_event_data_transformation.h"
-#include "knuckle_drawing_manager.h"
-#include "knuckle_dynamic_drawing_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -302,13 +300,11 @@ private:
         bool isOpen { false };
     } antiMistake_;
     bool isOpenAntiMisTakeObserver_ { false };
-    std::shared_ptr<KnuckleDrawingManager> knuckleDrawMgr_ { nullptr };
     bool mouseFlag_ {false};
     std::map<int32_t, std::vector<int32_t>> targetTouchWinIds_;
     std::map<int32_t, std::vector<int32_t>> targetMouseWinIds_;
     int32_t pointerActionFlag_ { -1 };
     int32_t currentUserId_ { -1 };
-    std::shared_ptr<KnuckleDynamicDrawingManager> knuckleDynamicDrawingManager_ { nullptr };
     std::shared_ptr<PointerEvent> lastPointerEventForFold_ { nullptr };
     Direction lastDirection_ = static_cast<Direction>(-1);
     std::map<int32_t, WindowInfo> lastMatchedWindow_;
