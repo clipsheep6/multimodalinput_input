@@ -417,6 +417,12 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::TRANSFER_BINDER_CLIENT_SERVICE):
             ret = StubTransferBinderClientService(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_POINTER_SWITCH):
+            return StubSetPointerSwitch(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_POINTER_SMART_CHANGE_SWITCH):
+            return StubSetPointerSmartChangeSwitch(data, reply);
+            break;    
         default: {
             MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
             ret = IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -2611,6 +2617,28 @@ int32_t MultimodalInputConnectStub::StubTransferBinderClientService(MessageParce
         return ret;
     }
     WRITEINT32(reply, ret);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSetPointerSwitch(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = SetPointerSwitch();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SetPointerSwitch failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSetPointerSmartChangeSwitch(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = SetPointerSmartChangeSwitch();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call OnPointerHoverEffect failed, ret:%{public}d", ret);
+        return ret;
+    }
     return RET_OK;
 }
 } // namespace MMI
