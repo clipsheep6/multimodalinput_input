@@ -44,9 +44,9 @@ public:
     void UpdateDisplayInfo(const DisplayInfo& displayInfo);
     KnuckleDrawingManager();
     ~KnuckleDrawingManager() = default;
-    static void RotationCanvasNode(std::shared_ptr<Rosen::RSCanvasNode> canvasNode, const DisplayInfo& displayInfo);
-    static bool CheckRotatePolicy(const DisplayInfo& displayInfo);
-    static std::string GetScreenReadState();
+    void RotationCanvasNode(std::shared_ptr<Rosen::RSCanvasNode> canvasNode, const DisplayInfo& displayInfo);
+    bool CheckRotatePolicy(const DisplayInfo& displayInfo);
+    std::string GetScreenReadState();
 private:
     bool IsValidAction(int32_t action);
     void CreateTouchWindow(int32_t displayId);
@@ -77,7 +77,7 @@ private:
     int32_t scaleH_ { 0 };
     int64_t firstDownTime_ { 0 };
     bool hasScreenReadObserver_ { false };
-    static ScreenReadState screenReadState_;
+    ScreenReadState screenReadState_ { };
 };
 } // namespace MMI
 } // namespace OHOS
