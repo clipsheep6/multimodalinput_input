@@ -135,6 +135,14 @@ public:
     {
         return 0;
     }
+    virtual int32_t SetPointerSwitch()
+    {
+        return 0;
+    }
+    virtual int32_t SetPointerSmartChangeSwitch()
+    {
+        return 0;
+    }
     virtual void ForceClearPointerVisiableStatus();
     virtual void InitPointerObserver() {}
 public:
