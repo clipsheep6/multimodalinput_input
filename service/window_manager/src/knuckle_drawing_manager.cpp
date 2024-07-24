@@ -65,11 +65,9 @@ constexpr int32_t FOLDABLE_DEVICE { 2 };
 constexpr char FOLDABLE_ROTATE  { '0' };
 constexpr int32_t SUBSCRIPT_TWO { 2 };
 constexpr int32_t SUBSCRIPT_ZERO { 0 };
-constexpr std::string SCREEN_READING { "accessibility_screenreader_enabled" };
-constexpr std::string SCREEN_READ_ENABLE { "1" };
+constexpr std::string_view SCREEN_READING { "accessibility_screenreader_enabled" };
+constexpr std::string_view SCREEN_READ_ENABLE { "1" };
 } // namespace
-
-ScreenReadState KnuckleDrawingManager::screenReadState_ {};
 
 KnuckleDrawingManager::KnuckleDrawingManager()
 {
@@ -120,7 +118,6 @@ bool KnuckleDrawingManager::IsSingleKnuckle(std::shared_ptr<PointerEvent> touchE
         MMI_HILOGD("Touch tool type is:%{public}d", item.GetToolType());
         if (!pointerInfos_.empty()) {
             DestoryWindow();
-			Rosen::RSTransaction::FlushImplicitTransaction();
         } else if (isRotate_) {
             isRotate_ = false;
             if (item.GetToolType() == PointerEvent::TOOL_TYPE_KNUCKLE) {
@@ -166,7 +163,6 @@ bool KnuckleDrawingManager::IsValidAction(const int32_t action)
     CALL_DEBUG_ENTER;
     if (screenReadState_.state == SCREEN_READ_ENABLE) {
         DestoryWindow();
-        Rosen::RSTransaction::FlushImplicitTransaction();
     }
     if (action == PointerEvent::POINTER_ACTION_DOWN || action == PointerEvent::POINTER_ACTION_PULL_DOWN ||
         (action == PointerEvent::POINTER_ACTION_MOVE && (!pointerInfos_.empty())) ||
@@ -391,6 +387,7 @@ int32_t KnuckleDrawingManager::DestoryWindow()
     canvasNode_.reset();
     CHKPR(surfaceNode_, RET_ERR);
     surfaceNode_.reset();
+    Rosen::RSTransaction::FlushImplicitTransaction();
     return RET_OK;
 }
 
