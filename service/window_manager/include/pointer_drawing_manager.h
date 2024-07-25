@@ -136,8 +136,6 @@ private:
     void AdjustMouseFocusByDirection90(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
     void AdjustMouseFocusByDirection180(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
     void AdjustMouseFocusByDirection270(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
-    void CreateMagicCursorChangeObserver();
-    int32_t CreatePointerSwitchObserver(isMagicCursor& item);
     void UpdateStyleOptions();
     int32_t GetIndependentPixels();
     bool CheckPointerStyleParam(int32_t windowId, PointerStyle pointerStyle);
