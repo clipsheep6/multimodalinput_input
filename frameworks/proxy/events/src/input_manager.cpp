@@ -613,6 +613,7 @@ int32_t InputManager::AncoRemoveConsumer(std::shared_ptr<IAncoConsumer> consumer
     return InputMgrImpl.AncoRemoveChannel(consumer);
 }
 
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 int32_t InputManager::PointerStyleChange(int32_t style)
 {
     return InputMgrImpl.PointerStyleChange(style);
@@ -622,5 +623,6 @@ int32_t InputManager::IntelligentChangeSwitch()
 {
     return InputMgrImpl.IntelligentChangeSwitch();
 }
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 } // namespace MMI
 } // namespace OHOS

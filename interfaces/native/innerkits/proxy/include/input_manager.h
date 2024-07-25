@@ -929,6 +929,7 @@ public:
      */
     int32_t RemoveVirtualInputDevice(int32_t deviceId);
 
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     /**
      * @brief 修改光标风格切换
      * @param style 光标风格
@@ -943,6 +944,7 @@ public:
     * @since 12
     */
     int32_t IntelligentChangeSwitch();
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
     int32_t AncoAddConsumer(std::shared_ptr<IAncoConsumer> consumer);
     int32_t AncoRemoveConsumer(std::shared_ptr<IAncoConsumer> consumer);
