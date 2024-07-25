@@ -35,9 +35,15 @@ public:
     void RemoveMonitor(int32_t monitorId);
     void MarkConsumed(int32_t monitorId, int32_t eventId);
     InputHandlerType GetHandlerType() const override;
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    int32_t SetRemoveMonitorCallback(std::function<void()> callback);
+    void OnRemoveMonitor();
+#endif
 
 public:
     static bool IsValidMonitorId(int32_t monitorId);
+private:
+    std::function<void()> removeMonitorCallback_ { nullptr };
 };
 
 inline InputHandlerType InputMonitorManager::GetHandlerType() const

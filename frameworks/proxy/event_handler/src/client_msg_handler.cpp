@@ -77,6 +77,10 @@ void ClientMsgHandler::Init()
         { MmiMessageId::REPORT_POINTER_EVENT, [this] (const UDSClient& client, NetPacket& pkt) {
             return this->ReportPointerEvent(client, pkt); }},
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+        { MmiMessageId::REMOVE_MONITOR, [this] (const UDSClient& client, NetPacket& pkt) {
+            return this->ReportRemoveMonitor(client, pkt); }},
+#endif
         { MmiMessageId::NOTIFY_BUNDLE_NAME, [this] (const UDSClient& client, NetPacket& pkt) {
             return this->NotifyBundleName(client, pkt); }},
     };
@@ -374,6 +378,15 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+int32_t ClientMsgHandler::ReportRemoveMonitor(const UDSClient &client, NetPacket &pkt)
+{
+    CALL_DEBUG_ENTER;
+    IMonitorMgr->OnRemoveMonitor();
+    return RET_OK;
+}
+#endif
 
 void ClientMsgHandler::OnDispatchEventProcessed(int32_t eventId, int64_t actionTime)
 {

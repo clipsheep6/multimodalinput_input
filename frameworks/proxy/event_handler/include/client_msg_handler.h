@@ -57,6 +57,9 @@ protected:
     (defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR))
     int32_t ReportPointerEvent(const UDSClient &client, NetPacket &pkt);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    int32_t ReportRemoveMonitor(const UDSClient &client, NetPacket &pkt);
+#endif
     int32_t NotifyBundleName(const UDSClient &client, NetPacket &pkt);
     int32_t OnInputDevice(const UDSClient &client, NetPacket &pkt);
     int32_t OnInputDeviceIds(const UDSClient &client, NetPacket &pkt);

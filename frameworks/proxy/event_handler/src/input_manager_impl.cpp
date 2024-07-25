@@ -792,6 +792,17 @@ int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consum
 #endif // OHOS_BUILD_ENABLE_MONITOR
 }
 
+int32_t InputManagerImpl::SetRemoveMonitorCallback(std::function<void()> callback)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    return IMonitorMgr->SetRemoveMonitorCallback(callback);
+#else
+    MMI_HILOGI("Monitor function does not support");
+    return ERROR_UNSUPPORT;
+#endif
+}
+
 void InputManagerImpl::RemoveMonitor(int32_t monitorId)
 {
     CALL_DEBUG_ENTER;
