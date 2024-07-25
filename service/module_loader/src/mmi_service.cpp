@@ -720,12 +720,12 @@ int32_t MMIService::SetPointerSize(int32_t size)
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 int32_t MMIService::ReadPointerSize(int32_t &size)
 {
-    size = IPointerDrawingManager::GetInstance()->GetPointerSize();
+    size = IPointerDrawingManager::GetInstance()->GetPointerSizeGlobal();
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
-int32_t MMIService::GetPointerSize(int32_t &size)
+int32_t MMIService::GetPointerSizeGlobal(int32_t &size)
 {
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
@@ -844,13 +844,13 @@ int32_t MMIService::MarkProcessed(int32_t eventType, int32_t eventId)
     return RET_OK;
 }
 
-int32_t MMIService::SetPointerColor(int32_t color)
+int32_t MMIService::SetPointerColorGlobal(int32_t color)
 {
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t ret = delegateTasks_.PostSyncTask(
         [color] {
-            return IPointerDrawingManager::GetInstance()->SetPointerColor(color);
+            return IPointerDrawingManager::GetInstance()->SetPointerColorGlobal(color);
         }
         );
     if (ret != RET_OK) {
@@ -864,12 +864,12 @@ int32_t MMIService::SetPointerColor(int32_t color)
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 int32_t MMIService::ReadPointerColor(int32_t &color)
 {
-    color = IPointerDrawingManager::GetInstance()->GetPointerColor();
+    color = IPointerDrawingManager::GetInstance()->GetPointerColorGlobal();
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
-int32_t MMIService::GetPointerColor(int32_t &color)
+int32_t MMIService::GetPointerColorGlobal(int32_t &color)
 {
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)

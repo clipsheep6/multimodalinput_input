@@ -401,7 +401,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetMouseHotSpot_003,
 
 /**
  * @tc.name: InputWindowsManagerTest_SetPointerColor_002
- * @tc.desc: Test SetPointerColor
+ * @tc.desc: Test SetPointerColorGlobal
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -415,8 +415,8 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerColor_002,
     Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
     pointerDrawingManager->surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
     ASSERT_TRUE(pointerDrawingManager->surfaceNode_ != nullptr);
-    pointerDrawingManager->SetPointerColor(16777216);
-    int32_t color = pointerDrawingManager->GetPointerColor();
+    pointerDrawingManager->SetPointerColorGlobal(16777216);
+    int32_t color = pointerDrawingManager->GetPointerColorGlobal();
     EXPECT_EQ(color, RET_OK);
 }
 
@@ -900,7 +900,7 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_AdjustMouseFocus_001
 
 /**
  * @tc.name: InputWindowsManagerTest_SetPointerColor_001
- * @tc.desc: Test SetPointerColor
+ * @tc.desc: Test SetPointerColorGlobal
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -909,11 +909,11 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerColor_001,
     CALL_TEST_DEBUG;
     std::shared_ptr<PointerDrawingManager> pointerDrawingManager =
         std::static_pointer_cast<PointerDrawingManager>(IPointerDrawingManager::GetInstance());
-    pointerDrawingManager->SetPointerColor(-1);
-    int32_t color = pointerDrawingManager->GetPointerColor();
+    pointerDrawingManager->SetPointerColorGlobal(-1);
+    int32_t color = pointerDrawingManager->GetPointerColorGlobal();
     EXPECT_EQ(color, 16777215);
-    pointerDrawingManager->SetPointerColor(16777216);
-    color = pointerDrawingManager->GetPointerColor();
+    pointerDrawingManager->SetPointerColorGlobal(16777216);
+    color = pointerDrawingManager->GetPointerColorGlobal();
     EXPECT_EQ(color, 0);
 }
 
@@ -969,10 +969,10 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_SetPointerSize_001, 
     std::shared_ptr<PointerDrawingManager> pointerDrawingManager =
         std::static_pointer_cast<PointerDrawingManager>(IPointerDrawingManager::GetInstance());
     pointerDrawingManager->SetPointerSize(0);
-    int32_t pointerSize = pointerDrawingManager->GetPointerSize();
+    int32_t pointerSize = pointerDrawingManager->GetPointerSizeGlobal();
     EXPECT_EQ(pointerSize, 1);
     pointerDrawingManager->SetPointerSize(8);
-    pointerSize = pointerDrawingManager->GetPointerSize();
+    pointerSize = pointerDrawingManager->GetPointerSizeGlobal();
     EXPECT_EQ(pointerSize, 7);
 }
 

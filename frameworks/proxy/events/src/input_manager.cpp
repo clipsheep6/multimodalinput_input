@@ -245,7 +245,7 @@ int32_t InputManager::SetPointerSize(int32_t size)
 
 int32_t InputManager::GetPointerSize(int32_t &size)
 {
-    return InputMgrImpl.GetPointerSize(size);
+    return InputMgrImpl.GetPointerSizeGlobal(size);
 }
 
 int32_t InputManager::SetMouseHotSpot(int32_t windowId, int32_t hotSpotX, int32_t hotSpotY)
@@ -285,12 +285,12 @@ bool InputManager::IsPointerVisible()
 
 int32_t InputManager::SetPointerColor(int32_t color)
 {
-    return InputMgrImpl.SetPointerColor(color);
+    return InputMgrImpl.SetPointerColorGlobal(color);
 }
 
 int32_t InputManager::GetPointerColor(int32_t &color)
 {
-    return InputMgrImpl.GetPointerColor(color);
+    return InputMgrImpl.GetPointerColorGlobal(color);
 }
 
 int32_t InputManager::EnableCombineKey(bool enable)

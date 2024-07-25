@@ -38,9 +38,9 @@ public:
     static napi_value GetPointerStyle(napi_env env, napi_callback_info info);
     static napi_value GetPointerStyleSync(napi_env env, napi_callback_info info);
     std::shared_ptr<JsPointerManager> GetJsPointerMgr() const;
-    static napi_value SetPointerColor(napi_env env, napi_callback_info info);
-    static napi_value GetPointerColor(napi_env env, napi_callback_info info);
-    static napi_value SetPointerColorSync(napi_env env, napi_callback_info info);
+    static napi_value SetPointerColorGlobal(napi_env env, napi_callback_info info);
+    static napi_value GetPointerColorGlobal(napi_env env, napi_callback_info info);
+    static napi_value SetPointerColorGlobalSync(napi_env env, napi_callback_info info);
     static napi_value GetPointerColorSync(napi_env env, napi_callback_info info);
     static napi_value SetPointerSpeed(napi_env env, napi_callback_info info);
     static napi_value SetPointerSpeedSync(napi_env env, napi_callback_info info);
@@ -52,7 +52,7 @@ public:
     static napi_value SetMouseScrollRows(napi_env env, napi_callback_info info);
     static napi_value GetMouseScrollRows(napi_env env, napi_callback_info info);
     static napi_value SetPointerSize(napi_env env, napi_callback_info info);
-    static napi_value GetPointerSize(napi_env env, napi_callback_info info);
+    static napi_value GetPointerSizeGlobal(napi_env env, napi_callback_info info);
     static napi_value SetPointerSizeSync(napi_env env, napi_callback_info info);
     static napi_value GetPointerSizeSync(napi_env env, napi_callback_info info);
     static napi_value SetMousePrimaryButton(napi_env env, napi_callback_info info);

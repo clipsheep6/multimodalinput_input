@@ -46,8 +46,8 @@ protected:
     int32_t StubRemoveInputEventFilter(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetMouseScrollRows(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetMouseScrollRows(MessageParcel& data, MessageParcel& reply);
-    int32_t StubSetPointerSize(MessageParcel& data, MessageParcel& reply);
-    int32_t StubGetPointerSize(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetPointerSizeGlobal(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetPointerSizeGlobal(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetCustomCursor(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetMouseIcon(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetMouseHotSpot(MessageParcel& data, MessageParcel& reply);
@@ -87,8 +87,8 @@ protected:
     int32_t StubGetDisplayBindInfo(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetAllMmiSubscribedEvents(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetDisplayBind(MessageParcel& data, MessageParcel& reply);
-    int32_t StubSetPointerColor(MessageParcel& data, MessageParcel& reply);
-    int32_t StubGetPointerColor(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetPointerColorGlobal(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetPointerColorGlobal(MessageParcel& data, MessageParcel& reply);
     int32_t StubEnableCombineKey(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetPointerSpeed(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetPointerSpeed(MessageParcel& data, MessageParcel& reply);

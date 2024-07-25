@@ -1084,12 +1084,12 @@ int32_t InputManagerImpl::SetPointerSize(int32_t size)
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
-int32_t InputManagerImpl::GetPointerSize(int32_t &size)
+int32_t InputManagerImpl::GetPointerSizeGlobal(int32_t &size)
 {
     CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_POINTER
     std::lock_guard<std::mutex> guard(mtx_);
-    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetPointerSize(size);
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetPointerSizeGlobal(size);
     if (ret != RET_OK) {
         MMI_HILOGE("Get pointer size failed");
     }
@@ -1201,12 +1201,12 @@ bool InputManagerImpl::IsPointerVisible()
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 
-int32_t InputManagerImpl::SetPointerColor(int32_t color)
+int32_t InputManagerImpl::SetPointerColorGlobal(int32_t color)
 {
     CALL_INFO_TRACE;
 #if defined OHOS_BUILD_ENABLE_POINTER
     std::lock_guard<std::mutex> guard(mtx_);
-    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetPointerColor(color);
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetPointerColorGlobal(color);
     if (ret != RET_OK) {
         MMI_HILOGE("Set pointer color failed, ret:%{public}d", ret);
     }
@@ -1217,12 +1217,12 @@ int32_t InputManagerImpl::SetPointerColor(int32_t color)
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
-int32_t InputManagerImpl::GetPointerColor(int32_t &color)
+int32_t InputManagerImpl::GetPointerColorGlobal(int32_t &color)
 {
     CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_POINTER
     std::lock_guard<std::mutex> guard(mtx_);
-    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetPointerColor(color);
+    int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetPointerColorGlobal(color);
     if (ret != RET_OK) {
         MMI_HILOGE("Get pointer color failed");
     }

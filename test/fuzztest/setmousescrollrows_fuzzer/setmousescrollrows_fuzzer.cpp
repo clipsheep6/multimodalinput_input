@@ -57,7 +57,7 @@ void SetPointerSizeFuzzTest(const uint8_t* data, size_t size)
     int32_t pointerSizeAfter;
     startPos += GetObject<int32_t>(pointerSizeBefore, data + startPos, size - startPos);
     InputManager::GetInstance()->SetPointerSize(pointerSizeBefore);
-    InputManager::GetInstance()->GetPointerSize(pointerSizeAfter);
+    InputManager::GetInstance()->GetPointerSizeGlobal(pointerSizeAfter);
 }
 
 void GetAllMmiSubscribedEventsFuzzTest(const uint8_t* data, size_t size)
@@ -89,9 +89,9 @@ void SetHoverScrollStateFuzzTest(const uint8_t* data, size_t size)
 void PointerColorFuzzTest(const uint8_t* data, size_t size)
 {
     int32_t firstColor = 0xA946F1;
-    InputManager::GetInstance()->SetPointerColor(firstColor);
+    InputManager::GetInstance()->SetPointerColorGlobal(firstColor);
     int32_t getColor = 3;
-    InputManager::GetInstance()->GetPointerColor(getColor);
+    InputManager::GetInstance()->GetPointerColorGlobal(getColor);
 }
 
 void ClearWindowPointerStyleFuzzTest(const uint8_t* data, size_t size)

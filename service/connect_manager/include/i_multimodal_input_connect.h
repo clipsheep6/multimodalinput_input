@@ -61,7 +61,7 @@ public:
     virtual int32_t SetMouseIcon(int32_t windowId, void* pixelMap) = 0;
     virtual int32_t SetPointerSize(int32_t size) = 0;
     virtual int32_t SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napStatus) = 0;
-    virtual int32_t GetPointerSize(int32_t &size) = 0;
+    virtual int32_t GetPointerSizeGlobal(int32_t &size) = 0;
     virtual int32_t SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY) = 0;
     virtual int32_t SetMousePrimaryButton(int32_t primaryButton) = 0;
     virtual int32_t GetMousePrimaryButton(int32_t &primaryButton) = 0;
@@ -70,8 +70,8 @@ public:
     virtual int32_t SetPointerVisible(bool visible, int32_t priority) = 0;
     virtual int32_t IsPointerVisible(bool &visible) = 0;
     virtual int32_t MarkProcessed(int32_t eventType, int32_t eventId) = 0;
-    virtual int32_t SetPointerColor(int32_t color) = 0;
-    virtual int32_t GetPointerColor(int32_t &color) = 0;
+    virtual int32_t SetPointerColorGlobal(int32_t color) = 0;
+    virtual int32_t GetPointerColorGlobal(int32_t &color) = 0;
     virtual int32_t EnableCombineKey(bool enable) = 0;
     virtual int32_t SetPointerSpeed(int32_t speed) = 0;
     virtual int32_t GetPointerSpeed(int32_t &speed) = 0;
