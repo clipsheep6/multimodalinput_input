@@ -344,10 +344,14 @@ void PointerDrawingManager::InitPointerObserver()
 {}
 
 int32_t PointerDrawingManager::SetPointerSwitch()
-{}
+{
+    return 0;
+}
 
 int32_t PointerDrawingManager::SetPointerSmartChangeSwitch()
-{}
+{
+    return 0;
+}
 
 std::shared_ptr<IPreferenceManager> IPreferenceManager::instance_;
 std::mutex IPreferenceManager::mutex_;
