@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -68,7 +68,7 @@ private:
 
 private:
     bool OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
-    bool HandleKeyDown(const std::shared_ptr<KeyEvent> &keyEvent);
+    bool HandleKeyDown(const std::shared_ptr<KeyEvent> &keyEvent, int32_t preKeyCode);
     bool HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent);
     bool HandleKeyCancel(const std::shared_ptr<KeyEvent> &keyEvent);
     bool HandleRingMute(std::shared_ptr<KeyEvent> keyEvent);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -385,6 +385,7 @@ bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEven
         MMI_HILOGD("Repeat KeyEvent, skip");
         return true;
     }
+    int32_t preKeyCode = keyEvent_->GetKeyCode();
     keyEvent_ = KeyEvent::Clone(keyEvent);
     int32_t keyAction = keyEvent->GetKeyAction();
     MMI_HILOGD("keyCode:%{public}d, keyAction:%{public}s", keyEvent->GetKeyCode(),
@@ -400,7 +401,7 @@ bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEven
     }
     bool handled = false;
     if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
-        handled = HandleKeyDown(keyEvent);
+        handled = HandleKeyDown(keyEvent, preKeyCode);
     } else if (keyAction == KeyEvent::KEY_ACTION_UP) {
         hasEventExecuting_ = false;
         handled = HandleKeyUp(keyEvent);
@@ -725,6 +726,10 @@ bool KeySubscriberHandler::HandleKeyDown(const std::shared_ptr<KeyEvent> &keyEve
             ClearSubscriberTimer(subscribers);
             continue;
         }
+        if (!keyOption->IsRepeat() && keyCode == preKeyCode) {
+            MMI_HILOGD("Subscribers do not need repeat events");
+            continue;
+        }
         NotifyKeyDownSubscriber(keyEvent, keyOption, subscribers, handled);
     }
     MMI_HILOGD("Handle key down:%{public}s", handled ? "true" : "false");
@@ -945,9 +950,9 @@ void KeySubscriberHandler::PrintKeyOption(const std::shared_ptr<KeyOption> keyOp
 {
     CHKPV(keyOption);
     MMI_HILOGD("keyOption->finalKey:%{public}d,keyOption->isFinalKeyDown:%{public}s, "
-        "keyOption->finalKeyDownDuration:%{public}d",
+        "keyOption->finalKeyDownDuration:%{public}d, keyOption->isRepeat:%{public}s",
         keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
-        keyOption->GetFinalKeyDownDuration());
+        keyOption->GetFinalKeyDownDuration(), keyOption->IsRepeat() ? "true" : "false");
     for (const auto &keyCode : keyOption->GetPreKeys()) {
         MMI_HILOGD("keyOption->prekey:%{public}d", keyCode);
     }
