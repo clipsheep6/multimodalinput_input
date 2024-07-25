@@ -1717,7 +1717,7 @@ napi_value JsPointerContext::GetTouchpadScrollRows(napi_env env, napi_callback_i
     return jsPointerMgr->GetTouchpadScrollRows(env, argv[0]);
 }
 
-napi_value JsPointerContext::SetPointerSwitch(napi_env env, napi_callback_info info)
+napi_value JsPointerContext::PointerStyleChange(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
@@ -1725,12 +1725,12 @@ napi_value JsPointerContext::SetPointerSwitch(napi_env env, napi_callback_info i
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
     CHKPP(jsPointerMgr);
     auto func = [jsPointerMgr] (napi_env env) -> napi_value {
-        return jsPointerMgr->SetPointerSwitch(env);
+        return jsPointerMgr->PointerStyleChange(env);
     };
-    return jsPointerMgr->SetPointerSwitch(env);
+    return jsPointerMgr->PointerStyleChange(env);
 }
-
-napi_value JsPointerContext::SetPointerSmartChangeSwitch(napi_env env, napi_callback_info info)
+ 
+napi_value JsPointerContext::IntelligentChangeSwitch(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
@@ -1738,9 +1738,9 @@ napi_value JsPointerContext::SetPointerSmartChangeSwitch(napi_env env, napi_call
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
     CHKPP(jsPointerMgr);
     auto func = [jsPointerMgr] (napi_env env) -> napi_value {
-        return jsPointerMgr->SetPointerSmartChangeSwitch(env);
+        return jsPointerMgr->IntelligentChangeSwitch(env);
     };
-    return jsPointerMgr->SetPointerSmartChangeSwitch(env);
+    return jsPointerMgr->IntelligentChangeSwitch(env);
 }
 
 napi_value JsPointerContext::Export(napi_env env, napi_value exports)
@@ -1806,8 +1806,8 @@ napi_value JsPointerContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("getHardwareCursorStats", GetHardwareCursorStats),
         DECLARE_NAPI_STATIC_FUNCTION("setTouchpadScrollRows", SetTouchpadScrollRows),
         DECLARE_NAPI_STATIC_FUNCTION("getTouchpadScrollRows", GetTouchpadScrollRows),
-        DECLARE_NAPI_STATIC_FUNCTION("setPointerSwitch", SetPointerSwitch),
-        DECLARE_NAPI_STATIC_FUNCTION("setPointerSmartChangeSwitch", SetPointerSmartChangeSwitch),
+        DECLARE_NAPI_STATIC_FUNCTION("pointerStyleChange", PointerStyleChange),
+        DECLARE_NAPI_STATIC_FUNCTION("intelligentChangeSwitch", IntelligentChangeSwitch),
     };
     CHKRP(napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
     if (CreatePointerStyle(env, exports) == nullptr) {

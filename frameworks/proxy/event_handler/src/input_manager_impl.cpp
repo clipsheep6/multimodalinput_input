@@ -2322,16 +2322,18 @@ int32_t InputManagerImpl::AncoRemoveChannel(std::shared_ptr<IAncoConsumer> consu
     return ERROR_UNSUPPORT;
 }
 
-int32_t InputManagerImpl::SetPointerSwitch()
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+int32_t InputManagerImpl::PointerStyleChange(int32_t style)
 {
     CALL_DEBUG_ENTER;
-    return MULTIMODAL_INPUT_CONNECT_MGR->SetPointerSwitch();
+    return MULTIMODAL_INPUT_CONNECT_MGR->PointerStyleChange(style);
 }
-
-int32_t InputManagerImpl::SetPointerSmartChangeSwitch()
+ 
+int32_t InputManagerImpl::IntelligentChangeSwitch()
 {
     CALL_DEBUG_ENTER;
-    return MULTIMODAL_INPUT_CONNECT_MGR->SetPointerSmartChangeSwitch();
+    return MULTIMODAL_INPUT_CONNECT_MGR->IntelligentChangeSwitch();
 }
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 } // namespace MMI
 } // namespace OHOS

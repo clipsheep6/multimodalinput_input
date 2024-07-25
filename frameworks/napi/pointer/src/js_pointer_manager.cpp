@@ -1094,17 +1094,36 @@ napi_value JsPointerManager::GetTouchpadScrollRows(napi_env env, napi_value hand
     return promise;
 }
 
-napi_value JsPointerManager::SetPointerSwitch(napi_env env)
+napi_value JsPointerManager::PointerStyleChange(napi_env env, int32_t style, napi_value handle)
 {
     CALL_DEBUG_ENTER;
-    InputManager::GetInstance()->SetPointerSwitch();
-    return nullptr;
+    sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
+    CHKPP(asyncContext);
+    asyncContext->errorCode = InputManager::GetInstance()->PointerStyleChange(style);
+    if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
+        MMI_HILOGE("Non system applications use system API");
+        THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        return nullptr;
+    }
+    asyncContext->reserve << ReturnType::VOID;
+    napi_value promise = nullptr;
+    if (handle != nullptr) {
+        CHKRP(napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
+        if (napi_get_undefined(env, &promise) != napi_ok) {
+            CHKRP(napi_delete_reference(env, asyncContext->callback), DELETE_REFERENCE);
+            return nullptr;
+        }
+    } else {
+        CHKRP(napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
+    }
+    AsyncCallbackWork(asyncContext);
+    return promise;
 }
-
-napi_value JsPointerManager::SetPointerSmartChangeSwitch(napi_env env)
+ 
+napi_value JsPointerManager::IntelligentChangeSwitch(napi_env env)
 {
     CALL_DEBUG_ENTER;
-    InputManager::GetInstance()->SetPointerSmartChangeSwitch();
+    InputManager::GetInstance()->IntelligentChangeSwitch();
     return nullptr;
 }
 } // namespace MMI

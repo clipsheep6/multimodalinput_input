@@ -613,14 +613,14 @@ int32_t InputManager::AncoRemoveConsumer(std::shared_ptr<IAncoConsumer> consumer
     return InputMgrImpl.AncoRemoveChannel(consumer);
 }
 
-int32_t InputManager::SetPointerSwitch()
+int32_t InputManager::PointerStyleChange(int32_t style)
 {
-    return InputMgrImpl.SetPointerSwitch();
+    return InputMgrImpl.PointerStyleChange(style);
 }
-
-int32_t InputManager::SetPointerSmartChangeSwitch()
+ 
+int32_t InputManager::IntelligentChangeSwitch()
 {
-    return InputMgrImpl.SetPointerSmartChangeSwitch();
+    return InputMgrImpl.IntelligentChangeSwitch();
 }
 } // namespace MMI
 } // namespace OHOS

@@ -214,8 +214,10 @@ public:
     int32_t RemoveVirtualInputDevice(int32_t deviceId);
     int32_t AncoAddChannel(std::shared_ptr<IAncoConsumer> consumer);
     int32_t AncoRemoveChannel(std::shared_ptr<IAncoConsumer> consumer);
-    int32_t SetPointerSwitch();
-    int32_t SetPointerSmartChangeSwitch();
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+    int32_t PointerStyleChange(int32_t style);
+    int32_t IntelligentChangeSwitch();
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
 private:
     int32_t PackWindowInfo(NetPacket &pkt);

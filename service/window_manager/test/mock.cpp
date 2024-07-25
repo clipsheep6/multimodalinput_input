@@ -343,12 +343,12 @@ void PointerDrawingManager::InitPointerCallback()
 void PointerDrawingManager::InitPointerObserver()
 {}
 
-int32_t PointerDrawingManager::SetPointerSwitch()
+int32_t PointerDrawingManager::PointerStyleChange(int32_t style)
 {
     return 0;
 }
-
-int32_t PointerDrawingManager::SetPointerSmartChangeSwitch()
+ 
+int32_t PointerDrawingManager::IntelligentChangeSwitch()
 {
     return 0;
 }

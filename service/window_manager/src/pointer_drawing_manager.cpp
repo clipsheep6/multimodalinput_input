@@ -141,11 +141,8 @@ PointerDrawingManager::PointerDrawingManager()
     MMI_HILOGI("magiccurosr InitStyle");
     int32_t counter_ = 0;
     hasMagicCursor_.name = "isMagicCursor";
-    TimerMgr->AddTimer(WAIT_TIME_FOR_MAGIC_CURSOR, 1, [this]() {
-        MMI_HILOGD("Timer callback");
-        SetPointerSwitch();
-        SetPointerSmartChangeSwitch();
-    });
+    PointerStyleChange();
+    IntelligentChangeSwitch();
     MAGIC_CURSOR->InitStyle();
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     InitStyle();
@@ -154,7 +151,7 @@ PointerDrawingManager::PointerDrawingManager()
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 }
 
-int32_t PointerDrawingManager::SetPointerSwitch()
+int32_t PointerDrawingManager::PointerStyleChange(int32_t style)
 {
     bool statusValue = false;
     auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue("isMagicCursor", statusValue);
@@ -167,24 +164,24 @@ int32_t PointerDrawingManager::SetPointerSwitch()
     UpdateStyleOptions();
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     if (hasMagicCursor_.isShow != tmp) {
-    if (surfaceNode_ == nullptr) {
-        MMI_HILOGE("surfaceNode_ is nullptr, no need detach");
-        return RET_ERR;
+        if (surfaceNode_ == nullptr) {
+            MMI_HILOGE("surfaceNode_ is nullptr, no need detach");
+            return RET_ERR;
+        }
+        MMI_HILOGI("switch pointer style");
+        int64_t nodeId = surfaceNode_->GetId();
+        if (nodeId != MAGIC_CURSOR->GetSurfaceNodeId(nodeId)) {
+            surfaceNode_->DetachToDisplay(screenId_);
+            Rosen::RSTransaction::FlushImplicitTransaction();
+        }
+        MAGIC_CURSOR->DetachDisplayNode();
+        SwitchPointerStyle();
     }
-    MMI_HILOGI("switch pointer style");
-    int64_t nodeId = surfaceNode_->GetId();
-    if (nodeId != MAGIC_CURSOR->GetSurfaceNodeId(nodeId)) {
-        surfaceNode_->DetachToDisplay(screenId_);
-        Rosen::RSTransaction::FlushImplicitTransaction();
-    }
-    MAGIC_CURSOR->DetachDisplayNode();
-    SwitchPointerStyle();
-}
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     return RET_OK;
 }
-
-int32_t PointerDrawingManager::SetPointerSmartChangeSwitch()
+ 
+int32_t PointerDrawingManager::IntelligentChangeSwitch()
 {
     bool statusValue = true;
     auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue("smartChange", statusValue);

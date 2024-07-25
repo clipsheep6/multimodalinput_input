@@ -135,11 +135,11 @@ public:
     {
         return 0;
     }
-    virtual int32_t SetPointerSwitch()
+    virtual int32_t PointerStyleChange(int32_t style)
     {
         return 0;
     }
-    virtual int32_t SetPointerSmartChangeSwitch()
+    virtual int32_t IntelligentChangeSwitch()
     {
         return 0;
     }
