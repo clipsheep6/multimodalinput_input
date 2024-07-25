@@ -88,9 +88,6 @@ config("libmmi_server_config") {
     "${mmi_path}/util/socket/include",
     "${mmi_path}/util/network/include",
     "${mmi_path}/frameworks/proxy/event_handler/include",
-    "//third_party/cJSON",
-    "${preferences_path}/frameworks/native/include",
-    "${graphics_path}/2d_graphics/include",
     "${mmi_path}/util/napi/include",
   ]
 
@@ -241,7 +238,6 @@ ohos_shared_library("libmmi-server") {
     "${mmi_path}/service/connect_manager:mmi_connect_manager_service",
     "${mmi_path}/service/filter:mmi_event_filter_proxy",
     "${mmi_path}/util:libmmi-util",
-    "//third_party/cJSON:cjson",
   ]
 
   if (input_ext_feature_anco) {
@@ -251,6 +247,9 @@ ohos_shared_library("libmmi-server") {
   external_deps = [
     "c_utils:utils",
     "window_manager:libdm",
+    "cJSON:cjson",
+    "graphic_2d:2d_graphics",
+    "preferences:native_preferences",
   ]
   if (input_feature_pointer_drawing) {
     external_deps += [ "window_manager:libwm_lite" ]
