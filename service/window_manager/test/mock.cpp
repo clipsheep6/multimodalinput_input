@@ -343,6 +343,12 @@ void PointerDrawingManager::InitPointerCallback()
 void PointerDrawingManager::InitPointerObserver()
 {}
 
+int32_t PointerDrawingManager::SetPointerSwitch()
+{}
+
+int32_t PointerDrawingManager::SetPointerSmartChangeSwitch()
+{}
+
 std::shared_ptr<IPreferenceManager> IPreferenceManager::instance_;
 std::mutex IPreferenceManager::mutex_;
 std::shared_ptr<IPreferenceManager> IPreferenceManager::GetInstance()
