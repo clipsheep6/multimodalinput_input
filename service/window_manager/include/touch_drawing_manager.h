@@ -42,6 +42,7 @@ enum class EventActionType : uint32_t {
     MOVE_ACTION = 2,
     UP_ACTION = 3,
 };
+class DelegateInterface;
 class TouchDrawingManager {
 private:
 struct Bubble {
@@ -63,13 +64,17 @@ struct DevMode {
 public:
     DISALLOW_COPY_AND_MOVE(TouchDrawingManager);
     void TouchDrawHandler(std::shared_ptr<PointerEvent> pointerEvent);
-    void UpdateLabels();
+    int32_t UpdateLabels();
     void UpdateDisplayInfo(const DisplayInfo& displayInfo);
     void GetOriginalTouchScreenCoordinates(Direction direction, int32_t width, int32_t height,
         int32_t &physicalX, int32_t &physicalY);
-    void UpdateBubbleData();
+    int32_t UpdateBubbleData();
     void RotationScreen();
     void Dump(int32_t fd, const std::vector<std::string> &args);
+    void SetDelegateProxy(std::shared_ptr<DelegateInterface> proxy)
+    {
+        delegateProxy_ = proxy;
+    }
 private:
     void CreateObserver();
     void AddCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& canvasNode, bool isTrackerNode);
@@ -135,6 +140,7 @@ private:
     bool isChangedMode_ { false };
     bool stopRecord_ { false };
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
+    std::shared_ptr<DelegateInterface> delegateProxy_ {nullptr};
     std::list<PointerEvent::PointerItem> lastPointerItem_ { };
     std::mutex mutex_;
 };
