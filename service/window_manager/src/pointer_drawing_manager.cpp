@@ -141,7 +141,8 @@ PointerDrawingManager::PointerDrawingManager()
     MMI_HILOGI("magiccurosr InitStyle");
     int32_t counter_ = 0;
     hasMagicCursor_.name = "isMagicCursor";
-    PointerStyleChange();
+    bool tmp = GetCurrentPointerStyle();
+    UpdatePointerStyle(tmp);
     IntelligentChangeSwitch();
     MAGIC_CURSOR->InitStyle();
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
@@ -151,7 +152,7 @@ PointerDrawingManager::PointerDrawingManager()
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 }
 
-int32_t PointerDrawingManager::PointerStyleChange(int32_t style)
+bool PointerDrawingManager::GetCurrentPointerStyle()
 {
     bool statusValue = false;
     auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).GetBoolValue("isMagicCursor", statusValue);
@@ -161,6 +162,33 @@ int32_t PointerDrawingManager::PointerStyleChange(int32_t style)
     }
     bool tmp = hasMagicCursor_.isShow;
     hasMagicCursor_.isShow = statusValue;
+    return tmp;
+}
+ 
+int32_t PointerDrawingManager::PointerStyleChange(int32_t style)
+{
+    bool statusValue = false;
+    int32_t ret;
+    if (style == 0) {
+        ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).PutBoolValue("isMagicCursor", statusValue);
+        if (ret != RET_OK) {
+            MMI_HILOGE("Set value from setting date fail");
+            return RET_ERR;
+        }
+    } else if (style == 1) {
+        statusValue = true;
+        ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).PutBoolValue("isMagicCursor", statusValue);
+        if (ret != RET_OK) {
+            MMI_HILOGE("Set value from setting date fail");
+            return RET_ERR;
+        }
+    }
+    bool tmp = hasMagicCursor_.isShow;
+    hasMagicCursor_.isShow = statusValue;
+    return UpdatePointerStyle(tmp);
+}
+ 
+int32_t PointerDrawingManager::UpdatePointerStyle(bool tmp){
     UpdateStyleOptions();
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     if (hasMagicCursor_.isShow != tmp) {
