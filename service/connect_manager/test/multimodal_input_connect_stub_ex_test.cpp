@@ -254,6 +254,10 @@ public:
         return retAddVirtualInputDevice_;
     }
     int32_t RemoveVirtualInputDevice(int32_t deviceId) override { return deviceId; }
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+    int32_t PointerStyleChange(int32_t style) override { return RET_OK; }
+    int32_t IntelligentChangeSwitch() override { return RET_OK; }
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     int32_t EnableHardwareCursorStats(bool enable) override { return static_cast<int32_t>(enable); }
     int32_t GetHardwareCursorStats(uint32_t &frameCount, uint32_t &vsyncCount) override { return retCursorStats_; }
     int32_t SetMoveEventFilters(bool flag) { return 0; }
@@ -7737,5 +7741,43 @@ HWTEST_F(MultimodalInputConnectStubTest,
     MessageParcel reply;
     EXPECT_NO_FATAL_FAILURE(stub->StubTransferBinderClientService(data, reply));
 }
+
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubPointerStyleChange
+ * @tc.desc: Cover if (!IsRunning()) branch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_PointerStyleChange, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_NOT_START;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubPointerStyleChange(data, reply));
+}
+ 
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubIntelligentChangeSwitch
+ * @tc.desc: Cover if (!IsRunning()) branch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubIntelligentChangeSwitch, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_NOT_START;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubIntelligentChangeSwitch(data, reply));
+}
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 } // namespace MMI
 } // namespace OHOS

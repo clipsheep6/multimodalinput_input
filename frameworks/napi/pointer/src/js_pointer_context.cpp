@@ -31,6 +31,7 @@ constexpr int32_t MIN_ROWS { 1 };
 constexpr int32_t MAX_ROWS { 100 };
 constexpr size_t INPUT_PARAMETER { 2 };
 constexpr int32_t DEFAULT_POINTER_SIZE { 1 };
+constexpr int32_t DEFAULT_STYLE { 0 };
 constexpr int32_t MIN_POINTER_SIZE { 1 };
 constexpr int32_t MAX_POINTER_SIZE { 7 };
 constexpr int32_t MIN_POINTER_COLOR { 0x000000 };
@@ -1717,6 +1718,51 @@ napi_value JsPointerContext::GetTouchpadScrollRows(napi_env env, napi_callback_i
     return jsPointerMgr->GetTouchpadScrollRows(env, argv[0]);
 }
 
+napi_value JsPointerContext::PointerStyleChange(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 2;
+    napi_value argv[2] = { 0 };
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc < 1) {
+        MMI_HILOGE("At least 1 parameter is required");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "style", "number");
+        return nullptr;
+    }
+    if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
+        MMI_HILOGE("Style parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "style", "number");
+        return nullptr;
+    }
+    int32_t style = DEFAULT_STYLE;
+    CHKRP(napi_get_value_int32(env, argv[0], &style), GET_VALUE_INT32);
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    if (argc == 1) {
+        return jsPointerMgr->PointerStyleChange(env, style);
+    }
+    if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
+        MMI_HILOGE("Callback parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        return nullptr;
+    }
+    return jsPointerMgr->PointerStyleChange(env, style, argv[1]);
+}
+ 
+napi_value JsPointerContext::IntelligentChangeSwitch(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
+    auto func = [jsPointerMgr] (napi_env env) -> napi_value {
+        return jsPointerMgr->IntelligentChangeSwitch(env);
+    };
+    return jsPointerMgr->IntelligentChangeSwitch(env);
+}
+
 napi_value JsPointerContext::Export(napi_env env, napi_value exports)
 {
     CALL_DEBUG_ENTER;
@@ -1780,6 +1826,8 @@ napi_value JsPointerContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("getHardwareCursorStats", GetHardwareCursorStats),
         DECLARE_NAPI_STATIC_FUNCTION("setTouchpadScrollRows", SetTouchpadScrollRows),
         DECLARE_NAPI_STATIC_FUNCTION("getTouchpadScrollRows", GetTouchpadScrollRows),
+        DECLARE_NAPI_STATIC_FUNCTION("pointerStyleChange", PointerStyleChange),
+        DECLARE_NAPI_STATIC_FUNCTION("intelligentChangeSwitch", IntelligentChangeSwitch),
     };
     CHKRP(napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
     if (CreatePointerStyle(env, exports) == nullptr) {

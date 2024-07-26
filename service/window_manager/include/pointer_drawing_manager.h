@@ -105,6 +105,8 @@ public:
     int32_t GetPointerSnapshot(void *pixelMapPtr) override;
     void InitPointerCallback() override;
     void InitPointerObserver() override;
+    int32_t PointerStyleChange(int32_t style) override;
+    int32_t IntelligentChangeSwitch() override;
 
 private:
     IconStyle GetIconType(MOUSE_ICON mouseIcon);
@@ -126,6 +128,8 @@ private:
     int32_t InitLayer(const MOUSE_ICON mouseStyle);
     int32_t SetPointerStylePreference(PointerStyle pointerStyle);
     void UpdateMouseStyle();
+    bool GetCurrentPointerStyle();
+    int32_t UpdatePointerStyle(bool tmp);
     int32_t UpdateCursorProperty(void* pixelMap, const int32_t &focusX, const int32_t &focusY);
     void RotateDegree(Direction direction);
     int32_t DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
@@ -134,8 +138,6 @@ private:
     void AdjustMouseFocusByDirection90(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
     void AdjustMouseFocusByDirection180(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
     void AdjustMouseFocusByDirection270(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
-    void CreateMagicCursorChangeObserver();
-    int32_t CreatePointerSwitchObserver(isMagicCursor& item);
     void UpdateStyleOptions();
     int32_t GetIndependentPixels();
     bool CheckPointerStyleParam(int32_t windowId, PointerStyle pointerStyle);
