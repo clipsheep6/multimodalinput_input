@@ -19,7 +19,9 @@
 #include <iostream>
 #include <list>
 
+#include "common/rs_thread_handler.h"
 #include "draw/canvas.h"
+#include "event_handler.h"
 #include "nocopyable.h"
 #include "pixel_map.h"
 #include "transaction/rs_transaction.h"
@@ -146,9 +148,27 @@ private:
     Rosen::Drawing::AlphaType AlphaTypeToAlphaType(Media::AlphaType alphaType);
     std::shared_ptr<Rosen::Drawing::Image> ExtractDrawingImage(std::shared_ptr<Media::PixelMap> pixelMap);
     void DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUSE_ICON mouseStyle);
-    bool SetHardWareLocation(int32_t displayId, int32_t physicalX, int32_t physicalY);
     void SetPixelMap(std::shared_ptr<OHOS::Media::PixelMap> pixelMap);
     void ForceClearPointerVisiableStatus() override;
+    void CreateCanvasNode();
+    void SetSurfaceNodeVisible(bool visible);
+    bool ChangeHasHardwareCursorAnimate();
+    float CalculatePhysicalXOffset(ICON_TYPE iconType);
+    float CalculatePhysicalYOffset(ICON_TYPE iconType);
+    bool DynamicSetHardwareCursorPosition(int32_t physicalX, int32_t physicalY, ICON_TYPE iconType);
+    bool SetHardWareLocation(int32_t displayId, int32_t physicalX, int32_t physicalY, ICON_TYPE iconType);
+    bool SetDynamicHardWareLocation(int32_t physicalX, int32_t physicalY, ICON_TYPE iconType);
+    void SetHardwareCursorPosition(int32_t displayId, int32_t physicalX, int32_t physicalY,
+        const PointerStyle pointerStyle);
+    void RenderThreadLoop();
+    int32_t RequestNextVSync();
+    void OnVsync(uint64_t timestamp);
+    void PostTask(Rosen::RSTaskMessage::RSTask task);
+    int32_t ParsingDynamicImage(const MOUSE_ICON mouseStyle);
+    void DrawDynamicImage(OHOS::Rosen::Drawing::Canvas &canvas, const MOUSE_ICON mouseStyle);
+    void DoHardwareCursorDraw();
+    int32_t FlushBuffer();
+    int32_t GetSurfaceInformation();
 
 private:
     struct PidInfo {
@@ -184,6 +204,22 @@ private:
     isMagicCursor hasMagicCursor_;
     bool hasInitObserver_ { false };
     bool isInit_ { false };
+    std::atomic<bool> hasHardwareCursorAnimate_ { false };
+    std::atomic<bool> hasLoadingPointerStyle_ { false };
+    int32_t frameCount_ { 30 };
+    int32_t currentFrame_ { 0 };
+    sptr<OHOS::Surface> layer_ { nullptr };
+    sptr<OHOS::SurfaceBuffer> buffer_ { nullptr };
+    uint8_t *addr_ { nullptr };
+    int32_t currentPhysicalX_ { -1 };
+    int32_t currentPhysicalY_ { -1 };
+    std::shared_ptr<Rosen::Drawing::Image> runningRightImage_ { nullptr };
+    std::shared_ptr<Rosen::Drawing::Image> image_ { nullptr };
+    std::shared_ptr<AppExecFwk::EventRunner> runner_ { nullptr };
+    std::shared_ptr<AppExecFwk::EventHandler> handler_ { nullptr };
+    std::shared_ptr<Rosen::VSyncReceiver> receiver_ { nullptr };
+    std::atomic<bool> isRenderRuning_{ false };
+    std::unique_ptr<std::thread> renderThread_;
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     std::shared_ptr<HardwareCursorPointerManager> hardwareCursorPointerManager_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
