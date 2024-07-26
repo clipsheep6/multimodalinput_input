@@ -183,7 +183,8 @@ int32_t PointerDrawingManager::PointerStyleChange(int32_t style)
     return UpdatePointerStyle(statusValue);
 }
  
-int32_t PointerDrawingManager::UpdatePointerStyle(bool statusValue){
+int32_t PointerDrawingManager::UpdatePointerStyle(bool statusValue)
+{
     bool tmp = hasMagicCursor_.isShow;
     hasMagicCursor_.isShow = statusValue;
     UpdateStyleOptions();

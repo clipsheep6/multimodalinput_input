@@ -2741,10 +2741,11 @@ void MMIService::CalculateFuntionRunningTime(std::function<void()> func, const s
 }
 
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-int32_t MMIService::PointerStyleChange(int32_t style) {
+int32_t MMIService::PointerStyleChange(int32_t style)
+{
     CALL_INFO_TRACE;
     int32_t ret = delegateTasks_.PostSyncTask(
-            [style] {
+        [style] {
                 return IPointerDrawingManager::GetInstance()->PointerStyleChange(style);
             }
     );

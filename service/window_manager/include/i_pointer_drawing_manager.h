@@ -142,7 +142,7 @@ public:
     virtual int32_t IntelligentChangeSwitch()
     {
         return 0;
-    }    
+    }
     virtual void ForceClearPointerVisiableStatus();
     virtual void InitPointerObserver() {}
 public:
