@@ -128,6 +128,8 @@ private:
     int32_t InitLayer(const MOUSE_ICON mouseStyle);
     int32_t SetPointerStylePreference(PointerStyle pointerStyle);
     void UpdateMouseStyle();
+    bool GetCurrentPointerStyle();
+    int32_t UpdatePointerStyle(bool tmp);
     int32_t UpdateCursorProperty(void* pixelMap, const int32_t &focusX, const int32_t &focusY);
     void RotateDegree(Direction direction);
     int32_t DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
