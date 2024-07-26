@@ -1099,12 +1099,14 @@ napi_value JsPointerManager::PointerStyleChange(napi_env env, int32_t style, nap
     CALL_DEBUG_ENTER;
     sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
     CHKPP(asyncContext);
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     asyncContext->errorCode = InputManager::GetInstance()->PointerStyleChange(style);
     if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
         return nullptr;
     }
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     asyncContext->reserve << ReturnType::VOID;
     napi_value promise = nullptr;
     if (handle != nullptr) {
@@ -1123,7 +1125,9 @@ napi_value JsPointerManager::PointerStyleChange(napi_env env, int32_t style, nap
 napi_value JsPointerManager::IntelligentChangeSwitch(napi_env env)
 {
     CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     InputManager::GetInstance()->IntelligentChangeSwitch();
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     return nullptr;
 }
 } // namespace MMI
