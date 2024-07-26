@@ -405,7 +405,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_THREE_GINGERS_TAPSWITCH):
             ret = StubGetTouchpadThreeFingersTapSwitch(data, reply);
-            break;      
+            break;
 #ifdef OHOS_BUILD_ENABLE_ANCO
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ADD_ANCO_CHANNEL):
             ret = StubAncoAddChannel(data, reply);

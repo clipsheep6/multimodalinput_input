@@ -705,7 +705,6 @@ void OH_Input_CancelInjection()
 
 void GetIntervalSinceLastInputCallback(int64_t interval)
 {
-    //IntervalSinceLastInput = interval;
     MMI_HILOGI("GetIntervalSinceLastInputCallback interval:%{public}lld", interval);
     return;
 }
