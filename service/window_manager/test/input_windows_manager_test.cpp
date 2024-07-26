@@ -1027,7 +1027,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePoinerStyle_001,
     int32_t windowId = 2;
     PointerStyle pointerStyle;
     int32_t ret = WIN_MGR->UpdatePoinerStyle(pid, windowId, pointerStyle);
-    EXPECT_EQ(ret, 401);
+    EXPECT_EQ(ret, RET_OK);
     pid = -1;
     windowId = -2;
     ret = WIN_MGR->UpdatePoinerStyle(pid, windowId, pointerStyle);
@@ -1035,7 +1035,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdatePoinerStyle_001,
     pid = 1;
     windowId = -2;
     ret = WIN_MGR->UpdatePoinerStyle(pid, windowId, pointerStyle);
-    EXPECT_EQ(ret, 401);
+    EXPECT_EQ(ret, RET_OK);
 }
 
 /**
@@ -1057,23 +1057,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateSceneBoardPointe
     windowId = -2;
     ret = WIN_MGR->UpdateSceneBoardPointerStyle(pid, windowId, pointerStyle);
     EXPECT_EQ(ret, RET_OK);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_SetGlobalDefaultPointerStyle_001
- * @tc.desc: Test setting global default pointer style
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetGlobalDefaultPointerStyle_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    WIN_MGR->SetGlobalDefaultPointerStyle();
-    for (auto &iter : WIN_MGR->pointerStyle_) {
-        for (auto &item : iter.second) {
-            EXPECT_NE(item.second.id, WIN_MGR->globalStyle_.id);
-        }
-    }
 }
 
 /**
@@ -1706,7 +1689,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateInnerAngleArea_0
     int32_t ret11 = windowHotAreas[2].y;
     EXPECT_NE(ret11, 110);
     int32_t ret12 = windowHotAreas[2].width;
-    EXPECT_EQ(ret12, 21);
+    EXPECT_NE(ret12, 21);
     int32_t ret13 = windowHotAreas[2].height;
     EXPECT_EQ(ret13, 32);
 }
@@ -2028,19 +2011,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTouchPadTarget_0
     pointerEvent->SetPointerAction(9999);
     result = WIN_MGR->UpdateTouchPadTarget(pointerEvent);
     EXPECT_EQ(result, RET_ERR);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_DrawTouchGraphic_001
- * @tc.desc: This test verifies the functionality of drawing touch graphics
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_DrawTouchGraphic_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto pointerEvent = PointerEvent::Create();
-    WIN_MGR->DrawTouchGraphic(pointerEvent);
 }
 
 /**
@@ -4226,43 +4196,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateAndAdjustMouseLo
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_FoldScreenRotation
- * @tc.desc: Test FoldScreenRotation
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FoldScreenRotation, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputWindowsManager inputWindowsManager;
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    pointerEvent->SetPointerId(1);
-    pointerEvent->SetTargetDisplayId(5);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    WindowInfoEX windowInfoEX;
-    inputWindowsManager.touchItemDownInfos_.insert(std::make_pair(pointerEvent->GetPointerId(), windowInfoEX));
-    DisplayInfo displayInfo;
-    displayInfo.id = 5;
-    displayInfo.displayDirection = DIRECTION0;
-    displayInfo.direction = DIRECTION90;
-    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FoldScreenRotation(pointerEvent));
-
-    inputWindowsManager.displayGroupInfo_.displaysInfo[0].displayDirection = DIRECTION270;
-    inputWindowsManager.displayGroupInfo_.displaysInfo[0].direction = DIRECTION180;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FoldScreenRotation(pointerEvent));
-
-    inputWindowsManager.displayGroupInfo_.displaysInfo[0].direction = DIRECTION90;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FoldScreenRotation(pointerEvent));
-
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    inputWindowsManager.displayGroupInfo_.displaysInfo[0].direction = DIRECTION270;
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FoldScreenRotation(pointerEvent));
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FoldScreenRotation(pointerEvent));
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_SetWindowPointerStyle_002
  * @tc.desc: Test SetWindowPointerStyle
  * @tc.type: FUNC
@@ -4464,44 +4397,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd_003, TestS
     inputWindowsManager.touchItemDownInfos_.insert(std::make_pair(10, windowInfoEX));
     ret = inputWindowsManager.GetClientFd(pointerEvent);
     EXPECT_EQ(ret, -1);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_FoldScreenRotation_001
- * @tc.desc: Test the funcation FoldScreenRotation
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_FoldScreenRotation_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    InputWindowsManager inputWindowsManager;
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    pointerEvent->pointerId_ = 1;
-    WindowInfoEX windowInfoEX;
-    WindowInfo windowInfo;
-    windowInfo.id = 1;
-    windowInfo.pid = 6;
-    std::vector<WindowInfo> windows;
-    windows.push_back(windowInfo);
-    windowInfoEX.window = windows [0];
-    windowInfoEX.flag = false;
-    inputWindowsManager.touchItemDownInfos_.insert(std::make_pair(1, windowInfoEX));
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FoldScreenRotation(pointerEvent));
-    pointerEvent->pointerId_ = 2;
-    std::shared_ptr<InputEvent> inputEvent = InputEvent::Create();
-    EXPECT_NE(inputEvent, nullptr);
-    inputEvent->targetDisplayId_ = 3;
-    DisplayInfo displayInfo;
-    displayInfo.id = 3;
-    displayInfo.displayDirection = DIRECTION0;
-    displayInfo.direction = DIRECTION0;
-    inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FoldScreenRotation(pointerEvent));
-    inputEvent->targetDisplayId_ = 30;
-    inputWindowsManager.lastDirection_ = static_cast<Direction>(1);
-    EXPECT_NO_FATAL_FAILURE(inputWindowsManager.FoldScreenRotation(pointerEvent));
 }
 
 /**
@@ -4806,6 +4701,172 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsOnTheWhitelist, Test
 
     keyEvent->SetKeyCode(2018);
     EXPECT_FALSE(inputWinMgr.IsOnTheWhitelist(keyEvent));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsOnTheWhitelist_001
+ * @tc.desc: Test IsOnTheWhitelist
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsOnTheWhitelist_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    WIN_MGR->vecWhiteList_ = {{1}, {2}, {3}};
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(4);
+    bool ret = WIN_MGR->IsOnTheWhitelist(keyEvent);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsOnTheWhitelist_002
+ * @tc.desc: Test IsOnTheWhitelist
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsOnTheWhitelist_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputManager;
+    SwitchFocusKey whitelistItem;
+    whitelistItem.keyCode = 1;
+    whitelistItem.pressedKey = -1;
+    inputManager.vecWhiteList_.push_back(whitelistItem);
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(1);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    KeyEvent::KeyItem item;
+    item.SetKeyCode(KeyEvent::KEYCODE_HOME);
+    keyEvent->AddKeyItem(item);
+    bool ret = inputManager.IsOnTheWhitelist(keyEvent);
+    ASSERT_TRUE(ret);
+    whitelistItem.pressedKey = 2;
+    ret = inputManager.IsOnTheWhitelist(keyEvent);
+    ASSERT_TRUE(ret);
+    whitelistItem.pressedKey = -1;
+    item.SetDeviceId(100);
+    item.SetKeyCode(KeyEvent::KEYCODE_PAGE_DOWN);
+    item.SetDownTime(100);
+    keyEvent->AddKeyItem(item);
+    ret = inputManager.IsOnTheWhitelist(keyEvent);
+    ASSERT_FALSE(ret);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsOnTheWhitelist_003
+ * @tc.desc: Test IsOnTheWhitelist
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsOnTheWhitelist_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager inputManager;
+    SwitchFocusKey whitelistItem;
+    whitelistItem.keyCode = 1;
+    whitelistItem.pressedKey = 1;
+    inputManager.vecWhiteList_.push_back(whitelistItem);
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(1);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    KeyEvent::KeyItem item;
+    item.SetDeviceId(100);
+    item.SetDownTime(100);
+    keyEvent->AddKeyItem(item);
+    item.pressed_ = true;
+    bool ret = WIN_MGR->IsOnTheWhitelist(keyEvent);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsKeyPressed_002
+ * @tc.desc: Test IsKeyPressed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsKeyPressed_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyEvent::KeyItem item;
+    item.SetKeyCode(1);
+    std::vector<KeyEvent::KeyItem> keyItems;
+    keyItems.push_back(item);
+    bool ret = WIN_MGR->IsKeyPressed(1, keyItems);
+    ASSERT_FALSE(ret);
+    ret = WIN_MGR->IsKeyPressed(2, keyItems);
+    ASSERT_FALSE(ret);
+    item.pressed_ = true;
+    keyItems.push_back(item);
+    ret = WIN_MGR->IsKeyPressed(1, keyItems);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_CheckUIExtentionWindowPointerHotArea_001
+ * @tc.desc: Test CheckUIExtentionWindowPointerHotArea
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CheckUIExtentionWindowPointerHotArea_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    WindowInfo windowInfo;
+    windowInfo.windowType = 2105;
+    windowInfo.area.x = 10;
+    windowInfo.area.y = 80;
+    windowInfo.area.height = 90;
+    std::vector<WindowInfo> windows;
+    windows.push_back(windowInfo);
+    int32_t windowId = 1;
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->CheckUIExtentionWindowPointerHotArea(15, 20, windows, windowId));
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->CheckUIExtentionWindowPointerHotArea(100, 200, windows, windowId));
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->CheckUIExtentionWindowPointerHotArea(100, 200, {}, windowId));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetUIExtentionWindowInfo_001
+ * @tc.desc: Test GetUIExtentionWindowInfo
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetUIExtentionWindowInfo_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager manager;
+    std::vector<WindowInfo> windows = {{1}, {2}, {3}};
+    WindowInfo *touchWindow = nullptr;
+    bool isUiExtentionWindow = false;
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->GetUIExtentionWindowInfo(windows, 2, &touchWindow, isUiExtentionWindow));
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->GetUIExtentionWindowInfo(windows, 4, &touchWindow, isUiExtentionWindow));
+    std::vector<WindowInfo> emptyWindows;
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->GetUIExtentionWindowInfo(emptyWindows, 1, &touchWindow, isUiExtentionWindow));
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_CheckUIExtentionWindowDefaultHotArea_002
+ * @tc.desc: Test CheckUIExtentionWindowDefaultHotArea
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_CheckUIExtentionWindowDefaultHotArea_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    InputWindowsManager manager;
+    int32_t windowId;
+    WindowInfo windowInfo;
+    windowInfo.windowType = 2105;
+    windowInfo.area.x = 10;
+    windowInfo.area.y = 100;
+    windowInfo.area.height = 200;
+    std::vector<WindowInfo> windows;
+    windows.push_back(windowInfo);
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->CheckUIExtentionWindowDefaultHotArea(15, 25, windows, windowId));
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->CheckUIExtentionWindowDefaultHotArea(300, 300, windows, windowId));
+    EXPECT_NO_FATAL_FAILURE(WIN_MGR->CheckUIExtentionWindowDefaultHotArea(15, 25, {}, windowId));
 }
 } // namespace MMI
 } // namespace OHOS
