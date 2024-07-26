@@ -145,6 +145,11 @@ public:
     int32_t AncoRemoveChannel(sptr<IAncoChannel> channel);
 #endif // OHOS_BUILD_ENABLE_ANCO
 
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+    int32_t PointerStyleChange(int32_t style);
+    int32_t IntelligentChangeSwitch();
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+
 private:
     MultimodalInputConnectManager() = default;
     DISALLOW_COPY_AND_MOVE(MultimodalInputConnectManager);

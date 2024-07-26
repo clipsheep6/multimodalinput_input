@@ -252,6 +252,15 @@ bool PointerDrawingManager::GetPointerVisible(int32_t pid)
 {
     return true;
 }
+int32_t PointerDrawingManager::PointerStyleChange(int32_t style)
+{
+    return 0;
+}
+ 
+int32_t PointerDrawingManager::IntelligentChangeSwitch()
+{
+    return 0;
+}
 int32_t PointerDrawingManager::SetPointerColor(int32_t color)
 {
     return 0;

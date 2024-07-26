@@ -417,6 +417,14 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::TRANSFER_BINDER_CLIENT_SERVICE):
             ret = StubTransferBinderClientService(data, reply);
             break;
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::POINTER_STYLE_CHANGE):
+            return StubPointerStyleChange(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::INTELLIGENT_CHANGE_SWITCH):
+            return StubIntelligentChangeSwitch(data, reply);
+            break;
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR            
         default: {
             MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
             ret = IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -2613,5 +2621,31 @@ int32_t MultimodalInputConnectStub::StubTransferBinderClientService(MessageParce
     WRITEINT32(reply, ret);
     return RET_OK;
 }
+
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+int32_t MultimodalInputConnectStub::StubPointerStyleChange(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t style = 0;
+    READINT32(data, style, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = PointerStyleChange(style);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call PointerStyleChange failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+ 
+int32_t MultimodalInputConnectStub::StubIntelligentChangeSwitch(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = IntelligentChangeSwitch();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call IntelligentChangeSwitch failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 } // namespace MMI
 } // namespace OHOS

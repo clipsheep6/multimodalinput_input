@@ -153,6 +153,10 @@ public:
     virtual int32_t AncoRemoveChannel(sptr<IAncoChannel> channel) = 0;
 #endif // OHOS_BUILD_ENABLE_ANCO
     virtual int32_t TransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject) = 0;
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+    virtual int32_t PointerStyleChange(int32_t style) = 0;
+    virtual int32_t IntelligentChangeSwitch() = 0;
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 };
 } // namespace MMI
 } // namespace OHOS
