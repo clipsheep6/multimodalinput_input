@@ -931,6 +931,7 @@ public:
 
     int32_t AncoAddConsumer(std::shared_ptr<IAncoConsumer> consumer);
     int32_t AncoRemoveConsumer(std::shared_ptr<IAncoConsumer> consumer);
+    int32_t GetIntervalSinceLastInput(std::function<void(int64_t)> callback);
 
 private:
     InputManager() = default;

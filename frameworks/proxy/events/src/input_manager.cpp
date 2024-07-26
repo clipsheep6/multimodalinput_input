@@ -612,5 +612,10 @@ int32_t InputManager::AncoRemoveConsumer(std::shared_ptr<IAncoConsumer> consumer
 {
     return InputMgrImpl.AncoRemoveChannel(consumer);
 }
+
+int32_t InputManager::GetIntervalSinceLastInput(std::function<void(int64_t)> callback)
+{
+    return InputMgrImpl.GetIntervalSinceLastInput(callback);
+}
 } // namespace MMI
 } // namespace OHOS

@@ -702,3 +702,17 @@ void OH_Input_CancelInjection()
     CALL_DEBUG_ENTER;
     OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().CancelInjection();
 }
+
+void GetIntervalSinceLastInputCallback(int64_t interval)
+{
+    //IntervalSinceLastInput = interval;
+    MMI_HILOGI("GetIntervalSinceLastInputCallback interval:%{public}lld", interval);
+    return;
+}
+
+int32_t OH_Input_GetIntervalSinceLastInput(int64_t &IntervalSinceLastInput)
+{
+    CALL_DEBUG_ENTER;
+    OHOS::MMI::InputManager::GetInstance()->GetIntervalSinceLastInput(GetIntervalSinceLastInputCallback);
+    return INPUT_SUCCESS;
+}

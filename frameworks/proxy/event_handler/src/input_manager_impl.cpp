@@ -2321,5 +2321,16 @@ int32_t InputManagerImpl::AncoRemoveChannel(std::shared_ptr<IAncoConsumer> consu
     MMI_HILOGI("AncoRemoveChannel function does not support");
     return ERROR_UNSUPPORT;
 }
+
+int32_t InputManagerImpl::GetIntervalSinceLastInput(std::function<void(int64_t)> callback)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("Client init failed");
+        return RET_ERR;
+    }
+    return INPUT_DEVICE_IMPL.GetIntervalSinceLastInput(callback);
+}
 } // namespace MMI
 } // namespace OHOS

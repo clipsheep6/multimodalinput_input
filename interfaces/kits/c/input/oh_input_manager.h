@@ -681,6 +681,16 @@ int64_t OH_Input_GetTouchEventActionTime(const struct Input_TouchEvent* touchEve
  */
 void OH_Input_CancelInjection();
 
+/**
+ * @brief 获取自上次输入以来的间隔.
+ *
+ * @param 自上次输入以来的间隔.
+ * @return 返回自上次输入事件以来的时间间隔.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+int32_t OH_Input_GetIntervalSinceLastInput(int64_t &IntervalSinceLastInput);
+
 #ifdef __cplusplus
 }
 #endif

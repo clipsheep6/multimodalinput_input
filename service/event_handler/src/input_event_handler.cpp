@@ -42,6 +42,7 @@ constexpr int32_t MT_TOOL_PALM { 2 };
 
 InputEventHandler::InputEventHandler()
 {
+    lastEventBeginTime_ = GetSysClockTime();
     udsServer_ = nullptr;
 }
 
@@ -203,6 +204,13 @@ int32_t InputEventHandler::BuildInputHandlerChain()
 UDSServer* InputEventHandler::GetUDSServer() const
 {
     return udsServer_;
+}
+
+int32_t InputEventHandler::GetIntervalSinceLastInput(int64_t &timeInterval)
+{
+    int64_t currentSystemTime = GetSysClockTime();
+    timeInterval = currentSystemTime - lastEventBeginTime_;
+    return RET_OK;
 }
 
 std::shared_ptr<EventNormalizeHandler> InputEventHandler::GetEventNormalizeHandler() const

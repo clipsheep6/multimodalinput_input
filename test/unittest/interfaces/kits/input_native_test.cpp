@@ -790,5 +790,17 @@ HWTEST_F(InputNativeTest, InputNativeTest_InjectTouchEvent_005, TestSize.Level1)
     retResult = OH_Input_InjectTouchEvent(touchEvent);
     EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
 }
+
+/**
+ * @tc.name: InputNativeTest_GetIntervalSinceLastInput_001
+ * @tc.desc: Verify the Get Interval Since Last Input
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_GetIntervalSinceLastInput_001, TestSize.Level1)
+{
+    int64_t IntervalSinceLastInput = 0;
+    OH_Input_GetIntervalSinceLastInput(IntervalSinceLastInput);
+}
 } // namespace MMI
 } // namespace OHOS
