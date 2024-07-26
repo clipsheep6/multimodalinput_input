@@ -188,7 +188,8 @@ int32_t PointerDrawingManager::PointerStyleChange(int32_t style)
     return UpdatePointerStyle(tmp);
 }
  
-int32_t PointerDrawingManager::UpdatePointerStyle(bool tmp){
+int32_t PointerDrawingManager::UpdatePointerStyle(bool tmp)
+{
     UpdateStyleOptions();
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     if (hasMagicCursor_.isShow != tmp) {
