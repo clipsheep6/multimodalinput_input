@@ -99,7 +99,7 @@ const int32_t TUPLE_PID { 0 };
 const int32_t TUPLE_UID { 1 };
 const int32_t TUPLE_NAME { 2 };
 const int32_t DEFAULT_POINTER_COLOR { 0x000000 };
-const int32_t DEFAULT_STYLE{ 0 };
+
 constexpr int32_t MAX_N_TRANSMIT_INFRARED_PATTERN { 500 };
 
 int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel& data,
@@ -2627,7 +2627,7 @@ int32_t MultimodalInputConnectStub::StubTransferBinderClientService(MessageParce
 int32_t MultimodalInputConnectStub::StubPointerStyleChange(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    int32_t style = DEFAULT_STYLE;
+    int32_t style = 0;
     READINT32(data, style, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = PointerStyleChange(style);
     if (ret != RET_OK) {
