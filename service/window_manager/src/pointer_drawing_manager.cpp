@@ -140,9 +140,11 @@ PointerDrawingManager::PointerDrawingManager()
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     MMI_HILOGI("magiccurosr InitStyle");
     hasMagicCursor_.name = "isMagicCursor";
-    bool statusValue = GetCurrentPointerStyle();
-    UpdatePointerStyle(statusValue);
-    IntelligentChangeSwitch();
+    TimerMgr->AddTimer(WAIT_TIME_FOR_MAGIC_CURSOR, 1, [this]() {
+        bool statusValue = GetCurrentPointerStyle();
+        UpdatePointerStyle(statusValue);
+        IntelligentChangeSwitch();
+    });
     MAGIC_CURSOR->InitStyle();
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     InitStyle();
