@@ -300,7 +300,7 @@ private:
     void ReportGestureInfo();
 #endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     void CheckAndUpdateTappingCountAtDown(std::shared_ptr<PointerEvent> touchEvent);
-
+    bool KnuckleDoubleClickHandle(const std::shared_ptr<PointerEvent> pointerEvent);
 private:
     Sequence matchedSequence_;
     ShortcutKey lastMatchedKey_;

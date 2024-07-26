@@ -65,7 +65,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
     int32_t SetOriginPointerId(std::shared_ptr<PointerEvent> pointerEvent);
     void TouchEventSetPressedKeys(std::shared_ptr<PointerEvent> pointerEvent);
-
+    bool KnuckleDoubleClickHandle(libinput_event* event);
 private:
     int32_t timerId_ { -1 };
     bool isShield_ { false };

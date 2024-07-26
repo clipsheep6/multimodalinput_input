@@ -68,6 +68,10 @@ const std::string WAKEUP_ABILITY_NAME { "WakeUpExtAbility" };
 const std::string SCREENSHOT_BUNDLE_NAME { "com.hmos.screenshot" };
 const std::string SCREENSHOT_ABILITY_NAME { "com.hmos.screenshot.ServiceExtAbility" };
 const std::string SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
+const std::string HARDEN_SCREENSHOT_BUNDLE_NAME { "com.huawei.hmos.screenshot" };
+const std::string HARDEN_SCREENSHOT_ABILITY_NAME { "com.huawei.hmos.screenshot.ServiceExtAbility" };
+const std::string HARDEN_SCREENRECORDER_BUNDLE_NAME { "com.huawei.hmos.screenrecorder" };
+const std::string HARDEN_SCREENRECORDER_ABILITY_NAME { "com.huawei.hmos.screenrecorder.ServiceExtAbility" };
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -88,6 +92,9 @@ void KeyCommandHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 void KeyCommandHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
+    if (KnuckleDoubleClickHandle(pointerEvent)) {
+        return;
+    }
     if (OnHandleEvent(pointerEvent)) {
         if (EventLogHelper::IsBetaVersion() && !pointerEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
             MMI_HILOGD("The pointerEvent start launch an ability, pointAction:%{public}s",
@@ -2137,6 +2144,41 @@ void KeyCommandHandler::CheckAndUpdateTappingCountAtDown(std::shared_ptr<Pointer
             DfxHisysevent::ReportFailIfKnockTooFast();
         }
     }
+}
+
+bool KeyCommandHandler::KnuckleDoubleClickHandle(const std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    auto actionType = pointerEvent->GetPointerAction();
+    if (actionType == KNUCKLE_1F_DOUBLE_CLICK) {
+        std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
+        if (screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF ||
+            screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED) {
+            MMI_HILOGI("The current screen is not in the unlocked state with the screen on");
+            return false;
+        }
+        Ability ability;
+        ability.bundleName = HARDEN_SCREENSHOT_BUNDLE_NAME;
+        ability.abilityName = HARDEN_SCREENSHOT_ABILITY_NAME;
+        ability.params.emplace(std::make_pair("trigger_type", "single_knuckle"));
+        LaunchAbility(ability, 0);
+        return true;
+    }
+    if (actionType == KNUCKLE_2F_DOUBLE_CLICK) {
+        std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
+        if (screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF ||
+            screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED) {
+            MMI_HILOGI("The current screen is not in the unlocked state with the screen on");
+            return false;
+        }
+        Ability ability;
+        ability.bundleName = HARDEN_SCREENRECORDER_BUNDLE_NAME;
+        ability.abilityName = HARDEN_SCREENRECORDER_ABILITY_NAME;
+        ability.params.emplace(std::make_pair("trigger_type", "double_knuckle"));
+        LaunchAbility(ability, 0);
+        return true;
+    }
+    return false;
 }
 } // namespace MMI
 } // namespace OHOS

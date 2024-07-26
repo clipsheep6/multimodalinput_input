@@ -25,6 +25,14 @@ inline constexpr int32_t MAX_DEVICENAME { 64 };
 inline constexpr int32_t MAX_UUIDSIZE { 64 };
 inline constexpr int32_t SYSTEMUID { 1000 };
 inline constexpr int32_t MAX_SOLTED_COORDS_NUMS { 10 };
+inline constexpr double SINGLE_KNUCKLE_ABS_PRESSURE_VALUE { 0.996078 };
+inline constexpr double DOUBLE_KNUCKLE_ABS_PRESSURE_VALUE { 1.0000000 };
+inline constexpr double KNUCKLE_ABS_PRESSURE_VALUE_CALIBRATION { 0.0000001 };
+
+enum KNUCKLE_DOUBLE_CLICK_EVENT_TYPE {
+    KNUCKLE_1F_DOUBLE_CLICK = 254,
+    KNUCKLE_2F_DOUBLE_CLICK,
+};
 
 enum SENIOR_DEVICE_TYPE {
     INPUT_DEVICE_AISENSOR = 31,
