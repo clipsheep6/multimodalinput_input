@@ -709,7 +709,7 @@ void GetIntervalSinceLastInputCallback(int64_t interval)
     return;
 }
 
-int32_t OH_Input_GetIntervalSinceLastInput(int64_t &IntervalSinceLastInput)
+int32_t OH_Input_GetIntervalSinceLastInput(int64_t &intervalSinceLastInput)
 {
     CALL_DEBUG_ENTER;
     OHOS::MMI::InputManager::GetInstance()->GetIntervalSinceLastInput(GetIntervalSinceLastInputCallback);

@@ -20,7 +20,8 @@ module_output_path = "input/input"
 ##############################fuzztest##########################################
 ohos_fuzztest("GetIntervalSinceLastInputFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file = "${mmi_path}/test/fuzztest/getintervalsincelastinput_fuzzer"
+  fuzz_config_file =
+      "${mmi_path}/test/fuzztest/getintervalsincelastinput_fuzzer"
   include_dirs = [ "${mmi_path}/interfaces/util/common/include" ]
   cflags = [
     "-g",

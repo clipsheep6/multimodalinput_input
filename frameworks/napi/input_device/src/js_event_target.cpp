@@ -1421,7 +1421,8 @@ void JsEventTarget::CallIntervalSinceLastInputPromise(uv_work_t *work, int32_t s
         }
         CHKRV_SCOPE(cb->env, napi_reject_deferred(cb->env, cb->deferred, callResult), REJECT_DEFERRED, scope);
     } else {
-        CHKRV_SCOPE(cb->env, napi_create_int64(cb->env, cb->data.IntervalSinceLastInput, &callResult), CREATE_INT64, scope);
+        CHKRV_SCOPE(cb->env, napi_create_int64(cb->env, cb->data.IntervalSinceLastInput, &callResult),
+            CREATE_INT64, scope);
         CHKRV_SCOPE(cb->env, napi_resolve_deferred(cb->env, cb->deferred, callResult), RESOLVE_DEFERRED, scope);
     }
     napi_close_handle_scope(cb->env, scope);
@@ -1466,7 +1467,8 @@ void JsEventTarget::CallIntervalSinceLastInputAsync(uv_work_t *work, int32_t sta
         }
         CHKRV_SCOPE(cb->env, napi_get_undefined(cb->env, &callResult[1]), GET_UNDEFINED, scope);
     } else {
-        CHKRV_SCOPE(cb->env, napi_create_int64(cb->env, cb->data.IntervalSinceLastInput, &callResult[1]), CREATE_INT64, scope);
+        CHKRV_SCOPE(cb->env, napi_create_int64(cb->env, cb->data.IntervalSinceLastInput, &callResult[1]),
+            CREATE_INT64, scope);
         CHKRV_SCOPE(cb->env, napi_get_undefined(cb->env, &callResult[0]), GET_UNDEFINED, scope);
     }
     napi_value handler = nullptr;

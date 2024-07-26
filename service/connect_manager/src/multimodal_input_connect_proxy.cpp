@@ -2349,7 +2349,7 @@ int32_t MultimodalInputConnectProxy::GetIntervalSinceLastInput(int64_t &timeInte
     if (ret != RET_OK) {
         MMI_HILOGE("MultimodalInputConnectProxy::GetTouchpadThree Send request fail, ret:%{public}d", ret);
     } else {
-        READINT64(reply, timeInterval); 
+        READINT64(reply, timeInterval);
     }
     return RET_OK;
 }
