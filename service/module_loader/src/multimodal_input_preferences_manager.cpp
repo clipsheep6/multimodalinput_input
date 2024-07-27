@@ -127,6 +127,8 @@ int32_t MultiModalInputPreferencesManager::InitPreferencesMap()
     preferencesMap_[strPointerSpeed_] = {MOUSE_FILE_NAME, pointerSpeed_};
     preferencesMap_[strPointerColor_] = {MOUSE_FILE_NAME, pointerColor_};
     preferencesMap_[strPointerStyle_] = {MOUSE_FILE_NAME, pointerStyle_};
+    preferencesMap_[strIsMagicCursor_] = {MOUSE_FILE_NAME, isMagicCursor_};
+    preferencesMap_[strSmartChange_] = {MOUSE_FILE_NAME, smartChange_};
     preferencesMap_[strMouseScrollRows_] = {MOUSE_FILE_NAME, mouseScrollRows_};
     preferencesMap_[strHoverScrollState_] = {MOUSE_FILE_NAME, static_cast<int32_t>(hoverScrollState_)};
     preferencesMap_[strMousePrimaryButton_] = {MOUSE_FILE_NAME, mousePrimaryButton_};

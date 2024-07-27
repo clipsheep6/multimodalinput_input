@@ -65,6 +65,8 @@ private:
     int32_t pointerSize_ { 1 };
     int32_t pointerStyle_ { 0 };
     int32_t touchpadScrollRows_ { 3 };
+    int32_t isMagicCursor_ { 0 };
+    bool smartChange_ { true };
     const std::string strKeyboardRepeatRate_ = "keyboardRepeatRate";
     const std::string strKeyboardRepeatDelay_ = "keyboardRepeatDelay";
     const std::string strMouseScrollRows_ = "rows";
@@ -78,6 +80,8 @@ private:
     const std::string strTouchpadPinchSwitch_ = "touchpadPinch";
     const std::string strTouchpadSwipeSwitch_ = "touchpadSwipe";
     const std::string strHoverScrollState_ = "isEnableHoverScroll";
+    const std::string strIsMagicCursor_ = "isMagicCursor";
+    const std::string strSmartChange_ = "smartChange";
 #ifdef OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
     const std::string strMoveEventFilterFlag_ = "moveEventFilterFlag";
 #endif // OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
