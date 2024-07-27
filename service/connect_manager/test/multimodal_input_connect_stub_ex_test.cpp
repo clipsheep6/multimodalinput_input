@@ -99,6 +99,12 @@ public:
         visible_ = visible;
         return static_cast<int32_t>(visible_);
     }
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+    int32_t PointerStyleChange(int32_t style) override { return RET_OK; }
+    int32_t GetCurrentPointerStyle(int32_t &style) override { return RET_OK; }
+    int32_t SetIntelligentChangeState(bool state) override { return RET_OK; }
+    int32_t GetIntelligentChangeState(bool &state) override { return RET_OK; }
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     int32_t IsPointerVisible(bool &visible) override { return static_cast<int32_t>(visible_); }
     int32_t MarkProcessed(int32_t eventType, int32_t eventId) override { return eventType; }
     int32_t SetPointerColor(int32_t color) override
@@ -7737,5 +7743,79 @@ HWTEST_F(MultimodalInputConnectStubTest,
     MessageParcel reply;
     EXPECT_NO_FATAL_FAILURE(stub->StubTransferBinderClientService(data, reply));
 }
+
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubPointerStyleChange
+ * @tc.desc: Cover if (!IsRunning()) branch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubPointerStyleChange, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_NOT_START;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubPointerStyleChange(data, reply));
+}
+ 
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubGetCurrentPointerStyle
+ * @tc.desc: Cover if (!IsRunning()) branch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetCurrentPointerStyle, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_NOT_START;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubGetCurrentPointerStyle(data, reply));
+}
+ 
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubSetIntelligentChangeState
+ * @tc.desc: Cover if (!IsRunning()) branch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubSetIntelligentChangeState, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_NOT_START;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubSetIntelligentChangeState(data, reply));
+}
+ 
+/**
+ * @tc.name: MultimodalInputConnectStubTest_StubGetIntelligentChangeState
+ * @tc.desc: Cover if (!IsRunning()) branch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MultimodalInputConnectStubTest, MultimodalInputConnectStubTest_StubGetIntelligentChangeState, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<MultimodalInputConnectStub> stub = std::make_shared<MMIServiceTest>();
+    ASSERT_NE(stub, nullptr);
+    std::shared_ptr<MMIServiceTest> service = std::static_pointer_cast<MMIServiceTest>(stub);
+    service->state_ = ServiceRunningState::STATE_NOT_START;
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_NO_FATAL_FAILURE(stub->StubGetIntelligentChangeState(data, reply));
+}
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 } // namespace MMI
 } // namespace OHOS

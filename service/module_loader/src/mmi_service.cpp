@@ -2737,11 +2737,78 @@ void MMIService::CalculateFuntionRunningTime(std::function<void()> func, const s
     HiviewDFX::XCollie::GetInstance().CancelTimer(id);
 }
 
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+int32_t MMIService::PointerStyleChange(int32_t style)
+{
+    CALL_INFO_TRACE;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [style] {
+            return IPointerDrawingManager::GetInstance()->PointerStyleChange(style);
+        }
+    );
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set pointer style failed, return:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+ 
+int32_t MMIService::GetCurrentPointerStyle(int32_t &style)
+{
+    CALL_INFO_TRACE;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, &style] {
+            style = IPointerDrawingManager::GetInstance()->GetCurrentPointerStyle();
+            return RET_OK;
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get pointer style failed, return:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+ 
+int32_t MMIService::SetIntelligentChangeState(bool state)
+{
+    CALL_INFO_TRACE;
+#if defined OHOS_BUILD_ENABLE_POINTER
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [state] {
+            return IPointerDrawingManager::GetInstance()->SetIntelligentChangeState(state);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set intelligent change state failed, return:%{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
+}
+ 
+int32_t MMIService::GetIntelligentChangeState(bool &state)
+{
+    CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, &state] {
+            state = IPointerDrawingManager::GetInstance()->GetIntelligentChangeState();
+            return RET_OK;
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get intelligent change state, return:%{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+
 void MMIService::PrintLog(const std::string &flag, int32_t duration)
 {
     MMI_HILOGW("MMIBlockTask name : %{public}s, duration Time : %{public}d", flag.c_str(), duration);
 }
-
 
 } // namespace MMI
 } // namespace OHOS

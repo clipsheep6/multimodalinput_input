@@ -417,6 +417,20 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::TRANSFER_BINDER_CLIENT_SERVICE):
             ret = StubTransferBinderClientService(data, reply);
             break;
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::POINTER_STYLE_CHANGE):
+            return StubPointerStyleChange(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_CURRENT_POINTER_STYLE):
+            return StubGetCurrentPointerStyle(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_INTELLIGENT_CHANGE_STATE):
+            return StubSetIntelligentChangeState(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_INTELLIGENT_CHANGE_STATE):
+            return StubGetIntelligentChangeState(data, reply);
+            break;
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
         default: {
             MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
             ret = IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -2613,5 +2627,82 @@ int32_t MultimodalInputConnectStub::StubTransferBinderClientService(MessageParce
     WRITEINT32(reply, ret);
     return RET_OK;
 }
+
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+int32_t MultimodalInputConnectStub::StubPointerStyleChange(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t style = 0;
+    READINT32(data, style, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = PointerStyleChange(style);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call PointerStyleChange failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+ 
+int32_t MultimodalInputConnectStub::StubGetCurrentPointerStyle(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+ 
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+ 
+    int32_t style = 0;
+    int32_t ret = GetCurrentPointerStyle(style);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call GetCurrentPointerStyle failed ret:%{public}d", ret);
+        return ret;
+    }
+    WRITEINT32(reply, style, IPC_STUB_WRITE_PARCEL_ERR);
+    MMI_HILOGD("Pointer style:%{public}d, ret:%{public}d", style, ret);
+    return RET_OK;
+}
+ 
+int32_t MultimodalInputConnectStub::StubSetIntelligentChangeState(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+ 
+    bool state = true;
+    READBOOL(data, state, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetIntelligentChangeState(state);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SetIntelligentChangeState failed, ret:%{public}d", ret);
+        return ret;
+    }
+    MMI_HILOGD("Success state:%{public}d, pid:%{public}d", state, GetCallingPid());
+    return RET_OK;
+}
+ 
+int32_t MultimodalInputConnectStub::StubGetIntelligentChangeState(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PER_HELPER->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+ 
+    bool state = true;
+    int32_t ret = GetIntelligentChangeState(state);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call GetIntelligentChangeState failed, ret:%{public}d", ret);
+        return ret;
+    }
+    WRITEBOOL(reply, state, IPC_STUB_WRITE_PARCEL_ERR);
+    MMI_HILOGD("Mouse hover scroll state:%{public}d, ret:%{public}d", state, ret);
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 } // namespace MMI
 } // namespace OHOS

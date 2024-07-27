@@ -1093,5 +1093,117 @@ napi_value JsPointerManager::GetTouchpadScrollRows(napi_env env, napi_value hand
     AsyncCallbackWork(asyncContext);
     return promise;
 }
+
+napi_value JsPointerManager::PointerStyleChange(napi_env env, int32_t style, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
+    CHKPP(asyncContext);
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+    asyncContext->errorCode = InputManager::GetInstance()->PointerStyleChange(style);
+    if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
+        MMI_HILOGE("Non system applications use system API");
+        THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        return nullptr;
+    }
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+    asyncContext->reserve << ReturnType::VOID;
+    napi_value promise = nullptr;
+    if (handle != nullptr) {
+        CHKRP(napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
+        if (napi_get_undefined(env, &promise) != napi_ok) {
+            CHKRP(napi_delete_reference(env, asyncContext->callback), DELETE_REFERENCE);
+            return nullptr;
+        }
+    } else {
+        CHKRP(napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
+    }
+    AsyncCallbackWork(asyncContext);
+    return promise;
+}
+ 
+napi_value JsPointerManager::GetCurrentPointerStyle(napi_env env, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
+    CHKPP(asyncContext);
+    int32_t style = 0;
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+    asyncContext->errorCode = InputManager::GetInstance()->GetCurrentPointerStyle(style);
+    if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
+        MMI_HILOGE("Non system applications use system API");
+        THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        return nullptr;
+    }
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+    asyncContext->reserve << ReturnType::NUMBER << style;
+    napi_value promise = nullptr;
+    uint32_t initialRefCount = 1;
+    if (handle != nullptr) {
+        CHKRP(napi_create_reference(env, handle, initialRefCount, &asyncContext->callback), CREATE_REFERENCE);
+        if (napi_get_undefined(env, &promise) != napi_ok) {
+            CHKRP(napi_delete_reference(env, asyncContext->callback), DELETE_REFERENCE);
+            return nullptr;
+        }
+    } else {
+        CHKRP(napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
+    }
+    AsyncCallbackWork(asyncContext);
+    return promise;
+}
+ 
+napi_value JsPointerManager::SetIntelligentChangeState(napi_env env, bool state, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
+    CHKPP(asyncContext);
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+    asyncContext->errorCode = InputManager::GetInstance()->SetIntelligentChangeState(state);
+    if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
+        MMI_HILOGE("Non system applications use system API");
+        THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        return nullptr;
+    }
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+    asyncContext->reserve << ReturnType::VOID;
+ 
+    napi_value promise = nullptr;
+    if (handle != nullptr) {
+        CHKRP(napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
+        CHKRP(napi_get_undefined(env, &promise), GET_UNDEFINED);
+    } else {
+        CHKRP(napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
+    }
+    AsyncCallbackWork(asyncContext);
+    return promise;
+}
+ 
+napi_value JsPointerManager::GetIntelligentChangeState(napi_env env, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
+    CHKPP(asyncContext);
+ 
+    bool state = true;
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+    asyncContext->errorCode = InputManager::GetInstance()->GetIntelligentChangeState(state);
+    if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
+        MMI_HILOGE("Non system applications use system API");
+        THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        return nullptr;
+    }
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+    asyncContext->reserve << ReturnType::BOOL << state;
+ 
+    napi_value promise = nullptr;
+    if (handle != nullptr) {
+        CHKRP(napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
+        CHKRP(napi_get_undefined(env, &promise), GET_UNDEFINED);
+    } else {
+        CHKRP(napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
+    }
+    AsyncCallbackWork(asyncContext);
+    return promise;
+}
 } // namespace MMI
 } // namespace OHOS

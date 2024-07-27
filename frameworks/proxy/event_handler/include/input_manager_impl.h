@@ -248,6 +248,12 @@ private:
 #ifdef OHOS_BUILD_ENABLE_ANCO
     bool IsValidAncoWindow(const std::vector<WindowInfo> &windows);
 #endif // OHOS_BUILD_ENABLE_ANCO
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+    int32_t PointerStyleChange(int32_t style);
+    int32_t GetCurrentPointerStyle(int32_t &style);
+    int32_t SetIntelligentChangeState(bool state);
+    int32_t GetIntelligentChangeState(bool &state);
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
 private:
     std::map<int32_t, std::tuple<sptr<IEventFilter>, int32_t, uint32_t>> eventFilterServices_;

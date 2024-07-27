@@ -929,6 +929,40 @@ public:
      */
     int32_t RemoveVirtualInputDevice(int32_t deviceId);
 
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+    /**
+     * @brief 修改光标风格切换
+     * @param style 光标风格
+     * @return 返回0表示接口调用成功，否则，表示接口调用失败。
+     * @since 12
+     */
+    int32_t PointerStyleChange(int32_t style);
+ 
+    /**
+     * @brief 获取当前光标风格
+     * @param style 光标风格
+     * @return 返回0表示接口调用成功，否则，表示接口调用失败。
+     * @since 12
+     */
+    int32_t GetCurrentPointerStyle(int32_t &style);
+ 
+    /**
+     * @brief 修改智能变化开关状态
+     * @param state 开关状态
+     * @return 返回0表示接口调用成功，否则，表示接口调用失败。
+     * @since 12
+     */
+    int32_t SetIntelligentChangeState(bool state);
+ 
+    /**
+     * @brief 获取智能变化开关状态
+     * @param state 开关状态
+     * @return 返回0表示接口调用成功，否则，表示接口调用失败。
+     * @since 12
+     */
+    int32_t GetIntelligentChangeState(bool &state);
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+
     int32_t AncoAddConsumer(std::shared_ptr<IAncoConsumer> consumer);
     int32_t AncoRemoveConsumer(std::shared_ptr<IAncoConsumer> consumer);
 
