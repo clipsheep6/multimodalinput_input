@@ -665,6 +665,50 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsNeedRefreshLayer_003
 }
 
 /**
+ * @tc.name: InputWindowsManagerTest_IsNeedRefreshLayer_004
+ * @tc.desc: Test the function IsNeedRefreshLayer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsNeedRefreshLayer_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    int32_t windowId = 3;
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillOnce(Return(false));
+
+    int32_t displayId = -2;
+    std::optional<WindowInfo> touchWindow = inputWindowsManager->GetWindowInfo(3, 5);
+    touchWindow->id = 3;
+    bool ret = inputWindowsManager->IsNeedRefreshLayer(windowId);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_IsNeedRefreshLayer_005
+ * @tc.desc: Test the function IsNeedRefreshLayer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsNeedRefreshLayer_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<InputWindowsManager> inputWindowsManager =
+        std::static_pointer_cast<InputWindowsManager>(WIN_MGR);
+    ASSERT_NE(inputWindowsManager, nullptr);
+    int32_t windowId = -1;
+    EXPECT_CALL(*messageParcelMock_, IsSceneBoardEnabled()).WillOnce(Return(false));
+
+    int32_t displayId = 2;
+    std::optional<WindowInfo> touchWindow = inputWindowsManager->GetWindowInfo(2, 4);
+    touchWindow->id = 2;
+    bool ret = inputWindowsManager->IsNeedRefreshLayer(windowId);
+    EXPECT_FALSE(ret);
+}
+
+/**
  * @tc.name: CalculateTipPoint_001
  * @tc.desc: Test the function CalculateTipPoint
  * @tc.type: FUNC
