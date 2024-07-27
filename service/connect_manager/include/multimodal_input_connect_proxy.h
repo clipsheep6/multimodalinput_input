@@ -144,7 +144,7 @@ public:
     int32_t GetCurrentPointerStyle(int32_t &style) override;
     int32_t SetIntelligentChangeState(bool state) override;
     int32_t GetIntelligentChangeState(bool &state) override;
-#endif // OHOS_BUILD_ENABLE_MAGICCURSOR    
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;

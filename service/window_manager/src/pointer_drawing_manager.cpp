@@ -76,6 +76,8 @@ constexpr int32_t DEFAULT_VALUE { -1 };
 constexpr int32_t ANIMATION_DURATION { 500 };
 constexpr int32_t DEFAULT_POINTER_STYLE { 0 };
 constexpr int32_t CURSOR_CIRCLE_STYLE { 41 };
+constexpr int32_t DEFAULT_CIRCLE_STYLE { 0 };
+constexpr int32_t MAGIC_CIRCLE_STYLE { 1 };
 constexpr int32_t MOUSE_ICON_BAIS { 5 };
 constexpr int32_t VISIBLE_LIST_MAX_SIZE { 100 };
 constexpr int32_t WAIT_TIME_FOR_MAGIC_CURSOR { 6000 };
@@ -158,18 +160,18 @@ int32_t PointerDrawingManager::GetCurrentPointerStyle()
 {
     std::string name = IS_MAGIC_CURSOR;
     GetPreferenceKey(name);
-    int32_t isMagicCursor = PREFERENCES_MGR->GetIntValue(name, 0);
+    int32_t isMagicCursor = PREFERENCES_MGR->GetIntValue(name, DEFAULT_CIRCLE_STYLE);
     MMI_HILOGD("Get state successfully, isMagicCursor:%{public}d", isMagicCursor);
     return isMagicCursor;
 }
  
 int32_t PointerDrawingManager::PointerStyleChange(int32_t style)
 {
-    int32_t statusValue = 0;
+    int32_t statusValue = DEFAULT_CIRCLE_STYLE;
     if (style == 0) {
-        statusValue = 0;
+        statusValue = DEFAULT_CIRCLE_STYLE;
     } else if (style == 1) {
-        statusValue = 1;
+        statusValue = MAGIC_CIRCLE_STYLE;
     }
     std::string name = IS_MAGIC_CURSOR;
     GetPreferenceKey(name);
@@ -218,7 +220,8 @@ int32_t PointerDrawingManager::SetIntelligentChangeState(bool state)
     return UpdateIntelligentChange(state);
 }
  
-bool PointerDrawingManager::GetIntelligentChangeState() {
+bool PointerDrawingManager::GetIntelligentChangeState()
+{
     std::string name = SMART_CHANGE;
     GetPreferenceKey(name);
     bool smartChange = PREFERENCES_MGR->GetBoolValue(name, true);
@@ -226,7 +229,8 @@ bool PointerDrawingManager::GetIntelligentChangeState() {
     return smartChange;
 }
  
-int32_t PointerDrawingManager::UpdateIntelligentChange(bool state){
+int32_t PointerDrawingManager::UpdateIntelligentChange(bool state)
+{
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     MAGIC_CURSOR->UpdateMagicCursorChangeState(state);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR

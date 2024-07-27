@@ -430,7 +430,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_INTELLIGENT_CHANGE_STATE):
             return StubGetIntelligentChangeState(data, reply);
             break;
-#endif // OHOS_BUILD_ENABLE_MAGICCURSOR            
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
         default: {
             MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
             ret = IPCObjectStub::OnRemoteRequest(code, data, reply, option);
