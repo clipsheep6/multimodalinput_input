@@ -35,8 +35,10 @@ constexpr int32_t TOUCHPAD_SCROLL_ROWS { 3 };
 constexpr int32_t RIGHT_CLICK_TYPE { 1 };
 constexpr int32_t POINTER_COLOR { -1 };
 constexpr int32_t POINTER_SIZE { 1 };
+constexpr int32_t IS_MAGIC_CURSOR { 0 };
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
 constexpr int32_t MAGIC_POINTER_SIZE { 1 };
+constexpr bool SMART_CHANGE { true };
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 constexpr int32_t POINTER_STYLE { 0 };
 constexpr int32_t ERROR_DELAY_VALUE { -1000 };
@@ -94,6 +96,7 @@ int32_t MultiModalInputPreferencesManager::GetPreferencesSettings()
     pointerSpeed_ = mousePref->GetInt(strPointerSpeed_, POINTER_SPEED);
     pointerColor_ = mousePref->GetInt(strPointerColor_, POINTER_COLOR);
     pointerStyle_ = mousePref->GetInt(strPointerStyle_, POINTER_STYLE);
+    isMagicCursor_ = mousePref->GetInt(strIsMagicCursor_, IS_MAGIC_CURSOR);    
     mouseScrollRows_ = mousePref->GetInt(strMouseScrollRows_, MOUSE_SCROLL_ROWS);
     hoverScrollState_ = mousePref->GetBool(strHoverScrollState_, BOOL_DEFAULT);
     mousePrimaryButton_ = mousePref->GetInt(strMousePrimaryButton_, PRIMARY_BUTTON);
@@ -111,6 +114,7 @@ int32_t MultiModalInputPreferencesManager::GetPreferencesSettings()
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     magicPointerSize_ = mousePref->GetInt(strMagicPointerSize_, MAGIC_POINTER_SIZE);
     magicPointerColor_ = mousePref->GetInt(strMagicPointerColor_, POINTER_COLOR);
+    smartChange_ = mousePref->GetBool(strSmartChange_, SMART_CHANGE);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 #ifdef OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
     moveEventFilterFlag_ = mousePref->GetBool(strMoveEventFilterFlag_, BOOL_DEFAULT);
@@ -128,7 +132,6 @@ int32_t MultiModalInputPreferencesManager::InitPreferencesMap()
     preferencesMap_[strPointerColor_] = {MOUSE_FILE_NAME, pointerColor_};
     preferencesMap_[strPointerStyle_] = {MOUSE_FILE_NAME, pointerStyle_};
     preferencesMap_[strIsMagicCursor_] = {MOUSE_FILE_NAME, isMagicCursor_};
-    preferencesMap_[strSmartChange_] = {MOUSE_FILE_NAME, smartChange_};
     preferencesMap_[strMouseScrollRows_] = {MOUSE_FILE_NAME, mouseScrollRows_};
     preferencesMap_[strHoverScrollState_] = {MOUSE_FILE_NAME, static_cast<int32_t>(hoverScrollState_)};
     preferencesMap_[strMousePrimaryButton_] = {MOUSE_FILE_NAME, mousePrimaryButton_};
@@ -147,6 +150,7 @@ int32_t MultiModalInputPreferencesManager::InitPreferencesMap()
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     preferencesMap_[strMagicPointerSize_] = {MOUSE_FILE_NAME, magicPointerSize_};
     preferencesMap_[strMagicPointerColor_] = {MOUSE_FILE_NAME, magicPointerColor_};
+    preferencesMap_[strSmartChange_] = {MOUSE_FILE_NAME, smartChange_};    
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 #ifdef OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
     preferencesMap_[strMoveEventFilterFlag_] = {MOUSE_FILE_NAME, static_cast<int32_t>(moveEventFilterFlag_)};
