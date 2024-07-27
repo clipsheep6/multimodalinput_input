@@ -162,6 +162,10 @@ public:
     int32_t AncoAddChannel(sptr<IAncoChannel> channel) override;
     int32_t AncoRemoveChannel(sptr<IAncoChannel> channel) override;
 #endif // OHOS_BUILD_ENABLE_ANCO
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+    int32_t PointerStyleChange(int32_t style) override;
+    int32_t IntelligentChangeSwitch() override;
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
 protected:
     void OnConnected(SessionPtr s) override;

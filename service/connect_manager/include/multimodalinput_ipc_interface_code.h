@@ -122,6 +122,10 @@ enum class MultimodalinputConnectInterfaceCode {
     GET_TOUCHPAD_SCROLL_ROWS = 98,
     GET_POINTER_SNAPSHOT = 99,
     SET_MOVE_EVENT_FILTERS = 100,
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+    POINTER_STYLE_CHANGE = 101,
+    INTELLIGENT_CHANGE_SWITCH = 102,
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 };
 
 enum class MultimodalinputEventObserverCode {

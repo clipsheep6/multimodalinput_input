@@ -139,6 +139,10 @@ public:
     int32_t AncoRemoveChannel(sptr<IAncoChannel> channel) override;
 #endif // OHOS_BUILD_ENABLE_ANCO
 	int32_t TransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject) override;
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+    int32_t PointerStyleChange(int32_t style) override;
+    int32_t IntelligentChangeSwitch() override;
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;

@@ -111,6 +111,8 @@ public:
     napi_value GetHardwareCursorStats(napi_env env);
     napi_value SetTouchpadScrollRows(napi_env env, int32_t rows, napi_value handle = nullptr);
     napi_value GetTouchpadScrollRows(napi_env env, napi_value handle = nullptr);
+    napi_value PointerStyleChange(napi_env env, int32_t style, napi_value handle = nullptr);
+    napi_value IntelligentChangeSwitch(napi_env env);
 
 private:
     napi_value SetTouchpadData(napi_env env, napi_value handle, int32_t errorCode);

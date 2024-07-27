@@ -2740,5 +2740,34 @@ void MMIService::CalculateFuntionRunningTime(std::function<void()> func, const s
     }
 }
 
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+int32_t MMIService::PointerStyleChange(int32_t style)
+{
+    CALL_INFO_TRACE;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [style] {
+                return IPointerDrawingManager::GetInstance()->PointerStyleChange(style);
+            }
+    );
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set pointer style failed, return:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+ 
+int32_t MMIService::IntelligentChangeSwitch()
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(std::bind(&IPointerDrawingManager::IntelligentChangeSwitch,
+        IPointerDrawingManager::GetInstance())));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to set current user, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+
 } // namespace MMI
 } // namespace OHOS
