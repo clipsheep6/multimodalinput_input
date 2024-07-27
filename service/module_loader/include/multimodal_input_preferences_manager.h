@@ -92,7 +92,7 @@ private:
     int32_t magicPointerColor_ { -1 };
     int32_t magicPointerSize_ { 1 };
     bool smartChange_ { true };
-    const std::string strSmartChange_ = "smartChange";    
+    const std::string strSmartChange_ = "smartChange";
     const std::string strMagicPointerColor_ = "magicPointerColor";
     const std::string strMagicPointerSize_ = "magicPointerSize";
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
