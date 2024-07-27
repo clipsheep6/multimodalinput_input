@@ -148,6 +148,12 @@ public:
     virtual int32_t GetPointerSnapshot(void *pixelMapPtr) = 0;
     virtual int32_t SetTouchpadScrollRows(int32_t rows) = 0;
     virtual int32_t GetTouchpadScrollRows(int32_t &rows) = 0;
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+    virtual int32_t PointerStyleChange(int32_t style) = 0;
+    virtual int32_t GetCurrentPointerStyle(int32_t &style) = 0;
+    virtual int32_t SetIntelligentChangeState(bool state) = 0;
+    virtual int32_t GetIntelligentChangeState(bool &state) = 0;
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 #ifdef OHOS_BUILD_ENABLE_ANCO
     virtual int32_t AncoAddChannel(sptr<IAncoChannel> channel) = 0;
     virtual int32_t AncoRemoveChannel(sptr<IAncoChannel> channel) = 0;

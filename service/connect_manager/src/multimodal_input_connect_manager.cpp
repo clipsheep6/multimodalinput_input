@@ -855,5 +855,31 @@ int32_t MultimodalInputConnectManager::AncoRemoveChannel(sptr<IAncoChannel> chan
     return multimodalInputConnectService_->AncoRemoveChannel(channel);
 }
 #endif // OHOS_BUILD_ENABLE_ANCO
+
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+int32_t MultimodalInputConnectManager::PointerStyleChange(int32_t style)
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->PointerStyleChange(style);
+}
+ 
+int32_t MultimodalInputConnectManager::GetCurrentPointerStyle(int32_t &style)
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->GetCurrentPointerStyle(style);
+}
+ 
+int32_t MultimodalInputConnectManager::SetIntelligentChangeState(bool state)
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->SetIntelligentChangeState(state);
+}
+ 
+int32_t MultimodalInputConnectManager::GetIntelligentChangeState(bool &state)
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->GetIntelligentChangeState(state);
+}
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 } // namespace MMI
 } // namespace OHOS

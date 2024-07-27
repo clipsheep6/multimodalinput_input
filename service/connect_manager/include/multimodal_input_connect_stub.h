@@ -140,6 +140,12 @@ protected:
     int32_t StubAncoRemoveChannel(MessageParcel& data, MessageParcel& reply);
 #endif // OHOS_BUILD_ENABLE_ANCO
     int32_t StubTransferBinderClientService(MessageParcel& data, MessageParcel& reply);
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+    int32_t StubPointerStyleChange(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetCurrentPointerStyle(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetIntelligentChangeState(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetIntelligentChangeState(MessageParcel& data, MessageParcel& reply);
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 
 private:
     int32_t VerifyTouchPadSetting(void);

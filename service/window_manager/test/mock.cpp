@@ -322,6 +322,25 @@ int32_t PointerDrawingManager::SwitchPointerStyle()
 {
     return 0;
 }
+int32_t PointerDrawingManager::PointerStyleChange(int32_t style)
+{
+    return 0;
+}
+ 
+int32_t PointerDrawingManager::GetCurrentPointerStyle()
+{
+    return 0;
+}
+ 
+int32_t PointerDrawingManager::SetIntelligentChangeState(bool state)
+{
+    return 0;
+}
+ 
+bool PointerDrawingManager::GetIntelligentChangeState()
+{
+    return true;
+}
 void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY) {}
 void PointerDrawingManager::Dump(int32_t fd, const std::vector<std::string> &args) {}
 int32_t PointerDrawingManager::EnableHardwareCursorStats(int32_t pid, bool enable)

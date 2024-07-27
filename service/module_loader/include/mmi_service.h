@@ -152,6 +152,12 @@ public:
     int32_t TransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject) override;
     int32_t SetTouchpadScrollRows(int32_t rows) override;
     int32_t GetTouchpadScrollRows(int32_t &rows) override;
+#ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+    int32_t PointerStyleChange(int32_t style) override;
+    int32_t GetCurrentPointerStyle(int32_t &style) override;
+    int32_t SetIntelligentChangeState(bool state) override;
+    int32_t GetIntelligentChangeState(bool &state) override;
+#endif // OHOS_BUILD_ENABLE_MAGICCURSOR    
     void CalculateFuntionRunningTime(std::function<void()> func, const std::string &flag);
 #ifdef OHOS_BUILD_ENABLE_ANCO
     void InitAncoUds();

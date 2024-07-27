@@ -135,6 +135,22 @@ public:
     {
         return 0;
     }
+    virtual int32_t PointerStyleChange(int32_t style)
+    {
+        return 0;
+    }
+    virtual int32_t GetCurrentPointerStyle()
+    {
+        return 0;
+    }
+    virtual int32_t SetIntelligentChangeState(bool state)
+    {
+        return 0;
+    }
+    virtual bool GetIntelligentChangeState()
+    {
+        return true;
+    }
     virtual void ForceClearPointerVisiableStatus();
     virtual void InitPointerObserver() {}
 public:

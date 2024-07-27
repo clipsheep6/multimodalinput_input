@@ -1211,22 +1211,6 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_UpdateMouseStyle_001
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_CreatePointerSwitchObserver_001
- * @tc.desc: Test CreatePointerSwitchObserver
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_CreatePointerSwitchObserver_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawingManager;
-    isMagicCursor item;
-    item.isShow = true;
-    item.name = "test";
-    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.CreatePointerSwitchObserver(item));
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_DrawCursor_001
  * @tc.desc: Test DrawCursor
  * @tc.type: FUNC
@@ -2040,19 +2024,6 @@ HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_SwitchPointerStyle
     PointerDrawingManager pointerDrawMgr;
     pointerDrawMgr.lastMouseStyle_.id = 2;
     ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.SwitchPointerStyle());
-}
-
-/**
- * @tc.name: PointerDrawingManagerTest_CreateMagicCursorChangeObserver
- * @tc.desc: Test CreateMagicCursorChangeObserver
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerDrawingManagerTest, PointerDrawingManagerTest_CreateMagicCursorChangeObserver, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    PointerDrawingManager pointerDrawMgr;
-    ASSERT_NO_FATAL_FAILURE(pointerDrawMgr.CreateMagicCursorChangeObserver());
 }
 
 /**
