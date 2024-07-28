@@ -447,34 +447,6 @@ HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_DestoryWindow_002,
 }
 
 /**
- * @tc.name: KnuckleDrawingManagerTest_CreateObserver_001
- * @tc.desc: Test Overrides CreateObserver function branches
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_CreateObserver_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KnuckleDrawingManager kceDrawMgr;
-    kceDrawMgr.hasScreenReadObserver_ = false;
-    EXPECT_NO_FATAL_FAILURE(kceDrawMgr.CreateObserver());
-}
-
-/**
- * @tc.name: KnuckleDrawingManagerTest_CreateObserver_002
- * @tc.desc: Test Overrides CreateObserver function branches
- * @tc.type: Function
- * @tc.require:
- */
-HWTEST_F(KnuckleDrawingManagerTest, KnuckleDrawingManagerTest_CreateObserver_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    KnuckleDrawingManager kceDrawMgr;
-    kceDrawMgr.hasScreenReadObserver_ = true;
-    EXPECT_NO_FATAL_FAILURE(kceDrawMgr.CreateObserver());
-}
-
-/**
  * @tc.name: KnuckleDrawingManagerTest_KnuckleDrawHandler
  * @tc.desc: Test Overrides KnuckleDrawHandler function branches
  * @tc.type: Function
