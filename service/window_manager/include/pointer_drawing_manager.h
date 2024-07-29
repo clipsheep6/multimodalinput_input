@@ -163,16 +163,16 @@ private:
     float CalculatePhysicalYOffset(ICON_TYPE iconType);
     bool SetTraditionsHardWareCursorLocation(int32_t displayId, int32_t physicalX, int32_t physicalY,
         ICON_TYPE iconType);
-#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    bool SetDynamicHardWareCursorLocation(int32_t physicalX, int32_t physicalY, ICON_TYPE iconType);
     void SetHardwareCursorPosition(int32_t displayId, int32_t physicalX, int32_t physicalY,
         const PointerStyle pointerStyle);
+    int32_t ParsingDynamicImage(const MOUSE_ICON mouseStyle);
+    void DrawDynamicImage(OHOS::Rosen::Drawing::Canvas &canvas, const MOUSE_ICON mouseStyle);
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    bool SetDynamicHardWareCursorLocation(int32_t physicalX, int32_t physicalY, ICON_TYPE iconType);
     void RenderThreadLoop();
     int32_t RequestNextVSync();
     void OnVsync(uint64_t timestamp);
     void PostTask(Rosen::RSTaskMessage::RSTask task);
-    int32_t ParsingDynamicImage(const MOUSE_ICON mouseStyle);
-    void DrawDynamicImage(OHOS::Rosen::Drawing::Canvas &canvas, const MOUSE_ICON mouseStyle);
     void DoHardwareCursorDraw();
     int32_t FlushBuffer();
     int32_t GetSurfaceInformation();
