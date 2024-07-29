@@ -68,10 +68,10 @@ const std::string WAKEUP_ABILITY_NAME { "WakeUpExtAbility" };
 const std::string SCREENSHOT_BUNDLE_NAME { "com.hmos.screenshot" };
 const std::string SCREENSHOT_ABILITY_NAME { "com.hmos.screenshot.ServiceExtAbility" };
 const std::string SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
-const std::string SCREENSHOT_BUNDLE_NAME_ON_PC { "com.huawei.hmos.screenshot" };
-const std::string SCREENSHOT_ABILITY_NAME_ON_PC { "com.huawei.hmos.screenshot.ServiceExtAbility" };
-const std::string SCREENRECORDER_BUNDLE_NAME_ON_PC { "com.huawei.hmos.screenrecorder" };
-const std::string SCREENRECORDER_ABILITY_NAME_ON_PC { "com.huawei.hmos.screenrecorder.ServiceExtAbility" };
+const std::string PC_START_SCREENSHOT_BUNDLE_NAME { "com.huawei.hmos.screenshot" };
+const std::string PC_START_SCREENSHOT_ABILITY_NAME { "com.huawei.hmos.screenshot.ServiceExtAbility" };
+const std::string PC_START_SCREENRECORDER_BUNDLE_NAME { "com.huawei.hmos.screenrecorder" };
+const std::string PC_START_SCREENRECORDER_ABILITY_NAME { "com.huawei.hmos.screenrecorder.ServiceExtAbility" };
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -2151,11 +2151,12 @@ bool KeyCommandHandler::KnuckleDoubleClickHandle(const std::shared_ptr<PointerEv
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     auto actionType = pointerEvent->GetPointerAction();
     if (actionType == KNUCKLE_1F_DOUBLE_CLICK &&
-        KnuckleDoubleClickProcess(SCREENSHOT_BUNDLE_NAME_ON_PC, SCREENSHOT_ABILITY_NAME_ON_PC, "single_knuckle")) {
+        KnuckleDoubleClickProcess(PC_START_SCREENSHOT_BUNDLE_NAME, PC_START_SCREENSHOT_ABILITY_NAME,
+        "single_knuckle")) {
         return true;
     }
-    if (actionType == KNUCKLE_2F_DOUBLE_CLICK && KnuckleDoubleClickProcess(SCREENRECORDER_BUNDLE_NAME_ON_PC,
-        SCREENRECORDER_ABILITY_NAME_ON_PC, "double_knuckle")) {
+    if (actionType == KNUCKLE_2F_DOUBLE_CLICK && KnuckleDoubleClickProcess(PC_START_SCREENRECORDER_BUNDLE_NAME,
+        PC_START_SCREENRECORDER_ABILITY_NAME, "double_knuckle")) {
         return true;
     }
     return false;
