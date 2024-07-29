@@ -1310,19 +1310,11 @@ ohos_unittest("KeyEventValueTransformationTest") {
 
   deps = [
     "${mmi_path}/service:libmmi-server",
-    "${mmi_path}/test/facility/libinput_wrapper:libinput_wrapper_sources",
-    "${mmi_path}/test/facility/virtual_device:virtual_device_sources",
     "${mmi_path}/util:libmmi-util",
   ]
 
   external_deps = [
-    "graphic_2d:2d_graphics",
-    "graphic_2d:librender_service_client",
     "hilog:libhilog",
-    "image_framework:image_native",
-    "init:libbegetutil",
-    "libinput:libinput-third-mmi",
-    "window_manager:libwm",
   ]
 }
 
