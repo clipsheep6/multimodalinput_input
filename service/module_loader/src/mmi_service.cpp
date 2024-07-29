@@ -2746,6 +2746,7 @@ int32_t MMIService::GetIntervalSinceLastInput(int64_t &timeInterval)
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputEventHandler::GetIntervalSinceLastInput,
                                                         InputHandler, std::ref(timeInterval)));
     MMI_HILOGD("timeInterval:%{public}lld", timeInterval);
+     if (ret != RET_OK) {
         MMI_HILOGE("Failed to GetIntervalSinceLastInput, ret:%{public}d", ret);
     }
     return ret;
