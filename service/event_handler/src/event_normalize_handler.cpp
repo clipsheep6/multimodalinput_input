@@ -864,8 +864,7 @@ bool EventNormalizeHandler::KnuckleDoubleClickHandle(libinput_event* event)
     auto touchpadEvent = libinput_event_get_touchpad_event(event);
     CHKPR(touchpadEvent, ERROR_NULL_POINTER);
     double value = libinput_event_touchpad_get_pressure(touchpadEvent);
-    if (value - SINGLE_KNUCKLE_ABS_PRESSURE_VALUE >= 0 &&
-        value - SINGLE_KNUCKLE_ABS_PRESSURE_VALUE < KNUCKLE_ABS_PRESSURE_VALUE_CALIBRATION) {
+    if (value >= SINGLE_KNUCKLE_ABS_PRESSURE_VALUE && value < DOUBLE_KNUCKLE_ABS_PRESSURE_VALUE) {
         std::shared_ptr<MMI::PointerEvent>  pointerEvent = PointerEvent::Create();
         CHKPR(pointerEvent, ERROR_NULL_POINTER);
         pointerEvent->SetPointerAction(KNUCKLE_1F_DOUBLE_CLICK);

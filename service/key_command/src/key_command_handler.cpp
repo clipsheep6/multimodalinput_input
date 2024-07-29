@@ -68,10 +68,10 @@ const std::string WAKEUP_ABILITY_NAME { "WakeUpExtAbility" };
 const std::string SCREENSHOT_BUNDLE_NAME { "com.hmos.screenshot" };
 const std::string SCREENSHOT_ABILITY_NAME { "com.hmos.screenshot.ServiceExtAbility" };
 const std::string SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
-const std::string HARDEN_SCREENSHOT_BUNDLE_NAME { "com.huawei.hmos.screenshot" };
-const std::string HARDEN_SCREENSHOT_ABILITY_NAME { "com.huawei.hmos.screenshot.ServiceExtAbility" };
-const std::string HARDEN_SCREENRECORDER_BUNDLE_NAME { "com.huawei.hmos.screenrecorder" };
-const std::string HARDEN_SCREENRECORDER_ABILITY_NAME { "com.huawei.hmos.screenrecorder.ServiceExtAbility" };
+const std::string SCREENSHOT_BUNDLE_NAME_ON_PC { "com.huawei.hmos.screenshot" };
+const std::string SCREENSHOT_ABILITY_NAME_ON_PC { "com.huawei.hmos.screenshot.ServiceExtAbility" };
+const std::string SCREENRECORDER_BUNDLE_NAME_ON_PC { "com.huawei.hmos.screenrecorder" };
+const std::string SCREENRECORDER_ABILITY_NAME_ON_PC { "com.huawei.hmos.screenrecorder.ServiceExtAbility" };
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -2150,35 +2150,32 @@ bool KeyCommandHandler::KnuckleDoubleClickHandle(const std::shared_ptr<PointerEv
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     auto actionType = pointerEvent->GetPointerAction();
-    if (actionType == KNUCKLE_1F_DOUBLE_CLICK) {
-        std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
-        if (screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF ||
-            screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED) {
-            MMI_HILOGI("The current screen is not in the unlocked state with the screen on");
-            return false;
-        }
-        Ability ability;
-        ability.bundleName = HARDEN_SCREENSHOT_BUNDLE_NAME;
-        ability.abilityName = HARDEN_SCREENSHOT_ABILITY_NAME;
-        ability.params.emplace(std::make_pair("trigger_type", "single_knuckle"));
-        LaunchAbility(ability, 0);
+    if (actionType == KNUCKLE_1F_DOUBLE_CLICK &&
+        KnuckleDoubleClickProcess(SCREENSHOT_BUNDLE_NAME_ON_PC, SCREENSHOT_ABILITY_NAME_ON_PC, "single_knuckle")) {
         return true;
     }
-    if (actionType == KNUCKLE_2F_DOUBLE_CLICK) {
-        std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
-        if (screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF ||
-            screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED) {
-            MMI_HILOGI("The current screen is not in the unlocked state with the screen on");
-            return false;
-        }
-        Ability ability;
-        ability.bundleName = HARDEN_SCREENRECORDER_BUNDLE_NAME;
-        ability.abilityName = HARDEN_SCREENRECORDER_ABILITY_NAME;
-        ability.params.emplace(std::make_pair("trigger_type", "double_knuckle"));
-        LaunchAbility(ability, 0);
+    if (actionType == KNUCKLE_2F_DOUBLE_CLICK && KnuckleDoubleClickProcess(SCREENRECORDER_BUNDLE_NAME_ON_PC,
+        SCREENRECORDER_ABILITY_NAME_ON_PC, "double_knuckle")) {
         return true;
     }
     return false;
+}
+
+bool KeyCommandHandler::KnuckleDoubleClickProcess(const std::string bundleName,
+    const std::string abilityName, const std::string action)
+{
+    std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
+    if (screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF ||
+        screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED) {
+        MMI_HILOGI("The current screen is not in the unlocked state with the screen on");
+        return false;
+    }
+    Ability ability;
+    ability.bundleName = bundleName;
+    ability.abilityName = abilityName;
+    ability.params.emplace(std::make_pair("trigger_type", action));
+    LaunchAbility(ability, 0);
+    return true;
 }
 } // namespace MMI
 } // namespace OHOS
