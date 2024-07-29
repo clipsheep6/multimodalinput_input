@@ -483,7 +483,9 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_DISPATCH_EVENT);
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
-    if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE) {
+    if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_ROTATE_UPDATE) {
         MMI_HILOG_FREEZEI("id:%{public}d recv", pointerEvent->GetId());
     }
     if (client->IsEventHandlerChanged()) {
@@ -642,7 +644,7 @@ int32_t InputManagerImpl::PackDisplayInfo(NetPacket &pkt)
     for (const auto &item : displayGroupInfo_.displaysInfo) {
         pkt << item.id << item.x << item.y << item.width
             << item.height << item.dpi << item.name << item.uniq << item.direction
-            << item.displayDirection << item.displayMode;
+            << item.displayDirection << item.displayMode << item.transform;
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write display data failed");

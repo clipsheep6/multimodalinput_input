@@ -99,6 +99,7 @@ class KeyGestureManager final {
         std::vector<Handler> handlers_;
     };
 
+private:
     class LongPressSingleKey : public KeyGesture {
     public:
         LongPressSingleKey(int32_t keyCode) : keyCode_(keyCode) {}
@@ -158,7 +159,6 @@ public:
     bool Intercept(std::shared_ptr<KeyEvent> KeyEvent);
     void ResetAll();
     void Dump() const;
-    void RunPendingHandlers();
 
 private:
     std::vector<std::unique_ptr<KeyGesture>> keyGestures_;

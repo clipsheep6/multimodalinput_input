@@ -123,7 +123,6 @@ static bool IsSingleDisplayFoldDevice()
 void RsRemoteDiedCallback()
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
     g_isRsRemoteDied = true;
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     MAGIC_CURSOR->RsRemoteDiedCallbackForMagicCursor();
@@ -133,7 +132,6 @@ void RsRemoteDiedCallback()
 void PointerDrawingManager::InitPointerCallback()
 {
     MMI_HILOGI("Init RS Callback start");
-    std::lock_guard<std::mutex> guard(mutex_);
     g_isRsRemoteDied = false;
     Rosen::OnRemoteDiedCallback callback = RsRemoteDiedCallback;
     Rosen::RSInterfaces::GetInstance().SetOnRemoteDiedCallback(callback);
@@ -1950,8 +1948,11 @@ void PointerDrawingManager::OnDisplayInfo(const DisplayGroupInfo &displayGroupIn
 void PointerDrawingManager::OnWindowInfo(const WinInfo &info)
 {
     CALL_DEBUG_ENTER;
-    windowId_ = info.windowId;
-    pid_ = info.windowPid;
+    if (pid_ != info.windowPid) {
+        windowId_ = info.windowId;
+        pid_ = info.windowPid;
+        UpdatePointerVisible();
+    }
 }
 
 void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPointerVisible,
@@ -1966,7 +1967,7 @@ void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPo
         if (!isHotPlug) {
             pointerVisible = (pointerVisible && IsPointerVisible());
         }
-        SetPointerVisible(getpid(), pointerVisible, 0);
+        SetPointerVisible(getpid(), pointerVisible, 0, false);
     } else {
         DeletePointerVisible(getpid());
     }
@@ -2011,6 +2012,7 @@ bool PointerDrawingManager::Init()
     CALL_DEBUG_ENTER;
     INPUT_DEV_MGR->Attach(shared_from_this());
     pidInfos_.clear();
+    hapPidInfos_.clear();
     return true;
 }
 
@@ -2041,6 +2043,15 @@ void PointerDrawingManager::UpdatePointerVisible()
 bool PointerDrawingManager::IsPointerVisible()
 {
     CALL_DEBUG_ENTER;
+    if (!hapPidInfos_.empty()) {
+        for (auto& item : hapPidInfos_) {
+            if (item.pid == pid_) {
+                MMI_HILOGI("Visible pid:%{public}d-visible:%{public}s",
+                    item.pid, item.visible ? "true" : "false");
+                return item.visible;
+            }
+        }
+    }
     if (pidInfos_.empty()) {
         MMI_HILOGD("Visible property is true");
         return true;
@@ -2089,9 +2100,35 @@ bool PointerDrawingManager::GetPointerVisible(int32_t pid)
     return true;
 }
 
-int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible, int32_t priority)
+void PointerDrawingManager::OnSessionLost(int32_t pid)
 {
-    MMI_HILOGI("pid:%{public}d,visible:%{public}s,priority:%{public}d", pid, visible ? "true" : "false", priority);
+    for (auto it = hapPidInfos_.begin(); it != hapPidInfos_.end(); ++it) {
+        if (it->pid == pid) {
+            hapPidInfos_.erase(it);
+            break;
+        }
+    }
+}
+
+int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible, int32_t priority, bool isHap)
+{
+    MMI_HILOGI("pid:%{public}d,visible:%{public}s,priority:%{public}d,isHap:%{public}s", pid,
+        visible ? "true" : "false", priority, isHap ? "true" : "false");
+    if (isHap) {
+        for (auto it = hapPidInfos_.begin(); it != hapPidInfos_.end(); ++it) {
+            if (it->pid == pid) {
+                hapPidInfos_.erase(it);
+                break;
+            }
+        }
+        PidInfo info = { .pid = pid, .visible = visible };
+        hapPidInfos_.push_back(info);
+        if (hapPidInfos_.size() > VISIBLE_LIST_MAX_SIZE) {
+            hapPidInfos_.pop_front();
+        }
+        UpdatePointerVisible();
+        return RET_OK;
+    }
     if (WIN_MGR->GetExtraData().appended && visible && priority == 0) {
         MMI_HILOGE("current is drag state, can not set pointer visible");
         return RET_ERR;
