@@ -91,7 +91,6 @@ int32_t HardwareCursorPointerManager::EnableStats(bool enable)
 {
     CALL_DEBUG_ENTER;
     CHKPR(powerInterface_, RET_ERR);
-    MMI_HILOGE("devId is:%{public}d", devId_);
     if (powerInterface_->EnableHardwareCursorStats(devId_, enable) != HDI::Display::Composer::V1_2::DISPLAY_SUCCESS) {
         MMI_HILOGE("Enable hardware cursor stats is error");
         return RET_ERR;
@@ -104,7 +103,6 @@ int32_t HardwareCursorPointerManager::GetCursorStats(uint32_t &frameCount, uint3
 {
     CALL_DEBUG_ENTER;
     CHKPR(powerInterface_, RET_ERR);
-    MMI_HILOGE("devId is:%{public}d", devId_);
     if (powerInterface_->GetHardwareCursorStats(devId_, frameCount, vsyncCount) !=
         HDI::Display::Composer::V1_2::DISPLAY_SUCCESS) {
         MMI_HILOGE("Get hardware cursor stats is error");
