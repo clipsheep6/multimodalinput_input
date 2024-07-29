@@ -41,6 +41,11 @@
 
 namespace OHOS {
 namespace MMI {
+namespace {
+constexpr int32_t DEFAULT_FRAME_RATE { 30 };
+constexpr int32_t INVALID_DISPLAY_ID { -1 };
+} // namespace
+
 struct isMagicCursor {
     std::string name;
     bool isShow { false };
@@ -152,12 +157,13 @@ private:
     void ForceClearPointerVisiableStatus() override;
     void CreateCanvasNode();
     void SetSurfaceNodeVisible(bool visible);
-    bool ChangeHasHardwareCursorAnimate();
+    bool EnabeHardwareCursorAnimate();
     float CalculatePhysicalXOffset(ICON_TYPE iconType);
     float CalculatePhysicalYOffset(ICON_TYPE iconType);
-    bool DynamicSetHardwareCursorPosition(int32_t physicalX, int32_t physicalY, ICON_TYPE iconType);
-    bool SetHardWareLocation(int32_t displayId, int32_t physicalX, int32_t physicalY, ICON_TYPE iconType);
-    bool SetDynamicHardWareLocation(int32_t physicalX, int32_t physicalY, ICON_TYPE iconType);
+    bool SetTraditionsHardWareCursorLocation(int32_t displayId, int32_t physicalX, int32_t physicalY,
+        ICON_TYPE iconType);
+#ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    bool SetDynamicHardWareCursorLocation(int32_t physicalX, int32_t physicalY, ICON_TYPE iconType);
     void SetHardwareCursorPosition(int32_t displayId, int32_t physicalX, int32_t physicalY,
         const PointerStyle pointerStyle);
     void RenderThreadLoop();
@@ -169,6 +175,7 @@ private:
     void DoHardwareCursorDraw();
     int32_t FlushBuffer();
     int32_t GetSurfaceInformation();
+#endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
 
 private:
     struct PidInfo {
@@ -206,13 +213,12 @@ private:
     bool isInit_ { false };
     std::atomic<bool> hasHardwareCursorAnimate_ { false };
     std::atomic<bool> hasLoadingPointerStyle_ { false };
-    int32_t frameCount_ { 30 };
+    int32_t frameCount_ { DEFAULT_FRAME_RATE };
     int32_t currentFrame_ { 0 };
     sptr<OHOS::Surface> layer_ { nullptr };
     sptr<OHOS::SurfaceBuffer> buffer_ { nullptr };
     uint8_t *addr_ { nullptr };
-    int32_t currentPhysicalX_ { -1 };
-    int32_t currentPhysicalY_ { -1 };
+    int32_t displayId_ { INVALID_DISPLAY_ID };
     std::shared_ptr<Rosen::Drawing::Image> runningRightImage_ { nullptr };
     std::shared_ptr<Rosen::Drawing::Image> image_ { nullptr };
     std::shared_ptr<AppExecFwk::EventRunner> runner_ { nullptr };
