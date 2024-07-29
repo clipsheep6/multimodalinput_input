@@ -168,7 +168,7 @@ private:
     int32_t ParsingDynamicImage(const MOUSE_ICON mouseStyle);
     void DrawDynamicImage(OHOS::Rosen::Drawing::Canvas &canvas, const MOUSE_ICON mouseStyle);
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
-    bool SetDynamicHardWareCursorLocation(int32_t physicalX, int32_t physicalY, ICON_TYPE iconType);
+    bool SetDynamicHardWareCursorLocation(int32_t physicalX, int32_t physicalY, MOUSE_ICON mouseStyle);
     void RenderThreadLoop();
     int32_t RequestNextVSync();
     void OnVsync(uint64_t timestamp);
@@ -219,7 +219,7 @@ private:
     int32_t currentFrame_ { 0 };
     sptr<OHOS::Surface> layer_ { nullptr };
     sptr<OHOS::SurfaceBuffer> buffer_ { nullptr };
-    uint8_t *addr_ { nullptr };
+    std::shared_ptr<uint8_t *> addr_ { nullptr };
     int32_t displayId_ { INVALID_DISPLAY_ID };
     std::shared_ptr<Rosen::Drawing::Image> runningRightImage_ { nullptr };
     std::shared_ptr<Rosen::Drawing::Image> image_ { nullptr };
