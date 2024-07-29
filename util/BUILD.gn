@@ -59,6 +59,7 @@ config("libmmi_util_config") {
 ohos_rust_shared_ffi("mmi_rust_key_config") {
   sources = [ "rust_key/src/lib.rs" ]
   external_deps = [ "hilog:hilog_rust" ]
+  innerapi_tags = [ "platformsdk_indirect" ]
   subsystem_name = "multimodalinput"
   part_name = "input"
 }
