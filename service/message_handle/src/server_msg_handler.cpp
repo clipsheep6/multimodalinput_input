@@ -267,10 +267,13 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
 
 int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    bool downEvent = (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_BUTTON_DOWN) &&
+        (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_BUTTON_UP) &&
+        (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_UP);
     if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_RAW_POINTER_MOVEMENT) ||
         (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_MOUSE) ||
         ((pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE) &&
-         (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_MOVE))) {
+        (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_PULL_MOVE) && downEvent)) {
         return RET_OK;
     }
     PointerEvent::PointerItem pointerItem {};
@@ -289,8 +292,14 @@ int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointer
     };
     auto displayInfo = WIN_MGR->GetPhysicalDisplay(cursorPos.displayId);
     CHKPR(displayInfo, ERROR_NULL_POINTER);
+    if (downEvent) {
+        if (cursorPos.direction != displayInfo->direction) {
+            WIN_MGR->UpdateAndAdjustMouseLocation(cursorPos.displayId, offset.dx, offset.dy);
+            return RET_OK;
+        }
+    }
 #ifndef OHOS_BUILD_EMULATOR
-    if (ROTATE_POLICY == WINDOW_ROTATE) {
+    if (TOUCH_DRAWING_MGR->IsWindowRotation()) {
         CalculateOffset(displayInfo->direction, offset);
     }
 #endif // OHOS_BUILD_EMULATOR
