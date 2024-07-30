@@ -6,7 +6,18 @@
             "libpath": "libmmi-server.z.so",
             "run-on-create": true,
             "distributed": true,
-            "dump_level": 1
+            "dump_level": 1,
+            "start-on-demand":{
+                "commonevent":[
+                    {
+                        "name":"usual.event.BUNDLE_SCAN_FINISHED",
+                        "value":"1",
+                        "extra-messages": {
+                            "NetType":"1"
+                        }
+                    }
+                ]
+            }
         }
     ]
 }
