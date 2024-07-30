@@ -82,6 +82,7 @@ std::mutex g_instanceMutex;
 MMIService* g_MMIService;
 const std::string DEF_INPUT_SEAT { "seat0" };
 const std::string THREAD_NAME { "mmi-service" };
+const std::string DATA_SHARE_READY { "usual.event.DATA_SHARE_READY" };
 constexpr int32_t WATCHDOG_INTERVAL_TIME { 30000 };
 constexpr int32_t WATCHDOG_DELAY_TIME { 40000 };
 constexpr int32_t RELOAD_DEVICE_TIME { 2000 };
@@ -1486,7 +1487,7 @@ void OnReceiveEvent(const EventFwk::CommonEventData &data)
 {
     auto const &want = data.GetWant();
     std::string action = want.GetAction();
-    if (action == "usual.event.DATA_SHARE_READY") {
+    if (action == DATA_SHARE_READY) {
         if (SettingDataShare::GetInstance(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID).CheckIfSettingsDataReady()) {
             IPointerDrawingManager::GetInstance()->InitPointerObserver();
         }
