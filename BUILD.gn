@@ -18,7 +18,10 @@ config("coverage_flags") {
   if (input_feature_coverage) {
     cflags = [ "--coverage" ]
     ldflags = [ "--coverage" ]
-    cflags_cc = [ "--coverage" ]
+    cflags_cc = [
+        "--coverage",
+        "-fvisibility=hidden"
+      ]
   }
 }
 
