@@ -308,6 +308,7 @@ void DumpWindowData(const std::shared_ptr<PointerEvent>& pointerEvent)
     item.GetDisplayX();
     item.GetDisplayY();
     item.GetTargetWindowId();
+    item.GetTargetWindowPid();
 }
 } // namespace MMI
 } // namespace OHOS
