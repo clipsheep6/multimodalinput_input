@@ -731,10 +731,6 @@ bool KeySubscriberHandler::HandleKeyDown(const std::shared_ptr<KeyEvent> &keyEve
             ClearSubscriberTimer(subscribers);
             continue;
         }
-        if (!keyOption->IsRepeat() && keyCode == preKeyCode) {
-            MMI_HILOGD("Subscribers do not need repeat events");
-            continue;
-        }
         NotifyKeyDownSubscriber(keyEvent, keyOption, subscribers, handled);
     }
     MMI_HILOGD("Handle key down:%{public}s", handled ? "true" : "false");
