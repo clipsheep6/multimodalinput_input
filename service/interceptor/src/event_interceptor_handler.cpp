@@ -55,6 +55,9 @@ void EventInterceptorHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> key
 void EventInterceptorHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
+    if (KnuckleDoubleClickHandle(pointerEvent)) {
+        return;
+    }
     if (OnHandleEvent(pointerEvent)) {
         BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP);
         MMI_HILOGD("Interception is succeeded");
@@ -385,6 +388,19 @@ void EventInterceptorHandler::InterceptorCollection::Dump(int32_t fd, const std:
                 session->GetEarliestEventTime(), session->GetDescript().c_str(),
                 session->GetProgramName().c_str());
     }
+}
+
+bool EventInterceptorHandler::KnuckleDoubleClickHandle(const std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    CHKPR(nextHandler_, ERROR_UNSUPPORT);
+    if (pointerEvent->GetPointerAction() != KNUCKLE_1F_DOUBLE_CLICK &&
+        pointerEvent->GetPointerAction() != KNUCKLE_2F_DOUBLE_CLICK) {
+        return false;
+    }
+    MMI_HILOGI("Current is Knuckle doubleClick Action");
+    nextHandler_->HandlePointerEvent(pointerEvent);
+    return true;
 }
 } // namespace MMI
 } // namespace OHOS

@@ -59,7 +59,7 @@ public:
 private:
     void InitSessionLostCallback();
     void OnSessionLost(SessionPtr session);
-
+    bool KnuckleDoubleClickHandle(const std::shared_ptr<PointerEvent> pointerEvent);
 private:
     class SessionHandler {
     public:
