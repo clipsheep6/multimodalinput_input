@@ -23,7 +23,7 @@
             OHOS::MMI::KeyOption*;
             OHOS::MMI::PointerEvent*;
             OHOS::MMI::PointerStyle*;
-            OHOS::MMI::MMIClient";
+            OHOS::MMI::MMIClient*;
             "vtable for OHOS::MMI::MMIClient";
         };
     local:
