@@ -48,6 +48,7 @@ public:
     void Dump(int32_t fd, const std::vector<std::string> &args);
     bool HandleKeyEventFilter(std::shared_ptr<KeyEvent> event);
     bool HandlePointerEventFilter(std::shared_ptr<PointerEvent> event);
+    bool KnuckleDoubleClickHandle(const std::shared_ptr<PointerEvent> pointerEvent);
 private:
     std::mutex lockFilter_;
     struct FilterInfo {

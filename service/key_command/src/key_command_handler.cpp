@@ -85,6 +85,9 @@ void KeyCommandHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 void KeyCommandHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
+    if (KnuckleDoubleClickHandle(pointerEvent)) {
+        return;
+    }
     if (OnHandleEvent(pointerEvent)) {
         MMI_HILOGD("The pointerEvent start launch an ability, pointAction:%{public}s",
             pointerEvent->DumpPointerAction());
@@ -2034,5 +2037,82 @@ std::ostream& operator<<(std::ostream& os, const Sequence& seq)
     return os;
 }
 
+bool KeyCommandHandler::KnuckleDoubleClickHandle(const std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    auto actionType = pointerEvent->GetPointerAction();
+    std::string shotBundleName = "";
+    std::string shotAbilityName = "";
+    std::string recorderBundleName = "";
+    std::string recorderAbilityName = "";
+    GetKnuckleAbilityInfo(shotBundleName, shotAbilityName, recorderBundleName, recorderAbilityName);
+
+    if (actionType == KNUCKLE_1F_DOUBLE_CLICK) {
+        KnuckleDoubleClickProcess(shotBundleName, shotAbilityName, "single_knuckle");
+        return true;
+    }
+    if (actionType == KNUCKLE_2F_DOUBLE_CLICK) {
+        KnuckleDoubleClickProcess(recorderBundleName, recorderAbilityName, "double_knuckle");
+        return true;
+    }
+    return false;
+}
+
+void KeyCommandHandler::KnuckleDoubleClickProcess(const std::string bundleName,
+    const std::string abilityName, const std::string action)
+{
+    std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
+    if (screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF ||
+        screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED) {
+        MMI_HILOGI("The current screen is not in the unlocked state with the screen on");
+        return;
+    }
+    Ability ability;
+    ability.bundleName = bundleName;
+    ability.abilityName = abilityName;
+    ability.params.emplace(std::make_pair("trigger_type", action));
+    LaunchAbility(ability, 0);
+}
+
+void KeyCommandHandler::GetKnuckleAbilityInfo(std::string &shotBundleName, std::string &shotAbilityName,
+    std::string &recorderBundleName, std::string &recorderAbilityName)
+{
+    if (!isParseConfig_) {
+        if (!ParseConfig()) {
+            MMI_HILOGE("Parse configFile failed");
+            return;
+        }
+        isParseConfig_ = true;
+    }
+    if (sequences_.empty()) {
+        MMI_HILOGI("No sequences configuration data");
+        return;
+    }
+    std::string bundleName = "";
+    std::string shotMatchName = ".screenshot";
+    std::string recorderMatchName = ".screenrecorder";
+    for (auto iter = sequences_.begin(); iter != sequences_.end();) {
+        bundleName = iter->ability.bundleName;
+        if (bundleName.find(shotMatchName) != std::string::npos) {
+            shotBundleName = iter->ability.bundleName;
+            shotAbilityName = iter->ability.abilityName;
+            break;
+        }
+        ++iter;
+    }
+    for (auto iter = sequences_.begin(); iter != sequences_.end();) {
+        bundleName = iter->ability.bundleName;
+        if (bundleName.find(recorderMatchName) != std::string::npos) {
+            recorderBundleName = iter->ability.bundleName;
+            recorderAbilityName = iter->ability.abilityName;
+            break;
+        }
+        ++iter;
+    }
+    if (shotBundleName.empty() || shotAbilityName.empty() || recorderBundleName.empty() ||
+        recorderAbilityName.empty()) {
+        MMI_HILOGI("Get knuckle Ability information failed");
+    }
+}
 } // namespace MMI
 } // namespace OHOS
