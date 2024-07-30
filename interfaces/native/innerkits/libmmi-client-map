@@ -15,10 +15,13 @@
  1.0 {
     global:
         extern "C++" {
+            OHOS::MMI::InputDevice*;
             OHOS::MMI::InputEvent*;
             OHOS::MMI::InputManager*;
             OHOS::MMI::KeyEvent*;
+            OHOS::MMI::KeyOption*;
             OHOS::MMI::PointerEvent*;
+            OHOS::MMI::PointerStyle*;
             "vtable for OHOS::MMI::MMIClient";
         };
     local:
