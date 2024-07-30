@@ -321,6 +321,16 @@ void PointerEvent::PointerItem::SetTargetWindowId(int32_t windowId)
     targetWindowId_ = windowId;
 }
 
+int32_t PointerEvent::PointerItem::GetTargetWindowPid() const
+{
+    return targetWindowId_;
+}
+
+void PointerEvent::PointerItem::SetTargetWindowPid(int32_t windowPid)
+{
+    targetWindowPid_ = windowPid;
+}
+
 int32_t PointerEvent::PointerItem::GetRawDx() const
 {
     return rawDx_;

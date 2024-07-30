@@ -1155,6 +1155,9 @@ public:
          * @since 12
          */
         int32_t GetRawDisplayY() const;
+
+        int32_t GetTargetWindowPid() const;
+        void SetTargetWindowPid(int32_t windowPid);
     private:
         int32_t pointerId_ { -1 };
         bool pressed_ { false };
@@ -1183,6 +1186,7 @@ public:
         int64_t downTime_ {};
         int32_t toolType_ {};
         int32_t targetWindowId_ { -1 };
+        int32_t targetWindowPid_ { -1 };
         int32_t originPointerId_ { 0 };
         int32_t rawDx_ {};
         int32_t rawDy_ {};

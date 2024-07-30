@@ -239,7 +239,15 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
         HandleMultiWindowPointerEvent(point, pointerItem);
         return;
     }
-    auto fd = WIN_MGR->GetClientFd(point);
+    int32_t fd = -1;
+    if (point->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN && pointerItem.GetTargetWindowPid() > 0) {
+        auto udsServer = InputHandler->GetUDSServer();
+        CHKPV(udsServer);
+        WIN_MGR->FoldScreenRotation(point);
+        fd = udsServer->GetClientFd(pointerItem.GetTargetWindowPid());
+    } else {
+        fd = WIN_MGR->GetClientFd(point);
+    }
     DispatchPointerEventInner(point, fd);
 }
 
