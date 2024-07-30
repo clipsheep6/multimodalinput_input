@@ -1109,7 +1109,7 @@ int32_t JsInputMonitor::TransformMousePointerEvent(std::shared_ptr<PointerEvent>
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     int32_t actionValue = TransformTsActionValue(pointerEvent->GetPointerAction());
     if (actionValue == RET_ERR) {
-        MMI_HILOGE("Transform action value failed");
+        MMI_HILOGD("Transform action value failed");
         return RET_ERR;
     }
     if (SetNameProperty(jsEnv_, result, "action", actionValue) != napi_ok) {
@@ -1434,14 +1434,10 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
             }
             case TypeName::THREE_FINGERS_TAP: {
                 bool canUse = false;
-                if (IsThreeFingersTap(pointerEvent)) {
-                    InputManager::GetInstance()->GetTouchpadThreeFingersTapSwitch(canUse);
+                InputManager::GetInstance()->GetTouchpadThreeFingersTapSwitch(canUse);
+                if (canUse) {
+                    ret = TransformMultiTapEvent(pointerEvent, napiPointer);
                 }
-                if (!canUse) {
-                    napi_close_handle_scope(jsEnv_, scope);
-                    continue;
-                }
-                ret = TransformMultiTapEvent(pointerEvent, napiPointer);
                 break;
             }
             case TypeName::JOYSTICK:{

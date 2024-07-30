@@ -332,6 +332,10 @@ int32_t PointerDrawingManager::GetHardwareCursorStats(int32_t pid, uint32_t &fra
 {
     return 0;
 }
+int32_t PointerDrawingManager::GetPointerSnapshot(void *pixelMap)
+{
+    return 0;
+}
 void PointerDrawingManager::ForceClearPointerVisiableStatus()
 {}
 void PointerDrawingManager::InitPointerCallback()
@@ -403,6 +407,11 @@ std::shared_ptr<EventNormalizeHandler> InputEventHandler::GetEventNormalizeHandl
     return nullptr;
 }
 
+std::shared_ptr<KeyCommandHandler> InputEventHandler::GetKeyCommandHandler() const
+{
+    return eventKeyCommandHandler_;
+}
+
 #ifdef OHOS_BUILD_ENABLE_POINTER
 void EventFilterHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {}
@@ -435,6 +444,9 @@ void KnuckleDynamicDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayI
 void KnuckleDynamicDrawingManager::KnuckleDynamicDrawHandler(std::shared_ptr<PointerEvent> pointerEvent)
 {}
 
+void KnuckleDynamicDrawingManager::SetKnuckleDrawingManager(std::shared_ptr<KnuckleDrawingManager> knuckleDrawMgr)
+{}
+
 SettingDataShare::~SettingDataShare() {}
 
 std::shared_ptr<SettingDataShare> SettingDataShare::instance_ = nullptr;
@@ -445,13 +457,12 @@ SettingDataShare& SettingDataShare::GetInstance(int32_t systemAbilityId)
         std::lock_guard<std::mutex> lock(mutex_);
         if (instance_ == nullptr) {
             instance_ = std::make_shared<SettingDataShare>();
-            Initialize(systemAbilityId);
         }
     }
     return *instance_;
 }
 
-ErrCode SettingDataShare::GetBoolValue(const std::string& key, bool& value)
+ErrCode SettingDataShare::GetBoolValue(const std::string& key, bool& value, const std::string &strUri)
 {
     return ERR_OK;
 }
@@ -461,38 +472,18 @@ sptr<SettingObserver> SettingDataShare::CreateObserver(const std::string& key, S
     return nullptr;
 }
 
-ErrCode SettingDataShare::RegisterObserver(const sptr<SettingObserver>& observer)
+ErrCode SettingDataShare::RegisterObserver(const sptr<SettingObserver>& observer, const std::string &strUri)
 {
     return ERR_OK;
 }
-
-void SettingDataShare::Initialize(int32_t systemAbilityId)
-{}
 
 FingersenseWrapper::FingersenseWrapper() {}
 
 FingersenseWrapper::~FingersenseWrapper() {}
 
-bool Rosen::DisplayManager::IsFoldable()
-{
-    return DfsMessageParcel::messageParcel->IsFoldable();
-}
-
 bool UDSSession::SendMsg(NetPacket &pkt) const
 {
     return DfsMessageParcel::messageParcel->SendMsg(pkt);
-}
-
-Rosen::DMError Rosen::DisplayManager::RegisterFoldStatusListener(
-    sptr<Rosen::DisplayManager::IFoldStatusListener> listener)
-{
-    return DfsMessageParcel::messageParcel->RegisterFoldStatusListener(listener);
-}
-
-Rosen::DMError Rosen::DisplayManager::UnregisterFoldStatusListener(
-    sptr<Rosen::DisplayManager::IFoldStatusListener> listener)
-{
-    return DfsMessageParcel::messageParcel->UnregisterFoldStatusListener(listener);
 }
 
 bool Rosen::SceneBoardJudgement::IsSceneBoardEnabled()

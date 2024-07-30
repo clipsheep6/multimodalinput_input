@@ -34,7 +34,9 @@
 #include "preferences.h"
 #include "preferences_errno.h"
 #include "preferences_helper.h"
+#include "scene_board_judgement.h"
 #include "timer_manager.h"
+#include "touchpad_transform_processor.h"
 #include "util.h"
 #include "util_ex.h"
 
@@ -65,6 +67,8 @@ constexpr int32_t SOFT_HARDEN_DEVICE_HEIGHT { 2080 };
 const std::string DEVICE_TYPE_HARDEN { "HAD" };
 const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
+const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
+constexpr int32_t WINDOW_ROTATE { 0 };
 constexpr int32_t WAIT_TIME_FOR_BUTTON_UP { 15 };
 } // namespace
 
@@ -101,7 +105,7 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
     auto displayInfo = WIN_MGR->GetPhysicalDisplay(cursorPos.displayId);
     CHKPR(displayInfo, ERROR_NULL_POINTER);
 #ifndef OHOS_BUILD_EMULATOR
-    if (displayInfo->displayDirection == DIRECTION0) {
+    if (ROTATE_POLICY == WINDOW_ROTATE && Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         CalculateOffset(displayInfo->direction, offset);
     }
 #endif // OHOS_BUILD_EMULATOR
@@ -127,7 +131,7 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
 #endif // OHOS_BUILD_EMULATOR
     WIN_MGR->UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y);
     pointerEvent_->SetTargetDisplayId(cursorPos.displayId);
-    MMI_HILOGD("Change coordinate: x:%{public}.2f, y:%{public}.2f, currentDisplayId:%{public}d",
+    MMI_HILOGD("Change coordinate: x:%.2f, y:%.2f, currentDisplayId:%d",
         cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
     return RET_OK;
 }
@@ -306,7 +310,7 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
         pointerEvent_->SetButtonId(PointerEvent::BUTTON_NONE);
     }
     if (libinput_event_pointer_get_axis_source(data) == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
-        MMI_HILOGI("Libinput event axis source type is finger");
+        MMI_HILOGD("Libinput event axis source type is finger");
         if (!isAxisBegin_) {
             return RET_ERR;
         }
@@ -344,18 +348,22 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
     if (libinput_event_pointer_has_axis(data, LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL)) {
         double axisValue = libinput_event_pointer_get_axis_value(data, LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL);
         if (source == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
+            axisValue = TouchPadTransformProcessor::GetTouchpadScrollRows() * (axisValue / initRows)
+                * tpScrollDirection;
             axisValue = HandleAxisAccelateTouchPad(axisValue) * tpScrollDirection;
         } else {
-            axisValue = GetMouseScrollRows() * (axisValue / initRows) * tpScrollDirection;
+            axisValue = GetMouseScrollRows() * axisValue * tpScrollDirection;
         }
         pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, axisValue);
     }
     if (libinput_event_pointer_has_axis(data, LIBINPUT_POINTER_AXIS_SCROLL_HORIZONTAL)) {
         double axisValue = libinput_event_pointer_get_axis_value(data, LIBINPUT_POINTER_AXIS_SCROLL_HORIZONTAL);
         if (source == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
+            axisValue = TouchPadTransformProcessor::GetTouchpadScrollRows() * (axisValue / initRows)
+                * tpScrollDirection;
             axisValue = HandleAxisAccelateTouchPad(axisValue) * tpScrollDirection;
         } else {
-            axisValue = GetMouseScrollRows() * (axisValue / initRows) * tpScrollDirection;
+            axisValue = GetMouseScrollRows() * axisValue * tpScrollDirection;
         }
         pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL, axisValue);
     }
@@ -743,7 +751,7 @@ int32_t MouseTransformProcessor::GetTouchpadSpeed()
 
 int32_t MouseTransformProcessor::SetPointerLocation(int32_t x, int32_t y)
 {
-    MMI_HILOGI("SetPointerLocation x:%{public}d, y:%{public}d", x, y);
+    MMI_HILOGI("SetPointerLocation x:%d, y:%d", x, y);
     CursorPosition cursorPos = WIN_MGR->GetCursorPos();
     if (cursorPos.displayId < 0) {
         MMI_HILOGE("No display");

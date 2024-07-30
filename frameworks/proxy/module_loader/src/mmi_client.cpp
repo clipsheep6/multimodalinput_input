@@ -26,7 +26,6 @@
 #include "multimodal_input_connect_manager.h"
 #include "proto.h"
 #include "util.h"
-#include "xcollie/watchdog.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MMIClient"
@@ -47,7 +46,7 @@ MMIClient::~MMIClient()
 void MMIClient::SetEventHandler(EventHandlerPtr eventHandler)
 {
     CHKPV(eventHandler);
-    eventHandler_ = eventHandler;
+    // use the new thread untill eventhandler use poll thread
 }
 
 void MMIClient::MarkIsEventHandlerChanged(EventHandlerPtr eventHandler)
@@ -105,11 +104,9 @@ bool MMIClient::StartEventRunner()
 {
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
-    if (eventHandler_ == nullptr) {
-        auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
-        eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
-        MMI_HILOGI("Create event handler, thread name:%{public}s", runner->GetRunnerThreadName().c_str());
-    }
+    auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
+    eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
+    MMI_HILOGI("Create event handler, thread name:%{public}s", runner->GetRunnerThreadName().c_str());
 
     if (isConnected_ && fd_ >= 0) {
         if (isListening_) {

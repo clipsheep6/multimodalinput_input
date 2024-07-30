@@ -54,6 +54,9 @@ void OnDisconnected(const IfMMIClient &client)
 {
     CALL_DEBUG_ENTER;
     InputMgrImpl.OnDisconnected();
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    IMonitorMgr->OnDisconnected();
+#endif // OHOS_BUILD_ENABLE_MONITOR
 }
 
 MultimodalEventHandler::MultimodalEventHandler() {}
@@ -84,7 +87,9 @@ int32_t MultimodalEventHandler::InjectEvent(const std::shared_ptr<KeyEvent> keyE
     keyEvent->UpdateId();
     LogTracer lt(keyEvent->GetId(), keyEvent->GetEventType(), keyEvent->GetKeyAction());
     if (keyEvent->GetKeyCode() < 0) {
-        MMI_HILOGE("KeyCode is invalid:%{public}u", keyEvent->GetKeyCode());
+        if (EventLogHelper::IsBetaVersion()) {
+            MMI_HILOGE("KeyCode is invalid:%{public}u", keyEvent->GetKeyCode());
+        }
         return RET_ERR;
     }
     CHKPR(MULTIMODAL_INPUT_CONNECT_MGR, RET_ERR);

@@ -14,7 +14,9 @@
  */
 
 #include "touch_drawing_manager.h"
+
 #include "bytrace_adapter.h"
+#include "delegate_interface.h"
 #include "parameters.h"
 #include "setting_datashare.h"
 #include "text/font_mgr.h"
@@ -207,7 +209,7 @@ void TouchDrawingManager::GetOriginalTouchScreenCoordinates(Direction direction,
     }
 }
 
-void TouchDrawingManager::UpdateLabels()
+int32_t TouchDrawingManager::UpdateLabels()
 {
     CALL_DEBUG_ENTER;
     if (pointerMode_.isShow) {
@@ -219,23 +221,25 @@ void TouchDrawingManager::UpdateLabels()
         DestoryTouchWindow();
     }
     Rosen::RSTransaction::FlushImplicitTransaction();
+    return RET_OK;
 }
 
-void TouchDrawingManager::UpdateBubbleData()
+int32_t TouchDrawingManager::UpdateBubbleData()
 {
     if (!bubbleMode_.isShow) {
-        CHKPV(surfaceNode_);
+        CHKPR(surfaceNode_, ERROR_NULL_POINTER);
         surfaceNode_->RemoveChild(bubbleCanvasNode_);
         bubbleCanvasNode_.reset();
         DestoryTouchWindow();
         Rosen::RSTransaction::FlushImplicitTransaction();
     }
+    return RET_OK;
 }
 
 void TouchDrawingManager::RotationScreen()
 {
     CALL_DEBUG_ENTER;
-    if (!isChangedRotation_) {
+    if (!isChangedRotation_ && !isChangedMode_) {
         return;
     }
 
@@ -247,7 +251,7 @@ void TouchDrawingManager::RotationScreen()
         if (bubbleMode_.isShow) {
             RotationCanvasNode(bubbleCanvasNode_);
         }
-    } else if (isChangedMode_ && displayInfo_.displayMode == DisplayMode::FULL) {
+    } else if (isChangedMode_) {
         if (pointerMode_.isShow) {
             ResetCanvasNode(trackerCanvasNode_);
             ResetCanvasNode(crosshairCanvasNode_);
@@ -289,14 +293,15 @@ template <class T>
 void TouchDrawingManager::CreateBubbleObserver(T &item)
 {
     CALL_DEBUG_ENTER;
-    SettingObserver::UpdateFunc updateFunc = [&item](const std::string& key) {
+    SettingObserver::UpdateFunc updateFunc = [&item, this](const std::string& key) {
         auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
             .GetBoolValue(key, item.isShow);
         if (ret != RET_OK) {
             MMI_HILOGE("Get value from setting date fail");
             return;
         }
-        TOUCH_DRAWING_MGR->UpdateBubbleData();
+        CHKPV(delegateProxy_);
+        delegateProxy_->OnPostSyncTask(std::bind(&TouchDrawingManager::UpdateBubbleData, this));
         MMI_HILOGI("key: %{public}s, statusValue: %{public}d", key.c_str(), item.isShow);
     };
     sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
@@ -313,14 +318,15 @@ template <class T>
 void TouchDrawingManager::CreatePointerObserver(T &item)
 {
     CALL_DEBUG_ENTER;
-    SettingObserver::UpdateFunc updateFunc = [&item](const std::string& key) {
+    SettingObserver::UpdateFunc updateFunc = [&item, this](const std::string& key) {
         auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
             .GetBoolValue(key, item.isShow);
         if (ret != RET_OK) {
             MMI_HILOGE("Get value from setting date fail");
             return;
         }
-        TOUCH_DRAWING_MGR->UpdateLabels();
+        CHKPV(delegateProxy_);
+        delegateProxy_->OnPostSyncTask(std::bind(&TouchDrawingManager::UpdateLabels, this));
         MMI_HILOGI("key: %{public}s, statusValue: %{public}d", key.c_str(), item.isShow);
     };
     sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
@@ -354,6 +360,11 @@ void TouchDrawingManager::AddCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& ca
     canvasNode = isTrackerNode ? Rosen::RSCanvasDrawingNode::Create() : Rosen::RSCanvasNode::Create();
     canvasNode->SetBounds(0, 0, scaleW_, scaleH_);
     canvasNode->SetFrame(0, 0, scaleW_, scaleH_);
+    if (IsWindowRotation()) {
+        RotationCanvasNode(canvasNode);
+    } else {
+        canvasNode->SetRotation(0);
+    }
 #ifndef USE_ROSEN_DRAWING
     canvasNode->SetBackgroundColor(SK_ColorTRANSPARENT);
 #else
@@ -361,7 +372,6 @@ void TouchDrawingManager::AddCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& ca
 #endif
     canvasNode->SetCornerRadius(1);
     canvasNode->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
-    canvasNode->SetRotation(0);
     surfaceNode_->AddChild(canvasNode, DEFAULT_VALUE);
 }
 
@@ -402,8 +412,8 @@ void TouchDrawingManager::RotationCanvas(RosenCanvas *canvas, Direction directio
             canvas->Translate(0, displayInfo_.width);
             canvas->Rotate(ROTATION_ANGLE_270, 0, 0);
         } else if (direction == Direction::DIRECTION180) {
-            canvas->Rotate(ROTATION_ANGLE_180, displayInfo_.width / CALCULATE_MIDDLE,
-                displayInfo_.height / CALCULATE_MIDDLE);
+            canvas->Rotate(ROTATION_ANGLE_180, static_cast<float>(displayInfo_.width) / CALCULATE_MIDDLE,
+                static_cast<float>(displayInfo_.height) / CALCULATE_MIDDLE);
         } else if (direction == Direction::DIRECTION270) {
             canvas->Translate(displayInfo_.height, 0);
             canvas->Rotate(ROTATION_ANGLE_90, 0, 0);
@@ -462,7 +472,8 @@ void TouchDrawingManager::DrawBubble()
     auto pointerIdList = pointerEvent_->GetPointerIds();
     for (auto pointerId : pointerIdList) {
         if ((pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_UP ||
-            pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) &&
+            pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP ||
+            pointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_CANCEL) &&
             pointerEvent_->GetPointerId() == pointerId) {
             MMI_HILOGI("Continue bubble draw, pointerAction:%{public}d, pointerId:%{public}d",
                 pointerEvent_->GetPointerAction(), pointerEvent_->GetPointerId());
@@ -806,7 +817,8 @@ bool TouchDrawingManager::IsValidAction(const int32_t action)
 {
     if (action == PointerEvent::POINTER_ACTION_DOWN || action == PointerEvent::POINTER_ACTION_PULL_DOWN ||
         action == PointerEvent::POINTER_ACTION_MOVE || action == PointerEvent::POINTER_ACTION_PULL_MOVE ||
-        action == PointerEvent::POINTER_ACTION_UP || action == PointerEvent::POINTER_ACTION_PULL_UP) {
+        action == PointerEvent::POINTER_ACTION_UP || action == PointerEvent::POINTER_ACTION_PULL_UP ||
+        action == PointerEvent::POINTER_ACTION_CANCEL) {
         return true;
     }
     return false;

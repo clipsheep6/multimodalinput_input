@@ -58,7 +58,7 @@ constexpr int32_t TOUCH_LIFT_LIMIT = 24;
 constexpr int32_t TOUCH_RIGHT_LIMIT = 24;
 constexpr int32_t TOUCH_TOP_LIMIT = 80;
 constexpr int32_t TOUCH_BOTTOM_LIMIT = 41;
-constexpr int32_t COMMON_PARAMETER_ERROR = 401;
+constexpr int32_t PARAMETER_ERROR = 401;
 constexpr int32_t KNUCKLE_KNOCKS = 1;
 constexpr size_t SINGLE_KNUCKLE_SIZE = 1;
 constexpr size_t DOUBLE_KNUCKLE_SIZE = 2;
@@ -85,9 +85,7 @@ enum SpecialType {
     KEY_DOWN_ACTION = 2
 };
 const std::map<int32_t, SpecialType> SPECIAL_KEYS = {
-    { KeyEvent::KEYCODE_POWER, SpecialType::KEY_DOWN_ACTION },
-    { KeyEvent::KEYCODE_VOLUME_DOWN, SpecialType::SPECIAL_ALL },
-    { KeyEvent::KEYCODE_VOLUME_UP, SpecialType::SPECIAL_ALL }
+    { KeyEvent::KEYCODE_POWER, SpecialType::KEY_DOWN_ACTION }
 };
 struct JsonParser {
     JsonParser() = default;

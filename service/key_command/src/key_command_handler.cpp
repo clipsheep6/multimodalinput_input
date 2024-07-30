@@ -29,6 +29,7 @@
 #include "dfx_hisysevent.h"
 #include "display_event_monitor.h"
 #include "error_multimodal.h"
+#include "event_log_helper.h"
 #include "gesturesense_wrapper.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
@@ -59,7 +60,9 @@ constexpr float MIN_GESTURE_STROKE_LENGTH { 200.0f };
 constexpr float MIN_LETTER_GESTURE_SQUARENESS { 0.15f };
 constexpr int32_t EVEN_NUMBER { 2 };
 constexpr int64_t NO_DELAY { 0 };
-constexpr int64_t FREQUENCY = 1000;
+constexpr int64_t FREQUENCY { 1000 };
+constexpr int64_t TAP_DOWN_INTERVAL_MILLIS { 550000 };
+constexpr int32_t MAX_TAP_COUNT { 2 };
 const std::string AIBASE_BUNDLE_NAME { "com.hmos.aibase" };
 const std::string WAKEUP_ABILITY_NAME { "WakeUpExtAbility" };
 const std::string SCREENSHOT_BUNDLE_NAME { "com.hmos.screenshot" };
@@ -86,8 +89,12 @@ void KeyCommandHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent> p
 {
     CHKPV(pointerEvent);
     if (OnHandleEvent(pointerEvent)) {
-        MMI_HILOGD("The pointerEvent start launch an ability, pointAction:%{public}s",
-            pointerEvent->DumpPointerAction());
+        if (EventLogHelper::IsBetaVersion() && !pointerEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+            MMI_HILOGD("The pointerEvent start launch an ability, pointAction:%{public}s",
+                pointerEvent->DumpPointerAction());
+        } else {
+            MMI_HILOGD("The pointerEvent start launch an ability, pointAction:%s", pointerEvent->DumpPointerAction());
+        }
     }
     CHKPV(nextHandler_);
     nextHandler_->HandlePointerEvent(pointerEvent);
@@ -108,6 +115,11 @@ void KeyCommandHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> poi
         pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
     }
     nextHandler_->HandleTouchEvent(pointerEvent);
+}
+
+bool KeyCommandHandler::GetKnuckleSwitchValue()
+{
+    return knuckleSwitch_.statusConfigValue;
 }
 
 void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> touchEvent)
@@ -132,6 +144,10 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> t
         SetKnuckleDoubleTapDistance(distanceDefaultConfig_);
         isDistanceConfig_ = true;
     }
+    if (!isKnuckleSwitchConfig_) {
+        CreateStatusConfigObserver(knuckleSwitch_);
+        isKnuckleSwitchConfig_ = true;
+    }
 
     switch (touchEvent->GetPointerAction()) {
         case PointerEvent::POINTER_ACTION_CANCEL:
@@ -151,6 +167,9 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> t
             MMI_HILOGD("Unknown pointer action:%{public}d", touchEvent->GetPointerAction());
             break;
     }
+#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+    HandleKnuckleGestureEvent(touchEvent);
+#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
 }
 
 void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<PointerEvent> touchEvent)
@@ -166,7 +185,6 @@ void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<Point
     doubleKnuckleGesture_.state = false;
     switch (toolType) {
         case PointerEvent::TOOL_TYPE_FINGER: {
-            isKnuckleState_ = false;
             HandleFingerGestureDownEvent(touchEvent);
             break;
         }
@@ -176,7 +194,6 @@ void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<Point
             break;
         }
         default: {
-            isKnuckleState_ = false;
             MMI_HILOGD("Current touch event tool type:%{public}d", toolType);
             break;
         }
@@ -190,11 +207,6 @@ void KeyCommandHandler::HandlePointerActionMoveEvent(const std::shared_ptr<Point
     int32_t id = touchEvent->GetPointerId();
     PointerEvent::PointerItem item;
     touchEvent->GetPointerItem(id, item);
-#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
-    if (item.GetToolType() == PointerEvent::TOOL_TYPE_KNUCKLE) {
-        HandleKnuckleGestureTouchMove(touchEvent);
-    }
-#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     if (!twoFingerGesture_.active) {
         return;
     }
@@ -285,7 +297,7 @@ void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<Poin
         MMI_HILOGW("Touch event tool type:%{public}d not knuckle", item.GetToolType());
         return;
     }
-    if (singleKnuckleGesture_.statusConfigValue) {
+    if (knuckleSwitch_.statusConfigValue) {
         MMI_HILOGI("Knuckle switch closed");
         return;
     }
@@ -304,9 +316,7 @@ void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<Poin
     } else {
         MMI_HILOGW("Other kunckle pointercnt not process, pointercnt:%{public}zu", pointercnt);
     }
-#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
-    HandleKnuckleGestureTouchDown(touchEvent);
-#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+    CheckAndUpdateTappingCountAtDown(touchEvent);
 }
 
 void KeyCommandHandler::HandleKnuckleGestureUpEvent(const std::shared_ptr<PointerEvent> touchEvent)
@@ -316,14 +326,12 @@ void KeyCommandHandler::HandleKnuckleGestureUpEvent(const std::shared_ptr<Pointe
     size_t pointercnt = touchEvent->GetPointerIds().size();
     if ((pointercnt == SINGLE_KNUCKLE_SIZE) && (!isDoubleClick_)) {
         singleKnuckleGesture_.lastPointerUpTime = touchEvent->GetActionTime();
-#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
-        HandleKnuckleGestureTouchUp(touchEvent);
-#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     } else if (pointercnt == DOUBLE_KNUCKLE_SIZE) {
         doubleKnuckleGesture_.lastPointerUpTime = touchEvent->GetActionTime();
     } else {
         MMI_HILOGW("Other kunckle pointercnt not process, pointercnt:%{public}zu", pointercnt);
     }
+    previousUpTime_ = touchEvent->GetActionTime();
 }
 
 void KeyCommandHandler::SingleKnuckleGestureProcesser(const std::shared_ptr<PointerEvent> touchEvent)
@@ -347,7 +355,6 @@ void KeyCommandHandler::KnuckleGestureProcessor(std::shared_ptr<PointerEvent> to
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
-    isKnuckleState_ = true;
     if (knuckleGesture.lastPointerDownEvent == nullptr) {
         MMI_HILOGI("Knuckle gesture first down Event");
         knuckleGesture.lastPointerDownEvent = touchEvent;
@@ -364,13 +371,13 @@ void KeyCommandHandler::KnuckleGestureProcessor(std::shared_ptr<PointerEvent> to
     if (isTimeIntervalReady && (type == KnuckleType::KNUCKLE_TYPE_DOUBLE || isDistanceReady)) {
         MMI_HILOGI("Knuckle gesture start launch ability");
         knuckleCount_ = 0;
-        DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(intervalTime);
+        DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(intervalTime, downToPrevDownDistance);
         BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_FINGERSCENE, knuckleGesture.ability.bundleName);
         LaunchAbility(knuckleGesture.ability, NO_DELAY);
         BytraceAdapter::StopLaunchAbility();
         knuckleGesture.state = true;
         if (knuckleGesture.ability.bundleName == SCREENRECORDER_BUNDLE_NAME) {
-            DfxHisysevent::ReportScreenRecorderGesture(++screenRecordingSuccessCount_, intervalTime);
+            DfxHisysevent::ReportScreenRecorderGesture(intervalTime);
         }
         ReportKnuckleScreenCapture(touchEvent);
     } else {
@@ -454,18 +461,6 @@ void KeyCommandHandler::AdjustDistanceConfigIfNeed(float distance)
     MMI_HILOGI("Adjust new double click distance:%{public}f", newDistanceConfig);
     downToPrevDownDistanceConfig_ = newDistanceConfig;
     checkAdjustDistanceCount_ = 0;
-}
-
-void KeyCommandHandler::ReportKnuckleDoubleClickEvent(const std::shared_ptr<PointerEvent> touchEvent,
-    KnuckleGesture &knuckleGesture)
-{
-    CHKPV(touchEvent);
-    size_t pointercnt = touchEvent->GetPointerIds().size();
-    if (pointercnt == SINGLE_KNUCKLE_SIZE) {
-        DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(knuckleGesture.downToPrevUpTime);
-        return;
-    }
-    MMI_HILOGW("Current touch event pointercnt:%{public}zu", pointercnt);
 }
 
 void KeyCommandHandler::ReportKnuckleScreenCapture(const std::shared_ptr<PointerEvent> touchEvent)
@@ -563,10 +558,63 @@ int32_t KeyCommandHandler::ConvertVPToPX(int32_t vp) const
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+void KeyCommandHandler::HandleKnuckleGestureEvent(std::shared_ptr<PointerEvent> touchEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(touchEvent);
+    int32_t id = touchEvent->GetPointerId();
+    PointerEvent::PointerItem item;
+    touchEvent->GetPointerItem(id, item);
+    if (item.GetToolType() != PointerEvent::TOOL_TYPE_KNUCKLE ||
+        touchEvent->GetPointerIds().size() != SINGLE_KNUCKLE_SIZE ||
+        singleKnuckleGesture_.state) {
+        MMI_HILOGD("Touch tool type is:%{public}d", item.GetToolType());
+        ResetKnuckleGesture();
+        return;
+    }
+    if (knuckleSwitch_.statusConfigValue) {
+        MMI_HILOGI("Knuckle switch closed");
+        return;
+    }
+    int32_t touchAction = touchEvent->GetPointerAction();
+    if (IsValidAction(touchAction)) {
+        switch (touchAction) {
+            case PointerEvent::POINTER_ACTION_CANCEL:
+            case PointerEvent::POINTER_ACTION_UP: {
+                HandleKnuckleGestureTouchUp(touchEvent);
+                break;
+            }
+            case PointerEvent::POINTER_ACTION_MOVE: {
+                HandleKnuckleGestureTouchMove(touchEvent);
+                break;
+            }
+            case PointerEvent::POINTER_ACTION_DOWN: {
+                HandleKnuckleGestureTouchDown(touchEvent);
+                break;
+            }
+            default:
+                MMI_HILOGD("Unknown pointer action:%{public}d", touchAction);
+                break;
+        }
+    }
+}
+
+bool KeyCommandHandler::IsValidAction(int32_t action)
+{
+    CALL_DEBUG_ENTER;
+    if (action == PointerEvent::POINTER_ACTION_DOWN ||
+        ((action == PointerEvent::POINTER_ACTION_MOVE || action == PointerEvent::POINTER_ACTION_UP ||
+        action == PointerEvent::POINTER_ACTION_CANCEL) && !gesturePoints_.empty())) {
+        return true;
+    }
+    return false;
+}
+
 void KeyCommandHandler::HandleKnuckleGestureTouchDown(std::shared_ptr<PointerEvent> touchEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
+    ResetKnuckleGesture();
     int32_t id = touchEvent->GetPointerId();
     PointerEvent::PointerItem item;
     touchEvent->GetPointerItem(id, item);
@@ -618,31 +666,29 @@ void KeyCommandHandler::HandleKnuckleGestureTouchUp(std::shared_ptr<PointerEvent
     CHKPV(touchEvent);
     auto touchUp = GESTURESENSE_WRAPPER->touchUp_;
     CHKPV(touchUp);
+    MMI_HILOGI("Knuckle gesturePoints size:%{public}zu, isGesturing:%{public}d, isLetterGesturing:%{public}d",
+        gesturePoints_.size(), isGesturing_, isLetterGesturing_);
     NotifyType notifyType = static_cast<NotifyType>(touchUp(gesturePoints_, gestureTimeStamps_,
         isGesturing_, isLetterGesturing_));
     switch (notifyType) {
         case NotifyType::REGIONGESTURE: {
             ProcessKnuckleGestureTouchUp(notifyType);
-            smartShotSuccTimes_++;
             drawOSuccTimestamp_ = touchEvent->GetActionTime();
             ReportRegionGesture();
             break;
         }
         case NotifyType::LETTERGESTURE: {
             ProcessKnuckleGestureTouchUp(notifyType);
-            drawSSuccessCount_++;
             ReportLetterGesture();
             break;
         }
         default: {
             MMI_HILOGW("Not a region gesture or letter gesture, notifyType:%{public}d", notifyType);
-            gestureFailCount_++;
             drawOFailTimestamp_ = touchEvent->GetActionTime();
             ReportIfNeed();
             break;
         }
     }
-    ResetKnuckleGesture();
 }
 
 void KeyCommandHandler::ProcessKnuckleGestureTouchUp(NotifyType type)
@@ -698,7 +744,7 @@ std::string KeyCommandHandler::GesturePointsToStr() const
 
 void KeyCommandHandler::ReportIfNeed()
 {
-    DfxHisysevent::ReportKnuckleGestureFaildTimes(gestureFailCount_);
+    DfxHisysevent::ReportKnuckleGestureFaildTimes();
     DfxHisysevent::ReportKnuckleGestureTrackLength(gestureTrackLength_);
     DfxHisysevent::ReportKnuckleGestureTrackTime(gestureTimeStamps_);
     if (isLastGestureSucceed_) {
@@ -709,13 +755,13 @@ void KeyCommandHandler::ReportIfNeed()
 
 void KeyCommandHandler::ReportRegionGesture()
 {
-    DfxHisysevent::ReportSmartShotSuccTimes(smartShotSuccTimes_);
+    DfxHisysevent::ReportSmartShotSuccTimes();
     ReportGestureInfo();
 }
 
 void KeyCommandHandler::ReportLetterGesture()
 {
-    DfxHisysevent::ReportKnuckleDrawSSuccessTimes(drawSSuccessCount_);
+    DfxHisysevent::ReportKnuckleDrawSSuccessTimes();
     ReportGestureInfo();
 }
 
@@ -772,7 +818,7 @@ bool KeyCommandHandler::ParseExcludeConfig()
         return ParseExcludeJson(defaultConfig);
     }
     std::string customConfig = filePath;
-    MMI_HILOGD("The exclude_keys_config.json file path:%{public}s", customConfig.c_str());
+    MMI_HILOGD("The exclude_keys_config.json file path:%s", customConfig.c_str());
     return ParseExcludeJson(customConfig) || ParseExcludeJson(defaultConfig);
 }
 
@@ -812,7 +858,7 @@ bool KeyCommandHandler::ParseJson(const std::string &configFile)
     bool isParseDoubleKnuckleGesture = IsParseKnuckleGesture(parser, DOUBLE_KNUCKLE_ABILITY, doubleKnuckleGesture_);
     bool isParseMultiFingersTap = ParseMultiFingersTap(parser, TOUCHPAD_TRIP_TAP_ABILITY, threeFingersTap_);
     bool isParseRepeatKeys = ParseRepeatKeys(parser, repeatKeys_);
-    singleKnuckleGesture_.statusConfig = SETTING_KNUCKLE_SWITCH;
+    knuckleSwitch_.statusConfig = SETTING_KNUCKLE_SWITCH;
     if (!isParseShortKeys && !isParseSequences && !isParseTwoFingerGesture && !isParseSingleKnuckleGesture &&
         !isParseDoubleKnuckleGesture && !isParseMultiFingersTap && !isParseRepeatKeys) {
         MMI_HILOGE("Parse configFile failed");
@@ -855,9 +901,9 @@ void KeyCommandHandler::Print()
         MMI_HILOGI("row:%{public}d", row++);
         auto &shortcutKey = item.second;
         for (const auto &prekey : shortcutKey.preKeys) {
-            MMI_HILOGI("preKey:%{public}d", prekey);
+            MMI_HILOGI("preKey:%d", prekey);
         }
-        MMI_HILOGI("finalKey:%{public}d, keyDownDuration:%{public}d, triggerType:%{public}d,"
+        MMI_HILOGI("finalKey:%d, keyDownDuration:%{public}d, triggerType:%{public}d,"
                    " bundleName:%{public}s, abilityName:%{public}s", shortcutKey.finalKey,
                    shortcutKey.keyDownDuration, shortcutKey.triggerType,
                    shortcutKey.ability.bundleName.c_str(), shortcutKey.ability.abilityName.c_str());
@@ -868,7 +914,7 @@ void KeyCommandHandler::PrintExcludeKeys()
 {
     size_t keysSize = excludeKeys_.size();
     for (size_t i = 0; i < keysSize; i++) {
-        MMI_HILOGD("keyCode:%{public}d, keyAction:%{public}d, delay:%{public}" PRId64,
+        MMI_HILOGD("keyCode:%d, keyAction:%{public}d, delay:%{public}" PRId64,
                    excludeKeys_[i].keyCode, excludeKeys_[i].keyAction, excludeKeys_[i].delay);
     }
 }
@@ -880,7 +926,7 @@ void KeyCommandHandler::PrintSeq()
     for (const auto &item : sequences_) {
         MMI_HILOGI("row:%{public}d", row++);
         for (const auto& sequenceKey : item.sequenceKeys) {
-            MMI_HILOGI("keyCode:%{public}d, keyAction:%{public}d, delay:%{public}" PRId64,
+            MMI_HILOGI("keyCode:%d, keyAction:%{public}d, delay:%{public}" PRId64,
                        sequenceKey.keyCode, sequenceKey.keyAction, sequenceKey.delay);
         }
         MMI_HILOGI("bundleName:%{public}s, abilityName:%{public}s",
@@ -917,8 +963,11 @@ bool KeyCommandHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> key)
     }
 
     if (IsExcludeKey(key)) {
-        MMI_HILOGD("ExcludekeyCode:%{public}d, ExcludekeyAction:%{public}d",
-                   key->GetKeyCode(), key->GetKeyAction());
+        if (EventLogHelper::IsBetaVersion() && !key->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+            MMI_HILOGD("ExcludekeyCode:%{public}d,ExcludekeyAction:%{public}d", key->GetKeyCode(), key->GetKeyAction());
+        } else {
+            MMI_HILOGD("ExcludekeyCode:%d, ExcludekeyAction:%{public}d", key->GetKeyCode(), key->GetKeyAction());
+        }
         auto items = key->GetKeyItems();
         MMI_HILOGD("KeyItemsSize:%{public}zu", items.size());
         if (items.size() != 1) {
@@ -963,7 +1012,6 @@ void KeyCommandHandler::ParseStatusConfigObserver()
         }
         CreateStatusConfigObserver<ShortcutKey>(shortcutKey);
     }
-    CreateStatusConfigObserver<KnuckleGesture>(singleKnuckleGesture_);
 }
 
 template <class T>
@@ -978,7 +1026,7 @@ void KeyCommandHandler::CreateStatusConfigObserver(T& item)
             MMI_HILOGE("Get value from setting date fail");
             return;
         }
-        MMI_HILOGI("Config changed key:%{public}s, value:%{public}d", key.c_str(), statusValue);
+        MMI_HILOGI("Config changed key:%s, value:%{public}d", key.c_str(), statusValue);
         item.statusConfigValue = statusValue;
     };
     sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
@@ -995,7 +1043,7 @@ void KeyCommandHandler::CreateStatusConfigObserver(T& item)
         MMI_HILOGE("Get value from setting date fail");
         return;
     }
-    MMI_HILOGI("Get value success key:%{public}s, value:%{public}d", item.statusConfig.c_str(), configVlaue);
+    MMI_HILOGI("Get value success key:%s, value:%{public}d", item.statusConfig.c_str(), configVlaue);
     item.statusConfigValue = configVlaue;
 }
 
@@ -1016,8 +1064,12 @@ std::shared_ptr<KeyEvent> KeyCommandHandler::CreateKeyEvent(int32_t keyCode, int
 bool KeyCommandHandler::PreHandleEvent(const std::shared_ptr<KeyEvent> key)
 {
     CHKPF(key);
-    MMI_HILOGD("KeyEvent occured. keyCode:%{public}d, keyAction:%{public}d",
-               key->GetKeyCode(), key->GetKeyAction());
+    if (EventLogHelper::IsBetaVersion() && !key->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+        MMI_HILOGD("KeyEvent occured. keyCode:%{public}d, keyAction:%{public}d",
+            key->GetKeyCode(), key->GetKeyAction());
+    } else {
+        MMI_HILOGD("KeyEvent occured. keyCode:%d, keyAction:%{public}d", key->GetKeyCode(), key->GetKeyAction());
+    }
     if (!IsEnableCombineKey(key)) {
         MMI_HILOGI("Combine key is taken over in key command");
         return false;
@@ -1065,6 +1117,9 @@ bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
             isHandleSequence_ = true;
         }
         return true;
+    }
+    if (key->GetKeyCode() == KeyEvent::KEYCODE_POWER) {
+        MMI_HILOGI("Handle power key DownStart:%{public}d", isDownStart_);
     }
     if (!isDownStart_) {
         HandleRepeatKeys(key);
@@ -1124,6 +1179,7 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
         MMI_HILOGD("Add timer success");
         return true;
     }
+    MMI_HILOGE("Handle event failed");
     return false;
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -1200,9 +1256,11 @@ bool KeyCommandHandler::HandleRepeatKey(const RepeatKey &item, bool &isLaunched,
         if (!statusValue) {
             return false;
         }
+        MMI_HILOGI("Repeat key matched keycode:%{public}d", keyEvent->GetKeyCode());
         BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_REPEAT_KEY, item.ability.bundleName);
         LaunchAbility(item.ability);
         BytraceAdapter::StopLaunchAbility();
+
         launchAbilityCount_ = count_;
         isLaunched = true;
         isDownStart_ = false;
@@ -1309,7 +1367,11 @@ bool KeyCommandHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent
         return true;
     }
     if (currentLaunchAbilityKey_.timerId >= 0 && IsKeyMatch(currentLaunchAbilityKey_, keyEvent)) {
-        MMI_HILOGD("repeat, current key %{public}d has launched ability", currentLaunchAbilityKey_.finalKey);
+        if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+            MMI_HILOGD("repeat, current key %{public}d has launched ability", currentLaunchAbilityKey_.finalKey);
+        } else {
+            MMI_HILOGD("repeat, current key %d has launched ability", currentLaunchAbilityKey_.finalKey);
+        }
         return true;
     }
     DfxHisysevent::GetComboStartTime();
@@ -1388,7 +1450,7 @@ bool KeyCommandHandler::IsRepeatKeyEvent(const SequenceKey &sequenceKey)
     for (size_t i = keys_.size(); i > 0; --i) {
         if (keys_[i-1].keyCode == sequenceKey.keyCode) {
             if (keys_[i-1].keyAction == sequenceKey.keyAction) {
-                MMI_HILOGI("Is repeat key, keyCode:%{public}d", sequenceKey.keyCode);
+                MMI_HILOGI("Is repeat key, keyCode:%d", sequenceKey.keyCode);
                 return true;
             }
             MMI_HILOGI("Is not repeat key");
@@ -1398,10 +1460,27 @@ bool KeyCommandHandler::IsRepeatKeyEvent(const SequenceKey &sequenceKey)
     return false;
 }
 
+bool KeyCommandHandler::IsActiveSequenceRepeating(std::shared_ptr<KeyEvent> keyEvent) const
+{
+    return (sequenceOccurred_ && !keys_.empty() &&
+            (keys_.back().keyCode == keyEvent->GetKeyCode()) &&
+            (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN));
+}
+
+void KeyCommandHandler::MarkActiveSequence(bool active)
+{
+    sequenceOccurred_ = active;
+}
+
 bool KeyCommandHandler::HandleSequences(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
+    if (IsActiveSequenceRepeating(keyEvent)) {
+        MMI_HILOGD("Skip repeating key(%{public}d) in active sequence", keyEvent->GetKeyCode());
+        return true;
+    }
+    MarkActiveSequence(false);
     if (matchedSequence_.timerId >= 0 && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
         MMI_HILOGI("screen locked, remove matchedSequence timer:%{public}d", matchedSequence_.timerId);
         TimerMgr->RemoveTimer(matchedSequence_.timerId);
@@ -1437,6 +1516,7 @@ bool KeyCommandHandler::HandleSequences(const std::shared_ptr<KeyEvent> keyEvent
     }
 
     if (isLaunchAbility) {
+        MarkActiveSequence(true);
         for (const auto& item : keys_) {
             if (IsSpecialType(item.keyCode, SpecialType::KEY_DOWN_ACTION)) {
                 HandleSpecialKeys(item.keyCode, item.keyAction);
@@ -1648,7 +1728,7 @@ bool KeyCommandHandler::HandleKeyDown(ShortcutKey &shortcutKey)
     MMI_HILOGI("Add timer success");
     lastMatchedKey_ = shortcutKey;
     if (InputHandler->GetSubscriberHandler()->IsKeyEventSubscribed(shortcutKey.finalKey, shortcutKey.triggerType)) {
-        MMI_HILOGI("current shortcutKey %{public}d is subSubcribed", shortcutKey.finalKey);
+        MMI_HILOGI("current shortcutKey %d is subSubcribed", shortcutKey.finalKey);
         return false;
     }
     return true;
@@ -1790,9 +1870,9 @@ void KeyCommandHandler::LaunchAbility(const Sequence &sequence)
 void ShortcutKey::Print() const
 {
     for (const auto &prekey: preKeys) {
-        MMI_HILOGI("Eventkey matched, preKey:%{public}d", prekey);
+        MMI_HILOGI("Eventkey matched, preKey:%d", prekey);
     }
-    MMI_HILOGI("Eventkey matched, finalKey:%{public}d, bundleName:%{public}s",
+    MMI_HILOGI("Eventkey matched, finalKey:%d, bundleName:%{public}s",
         finalKey, ability.bundleName.c_str());
 }
 
@@ -1859,15 +1939,15 @@ int32_t KeyCommandHandler::UpdateSettingsXml(const std::string &businessId, int3
     CALL_DEBUG_ENTER;
     if (businessId.empty() || businessIds_.empty()) {
         MMI_HILOGE("businessId or businessIds_ is empty");
-        return COMMON_PARAMETER_ERROR;
+        return PARAMETER_ERROR;
     }
     if (std::find(businessIds_.begin(), businessIds_.end(), businessId) == businessIds_.end()) {
         MMI_HILOGE("%{public}s not in the config file", businessId.c_str());
-        return COMMON_PARAMETER_ERROR;
+        return PARAMETER_ERROR;
     }
     if (delay < MIN_SHORT_KEY_DOWN_DURATION || delay > MAX_SHORT_KEY_DOWN_DURATION) {
         MMI_HILOGE("Delay is not in valid range");
-        return COMMON_PARAMETER_ERROR;
+        return PARAMETER_ERROR;
     }
     return PREFERENCES_MGR->SetShortKeyDuration(businessId, delay);
 }
@@ -1913,9 +1993,13 @@ bool KeyCommandHandler::CheckInputMethodArea(const std::shared_ptr<PointerEvent>
     int32_t displayY = item.GetDisplayY();
     int32_t displayId = touchEvent->GetTargetDisplayId();
     auto windows = WIN_MGR->GetWindowGroupInfoByDisplayId(displayId);
+    int32_t tragetWindowId = touchEvent->GetTargetWindowId();
     for (auto window : windows) {
         if (window.windowType != WINDOW_INPUT_METHOD_TYPE) {
             continue;
+        }
+        if (window.id != tragetWindowId) {
+            return false;
         }
         int32_t rightDownX;
         int32_t rightDownY;
@@ -1929,6 +2013,8 @@ bool KeyCommandHandler::CheckInputMethodArea(const std::shared_ptr<PointerEvent>
         }
         if (displayX >= window.area.x && displayX <= rightDownX &&
             displayY >= window.area.y && displayY <= rightDownY) {
+                MMI_HILOGI("In input method area, windowId:%{public}d, windowType:%{public}d",
+                    window.id, window.windowType);
                 return true;
         }
     }
@@ -2034,5 +2120,23 @@ std::ostream& operator<<(std::ostream& os, const Sequence& seq)
     return os;
 }
 
+void KeyCommandHandler::CheckAndUpdateTappingCountAtDown(std::shared_ptr<PointerEvent> touchEvent)
+{
+    CHKPV(touchEvent);
+    int64_t currentDownTime = touchEvent->GetActionTime();
+    int64_t downIntervalTime = currentDownTime - lastDownTime_;
+    lastDownTime_ = currentDownTime;
+    if (downIntervalTime <= 0 || downIntervalTime >= TAP_DOWN_INTERVAL_MILLIS) {
+        tappingCount_ = 1;
+        return;
+    }
+    tappingCount_++;
+    int64_t timeDiffToPrevKnuckleUpTime = currentDownTime - previousUpTime_;
+    if (timeDiffToPrevKnuckleUpTime <= downToPrevUpTimeConfig_) {
+        if (tappingCount_ > MAX_TAP_COUNT) {
+            DfxHisysevent::ReportFailIfKnockTooFast();
+        }
+    }
+}
 } // namespace MMI
 } // namespace OHOS

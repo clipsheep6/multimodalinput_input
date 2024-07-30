@@ -192,7 +192,6 @@ void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<PointerEv
     CHKPV(session_);
     MMI_HILOGD("Service SendToClient InputHandlerType:%{public}d, TokenType:%{public}d, pid:%{public}d",
         handlerType_, session_->GetTokenType(), session_->GetPid());
-    auto currentTime = GetSysClockTime();
     if (!session_->SendMsg(pkt)) {
         MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
         return;
@@ -466,14 +465,14 @@ void EventMonitorHandler::MonitorCollection::Dump(int32_t fd, const std::vector<
 {
     CALL_DEBUG_ENTER;
     mprintf(fd, "Monitor information:\t");
-    mprintf(fd, "monitors: count=%d", monitors_.size());
+    mprintf(fd, "monitors: count=%zu", monitors_.size());
     for (const auto &item : monitors_) {
         SessionPtr session = item.session_;
         CHKPV(session);
         mprintf(fd,
                 "handlerType:%d | Pid:%d | Uid:%d | Fd:%d "
                 "| EarliestEventTime:%" PRId64 " | Descript:%s "
-                "| EventType:%s | ProgramName:%s \t",
+                "| EventType:%u | ProgramName:%s \t",
                 item.handlerType_, session->GetPid(),
                 session->GetUid(), session->GetFd(),
                 session->GetEarliestEventTime(), session->GetDescript().c_str(),

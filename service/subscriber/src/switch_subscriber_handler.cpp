@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <parameters.h>
 #include "switch_subscriber_handler.h"
 
 #include "bytrace_adapter.h"
@@ -124,7 +125,16 @@ bool SwitchSubscriberHandler::OnSubscribeSwitchEvent(std::shared_ptr<SwitchEvent
             handled = true;
         }
     }
+    if (switchEvent->GetSwitchType() == SwitchEvent::SwitchType::SWITCH_PRIVACY) {
+        std::string value = OHOS::system::GetParameter(SUPER_PRIVACY_SWITCH, "");
+        if (value.empty() || value == "false") {
+            OHOS::system::SetParameter(SUPER_PRIVACY_SWITCH, "true");
+        } else {
+            OHOS::system::SetParameter(SUPER_PRIVACY_SWITCH, "false");
+        }
+    }
     MMI_HILOGD("%{public}s", handled ? "true" : "false");
+    MMI_HILOGD("SUPER_PRIVACY_SWITCH: %{public}s", OHOS::system::GetParameter(SUPER_PRIVACY_SWITCH, "").c_str());
     return handled;
 }
 
@@ -202,7 +212,7 @@ void SwitchSubscriberHandler::Dump(int32_t fd, const std::vector<std::string> &a
 {
     CALL_DEBUG_ENTER;
     mprintf(fd, "Subscriber information:\t");
-    mprintf(fd, "subscribers: count=%d", subscribers_.size());
+    mprintf(fd, "subscribers: count=%zu", subscribers_.size());
     for (const auto &item : subscribers_) {
         std::shared_ptr<Subscriber> subscriber = item;
         CHKPV(subscriber);
