@@ -19,9 +19,9 @@ config("coverage_flags") {
     cflags = [ "--coverage" ]
     ldflags = [ "--coverage" ]
     cflags_cc = [
-        "--coverage",
-        "-fvisibility=hidden"
-      ]
+      "--coverage",
+      "-fvisibility=hidden",
+    ]
   }
 }
 
