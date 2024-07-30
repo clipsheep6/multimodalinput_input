@@ -25,6 +25,7 @@
 #include "event_log_helper.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
+#include "key_auto_repeat.h"
 #include "net_packet.h"
 #include "proto.h"
 #include "timer_manager.h"
@@ -385,7 +386,6 @@ bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEven
         MMI_HILOGD("Repeat KeyEvent, skip");
         return true;
     }
-    int32_t preKeyCode = keyEvent_->GetKeyCode();
     keyEvent_ = KeyEvent::Clone(keyEvent);
     int32_t keyAction = keyEvent->GetKeyAction();
     MMI_HILOGD("keyCode:%{public}d, keyAction:%{public}s", keyEvent->GetKeyCode(),
@@ -401,7 +401,7 @@ bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEven
     }
     bool handled = false;
     if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
-        handled = HandleKeyDown(keyEvent, preKeyCode);
+        handled = HandleKeyDown(keyEvent);
     } else if (keyAction == KeyEvent::KEY_ACTION_UP) {
         hasEventExecuting_ = false;
         handled = HandleKeyUp(keyEvent);
@@ -498,13 +498,13 @@ void KeySubscriberHandler::NotifyKeyDownSubscriber(const std::shared_ptr<KeyEven
     CHKPV(keyOption);
     MMI_HILOGD("Notify key down subscribers size:%{public}zu", subscribers.size());
     if (keyOption->GetFinalKeyDownDuration() <= 0) {
-        NotifyKeyDownRightNow(keyEvent, subscribers, handled);
+        NotifyKeyDownRightNow(keyEvent, subscribers,  keyOption->IsRepeat(), handled);
     } else {
         NotifyKeyDownDelay(keyEvent, subscribers, handled);
     }
 }
 void KeySubscriberHandler::NotifyKeyDownRightNow(const std::shared_ptr<KeyEvent> &keyEvent,
-    std::list<std::shared_ptr<Subscriber>> &subscribers, bool &handled)
+    std::list<std::shared_ptr<Subscriber>> &subscribers, bool isRepeat, bool &handled)
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGD("The subscribe list size is %{public}zu", subscribers.size());
@@ -515,6 +515,11 @@ void KeySubscriberHandler::NotifyKeyDownRightNow(const std::shared_ptr<KeyEvent>
         if (!isForegroundExits_ || keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER ||
             foregroundPids_.find(sess->GetPid()) != foregroundPids_.end()) {
             MMI_HILOGD("keyOption->GetFinalKeyDownDuration() <= 0");
+            if (!isRepeat && keyEvent->GetKeyCode() == KeyRepeat->GetRepeatKeyCode()) {
+                MMI_HILOGD("Subscribers do not need to repeat events");
+                handled = true;
+                continue;
+            }
             NotifySubscriber(keyEvent, subscriber);
             handled = true;
         }

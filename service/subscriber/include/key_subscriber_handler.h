@@ -68,7 +68,7 @@ private:
 
 private:
     bool OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
-    bool HandleKeyDown(const std::shared_ptr<KeyEvent> &keyEvent, int32_t preKeyCode);
+    bool HandleKeyDown(const std::shared_ptr<KeyEvent> &keyEvent);
     bool HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent);
     bool HandleKeyCancel(const std::shared_ptr<KeyEvent> &keyEvent);
     bool HandleRingMute(std::shared_ptr<KeyEvent> keyEvent);
@@ -100,7 +100,7 @@ private:
     void NotifyKeyDownSubscriber(const std::shared_ptr<KeyEvent> &keyEvent, std::shared_ptr<KeyOption> keyOption,
         std::list<std::shared_ptr<Subscriber>> &subscribers, bool &handled);
     void NotifyKeyDownRightNow(const std::shared_ptr<KeyEvent> &keyEvent,
-        std::list<std::shared_ptr<Subscriber>> &subscribers, bool &handled);
+        std::list<std::shared_ptr<Subscriber>> &subscribers, bool isRepeat, bool &handled);
     void NotifyKeyDownDelay(const std::shared_ptr<KeyEvent> &keyEvent,
         std::list<std::shared_ptr<Subscriber>> &subscribers, bool &handled);
     void NotifyKeyUpSubscriber(const std::shared_ptr<KeyEvent> &keyEvent,
