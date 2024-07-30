@@ -44,7 +44,7 @@ public:
     static void ExecRegisterCb(const sptr<SettingObserver>& observer);
     ErrCode RegisterObserver(const sptr<SettingObserver>& observer, const std::string &strUri = std::string());
     ErrCode UnregisterObserver(const sptr<SettingObserver>& observer, const std::string &strUri = std::string());
-    bool CheckIfSettingsDataReady();    
+    bool CheckIfSettingsDataReady();
 
 private:
     static std::shared_ptr<SettingDataShare> instance_;
