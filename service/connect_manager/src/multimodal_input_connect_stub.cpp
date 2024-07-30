@@ -1226,7 +1226,7 @@ int32_t MultimodalInputConnectStub::StubSubscribeKeyEvent(MessageParcel& data, M
     CALL_DEBUG_ENTER;
     if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
+        return -ERROR_NOT_SYSAPI;
     }
 
     if (!IsRunning()) {
