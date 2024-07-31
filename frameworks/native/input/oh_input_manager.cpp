@@ -24,6 +24,10 @@
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "OHInputManager"
 
+static std::mutex g_CallBacksMutex;
+constexpr size_t PRE_KEYS_SIZE { 4 };
+int32_t MICROSECONDS = 1000;
+int32_t *g_keys;
 struct Input_KeyState {
     int32_t keyCode;
     int32_t keyState;
@@ -53,6 +57,24 @@ struct Input_TouchEvent {
     int32_t displayY;
     int64_t actionTime { -1 };
 };
+
+struct Input_KeyEventMonitorInfo {
+    int32_t subscribeId;
+    std::string eventType;
+    Input_ShortcutKeyCallback callback { nullptr };
+    std::shared_ptr<OHOS::MMI::KeyOption> keyOption { nullptr };
+};
+
+struct Input_ShortcutKey {
+    int32_t finalKey { -1 };
+    std::set<int32_t> pressedKeys {};
+    bool isFinalKeyDown { false };
+    int32_t finalKeyDownDuration { 0 };
+    bool isRepeat { false };
+};
+
+typedef std::map<std::string, std::list<Input_KeyEventMonitorInfo *>> Callbacks;
+static Callbacks g_callbacks = {};
 
 static std::shared_ptr<OHOS::MMI::KeyEvent> g_keyEvent = OHOS::MMI::KeyEvent::Create();
 static std::shared_ptr<OHOS::MMI::PointerEvent> g_mouseEvent = OHOS::MMI::PointerEvent::Create();
@@ -701,4 +723,454 @@ void OH_Input_CancelInjection()
 {
     CALL_DEBUG_ENTER;
     OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().CancelInjection();
+}
+
+struct Input_ShortcutKey* OH_Input_CreateShortcutKey()
+{
+    CALL_DEBUG_ENTER;
+    Input_ShortcutKey* shortcutKey = new (std::nothrow) Input_ShortcutKey();
+    CHKPL(shortcutKey);
+    return shortcutKey;
+}
+
+void OH_Input_DestroyShortcutKey(struct Input_ShortcutKey** shortcutKey)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(shortcutKey);
+    CHKPV(*shortcutKey);
+
+    if (g_keys != nullptr) {
+        free(g_keys);
+        g_keys = nullptr;
+    }
+
+    delete *shortcutKey;
+    *shortcutKey = nullptr;
+}
+
+void OH_Input_SetpressedKeys(struct Input_ShortcutKey* shortcutKey, int32_t* preKeys, int32_t size)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(shortcutKey);
+    CHKPV(preKeys);
+    if (size <= 0) {
+        MMI_HILOGE("PreKeys does not exist");
+        return;
+    }
+
+    for (int32_t i = 0; i < size; ++i) {
+        shortcutKey->pressedKeys.insert(preKeys[i]);
+    }
+    return;
+}
+
+int32_t* OH_Input_GetpressedKeys(const struct Input_ShortcutKey* shortcutKey)
+{
+    CALL_DEBUG_ENTER;
+    CHKPP(shortcutKey);
+    std::set<int32_t> preKeys = shortcutKey->pressedKeys;
+    int32_t size = preKeys.size();
+    if (size <= 0) {
+        MMI_HILOGE("The pressKeys not exit");
+        return nullptr;
+    }
+    g_keys = (int32_t *)malloc(size * sizeof(int32_t));
+    if (g_keys == nullptr) {
+        MMI_HILOGE("Memory allocation failed");
+        return nullptr;
+    }
+    int32_t index = 0;
+    for (auto it = preKeys.begin(); it != preKeys.end(); ++it) {
+        g_keys[index++] = *it;
+    }
+    return g_keys;
+}
+
+void OH_Input_SetfinalKey(struct Input_ShortcutKey* shortcutKey, int32_t finalKey)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(shortcutKey);
+    shortcutKey->finalKey = finalKey;
+    return;
+}
+
+int32_t OH_Input_GetfinalKey(const struct Input_ShortcutKey* shortcutKey, int32_t *finalKeyCode)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(shortcutKey, INPUT_PARAMETER_ERROR);
+    *finalKeyCode = shortcutKey->finalKey;
+    return INPUT_SUCCESS;
+}
+
+void OH_Input_SetIsFinalKeyDown(struct Input_ShortcutKey* shortcutKey, bool isFinalKeyDown)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(shortcutKey);
+    shortcutKey->isFinalKeyDown = isFinalKeyDown;
+    return;
+}
+
+bool OH_Input_GetIsFinalKeyDown(const struct Input_ShortcutKey* shortcutKey)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(shortcutKey, RET_ERR);
+    return shortcutKey->isFinalKeyDown;
+}
+
+void OH_Input_SetIsRepeat(struct Input_ShortcutKey* shortcutKey, bool isRepeat)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(shortcutKey);
+    shortcutKey->isRepeat  = isRepeat;
+    return;
+}
+
+bool OH_Input_GetIsRepeat(const struct Input_ShortcutKey* shortcutKey)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(shortcutKey, RET_ERR);
+    return shortcutKey->isRepeat;
+}
+
+void OH_Input_SetFinalKeyDownDuration(struct Input_ShortcutKey* shortcutKey, int32_t duration)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(shortcutKey);
+    shortcutKey->finalKeyDownDuration  = duration;
+    return;
+}
+
+int32_t OH_Input_GetFinalKeyDownDuration(const struct Input_ShortcutKey* shortcutKey)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(shortcutKey, INPUT_PARAMETER_ERROR);
+    return shortcutKey->finalKeyDownDuration;
+}
+
+static int32_t GetEventInfo(const struct Input_ShortcutKey* shortcutKey,
+    Input_KeyEventMonitorInfo* event, std::shared_ptr<OHOS::MMI::KeyOption> keyOption)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(shortcutKey, INPUT_PARAMETER_ERROR);
+    CHKPR(event, INPUT_PARAMETER_ERROR);
+    CHKPR(keyOption, INPUT_PARAMETER_ERROR);
+    if (shortcutKey->pressedKeys.empty()) {
+        MMI_HILOGE("pressedKeys not found");
+        return INPUT_FAILED;
+    }
+
+    std::set<int32_t> preKeys;
+    preKeys = shortcutKey->pressedKeys;
+    if (preKeys.size() > PRE_KEYS_SIZE) {
+        MMI_HILOGE("preKeys size invalid");
+        return INPUT_FAILED;
+    }
+    keyOption->SetPreKeys(preKeys);
+    std::string subKeyNames = "";
+    for (const auto &item : preKeys) {
+        subKeyNames += std::to_string(item);
+        subKeyNames += ",";
+    }
+
+    int32_t finalKey = shortcutKey->finalKey;
+    if (finalKey < 0) {
+        MMI_HILOGE("finalKey:%{public}d is less 0, can not process", finalKey);
+        return INPUT_FAILED;
+    }
+    subKeyNames += std::to_string(finalKey);
+    subKeyNames += ",";
+    keyOption->SetFinalKey(finalKey);
+
+    bool isFinalKeyDown = shortcutKey->isFinalKeyDown;
+    subKeyNames += std::to_string(isFinalKeyDown);
+    subKeyNames += ",";
+    keyOption->SetFinalKeyDown(isFinalKeyDown);
+
+    int32_t finalKeyDownDuration = shortcutKey->finalKeyDownDuration;
+    if (finalKeyDownDuration < 0) {
+        MMI_HILOGE("finalKeyDownDuration:%{public}d is less 0, can not process", finalKeyDownDuration);
+        return INPUT_FAILED;
+    }
+    subKeyNames += std::to_string(finalKeyDownDuration);
+    subKeyNames += ",";
+    keyOption->SetFinalKeyDownDuration(finalKeyDownDuration);
+
+    bool isRepeat = shortcutKey->isRepeat;
+    subKeyNames += std::to_string(isRepeat);
+    keyOption->SetIsRepeat(isRepeat);
+    event->eventType = subKeyNames;
+    MMI_HILOGD("event->eventType:%{public}s", event->eventType.c_str());
+    return INPUT_SUCCESS;
+}
+
+static int32_t GetPreSubscribeId(Input_KeyEventMonitorInfo* event)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(event, INPUT_PARAMETER_ERROR);
+    auto it = g_callbacks.find(event->eventType);
+    if (it == g_callbacks.end() || it->second.empty()) {
+        MMI_HILOGE("The callbacks is empty");
+        return INPUT_FAILED;
+    }
+    CHKPR(it->second.front(), INPUT_PARAMETER_ERROR);
+    return it->second.front()->subscribeId;
+}
+
+static int32_t AddEventCallback(Input_KeyEventMonitorInfo* event)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(event, INPUT_PARAMETER_ERROR);
+    if (g_callbacks.find(event->eventType) == g_callbacks.end()) {
+        MMI_HILOGD("No callback in %{public}s", event->eventType.c_str());
+        g_callbacks[event->eventType] = {};
+    }
+    auto it = g_callbacks.find(event->eventType);
+    if (it != g_callbacks.end()) {
+        for (const auto &iter: it->second) {
+            if (iter->callback == event->callback) {
+                MMI_HILOGI("Callback already exist");
+                return INPUT_SUCCESS;
+            }
+        }
+    }
+    it->second.push_back(event);
+    return INPUT_SUCCESS;
+}
+
+static bool IsMatchKeyAction(bool isFinalKeydown, int32_t keyAction)
+{
+    CALL_DEBUG_ENTER;
+    MMI_HILOGD("isFinalKeydown:%{public}d, keyAction:%{public}d", isFinalKeydown, keyAction);
+    if (isFinalKeydown && keyAction == OHOS::MMI::KeyEvent::KEY_ACTION_DOWN) {
+        return true;
+    }
+    if (!isFinalKeydown && keyAction == OHOS::MMI::KeyEvent::KEY_ACTION_UP) {
+        return true;
+    }
+    MMI_HILOGE("isFinalKeydown not matched with keyAction");
+    return false;
+}
+
+static bool MatchCombinationKeys(Input_KeyEventMonitorInfo* monitorInfo, std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPF(monitorInfo);
+    CHKPF(keyEvent);
+    auto keyOption = monitorInfo->keyOption;
+    CHKPF(keyOption);
+    std::vector<OHOS::MMI::KeyEvent::KeyItem> items = keyEvent->GetKeyItems();
+    int32_t infoFinalKey = keyOption->GetFinalKey();
+    int32_t keyEventFinalKey = keyEvent->GetKeyCode();
+    bool isFinalKeydown = keyOption->IsFinalKeyDown();
+    MMI_HILOGD("infoFinalKey:%{public}d,keyEventFinalKey:%{public}d", infoFinalKey, keyEventFinalKey);
+    if (infoFinalKey != keyEventFinalKey || items.size() > PRE_KEYS_SIZE ||
+        !IsMatchKeyAction(isFinalKeydown, keyEvent->GetKeyAction())) {
+        MMI_HILOGD("Param invalid");
+        return false;
+    }
+    std::set<int32_t> infoPreKeys = keyOption->GetPreKeys();
+    int32_t infoSize = 0;
+    for (auto it = infoPreKeys.begin(); it != infoPreKeys.end(); ++it) {
+        if (*it >= 0) {
+            infoSize++;
+        }
+    }
+    int32_t count = 0;
+    for (const auto &item : items) {
+        if (item.GetKeyCode() == keyEventFinalKey) {
+            continue;
+        }
+        auto iter = find(infoPreKeys.begin(), infoPreKeys.end(), item.GetKeyCode());
+        if (iter == infoPreKeys.end()) {
+            MMI_HILOGW("No keyCode in preKeys");
+            return false;
+        }
+        count++;
+    }
+    MMI_HILOGD("kevEventSize:%{public}d, infoSize:%{public}d", count, infoSize);
+    std::optional<OHOS::MMI::KeyEvent::KeyItem> keyItem = keyEvent->GetKeyItem();
+    if (!keyItem) {
+        MMI_HILOGE("The keyItem is nullopt");
+        return false;
+    }
+    auto downTime = keyItem->GetDownTime();
+    auto upTime = keyEvent->GetActionTime();
+    auto curDurationTime = keyOption->GetFinalKeyDownDuration();
+    if (curDurationTime > 0 && (upTime - downTime >= (static_cast<int64_t>(curDurationTime) * MICROSECONDS))) {
+        MMI_HILOGE("Skip, upTime - downTime >= duration");
+        return false;
+    }
+    return count == infoSize;
+}
+static void OnNotifyCallbackWorkResult(Input_KeyEventMonitorInfo* reportEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(reportEvent);
+
+    Input_KeyEventMonitorInfo *info = new(std::nothrow) Input_KeyEventMonitorInfo();
+    if (info == nullptr) {
+        MMI_HILOGE("info is null");
+        return;
+    }
+    info->keyOption = reportEvent->keyOption;
+    if (info->keyOption == nullptr) {
+        delete info;
+        MMI_HILOGE("keyOption is null");
+        return;
+    }
+    info->callback = reportEvent->callback;
+    if (info->callback == nullptr) {
+        delete info;
+        MMI_HILOGE("callback is null");
+        return;
+    }
+
+    Input_ShortcutKey shortcutKey;
+    shortcutKey.pressedKeys = info->keyOption->GetPreKeys();
+    shortcutKey.finalKey = info->keyOption->GetFinalKey();
+    shortcutKey.finalKeyDownDuration = info->keyOption->GetFinalKeyDownDuration();
+    shortcutKey.isFinalKeyDown = info->keyOption->IsFinalKeyDown();
+    shortcutKey.isRepeat = info->keyOption->GetIsRepeat();
+    info->callback(&shortcutKey);
+    delete info;
+}
+
+static void OnSubKeyEventCallback(std::shared_ptr<OHOS::MMI::KeyEvent> keyEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(keyEvent);
+    std::lock_guard guard(g_CallBacksMutex);
+    auto iter = g_callbacks.begin();
+    while (iter != g_callbacks.end()) {
+        auto &list = iter->second;
+        ++iter;
+        MMI_HILOGD("list size:%{public}zu", list.size());
+        auto infoIter = list.begin();
+        while (infoIter != list.end()) {
+            auto monitorInfo = *infoIter;
+            if (MatchCombinationKeys(monitorInfo, keyEvent)) {
+                OnNotifyCallbackWorkResult(monitorInfo);
+            }
+            ++infoIter;
+        }
+    }
+}
+
+int32_t OH_Input_AddShortcutKeyMonitor(const struct Input_ShortcutKey* shortcutKey, Input_ShortcutKeyCallback callback)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(shortcutKey, INPUT_PARAMETER_ERROR);
+    CHKPR(callback, INPUT_PARAMETER_ERROR);
+    std::lock_guard guard(g_CallBacksMutex);
+
+    Input_KeyEventMonitorInfo *event = new (std::nothrow) Input_KeyEventMonitorInfo();
+    auto keyOption = std::make_shared<OHOS::MMI::KeyOption>();
+    if (GetEventInfo(shortcutKey, event, keyOption) != INPUT_SUCCESS) {
+        delete event;
+        MMI_HILOGE("GetEventInfo failed");
+        return INPUT_FAILED;
+    }
+    event->keyOption = keyOption;
+    event->callback = callback;
+    int32_t preSubscribeId = GetPreSubscribeId(event);
+    if (preSubscribeId < 0) {
+        MMI_HILOGD("eventType:%{public}s", event->eventType.c_str());
+        int32_t subscribeId = -1;
+        subscribeId = OHOS::MMI::InputManager::GetInstance()->SubscribeKeyEvent(keyOption, OnSubKeyEventCallback);
+        if (subscribeId < 0) {
+            delete event;
+            MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
+            return INPUT_FAILED;
+        }
+        MMI_HILOGD("SubscribeId:%{public}d", subscribeId);
+        event->subscribeId = subscribeId;
+    } else {
+        event->subscribeId = preSubscribeId;
+    }
+    if (AddEventCallback(event) < 0) {
+        delete event;
+        MMI_HILOGE("Add event callback failed");
+        return INPUT_FAILED;
+    }
+    return INPUT_SUCCESS;
+}
+
+int32_t DelEventCallbackRef(std::list<Input_KeyEventMonitorInfo *> &infos,
+    Input_ShortcutKeyCallback callback, int32_t &subscribeId)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(&infos, INPUT_PARAMETER_ERROR);
+    CHKPR(callback, INPUT_PARAMETER_ERROR);
+
+    auto iter = infos.begin();
+    while (iter != infos.end()) {
+        if (*iter == nullptr) {
+            iter = infos.erase(iter);
+            continue;
+        }
+        if (callback == nullptr) {
+            Input_KeyEventMonitorInfo *monitorInfo = *iter;
+            infos.erase(iter++);
+            if (infos.empty()) {
+                subscribeId = monitorInfo->subscribeId;
+            }
+            delete monitorInfo;
+            MMI_HILOGD("Callback has been deleted, size:%{public}zu", infos.size());
+            continue;
+        }
+        if ((*iter)->callback == callback) {
+            Input_KeyEventMonitorInfo *monitorInfo = *iter;
+            iter = infos.erase(iter);
+            if (infos.empty()) {
+                subscribeId = monitorInfo->subscribeId;
+            }
+            delete monitorInfo;
+            MMI_HILOGD("Callback has been deleted, size:%{public}zu", infos.size());
+            return INPUT_SUCCESS;
+        }
+        ++iter;
+    }
+    return INPUT_SUCCESS;
+}
+
+int32_t DelEventCallback(Input_KeyEventMonitorInfo* event, int32_t &subscribeId)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(event, INPUT_PARAMETER_ERROR);
+    if (g_callbacks.count(event->eventType) <= 0) {
+        MMI_HILOGE("Callback doesn't exists");
+        return INPUT_PARAMETER_ERROR;
+    }
+    auto &info = g_callbacks[event->eventType];
+    MMI_HILOGD("EventType:%{public}s, Input_KeyEventMonitorInfo:%{public}zu", event->eventType.c_str(), info.size());
+    return DelEventCallbackRef(info, event->callback, subscribeId);
+}
+
+void OH_Input_RemoveShortcutKeyMonitor(const struct Input_ShortcutKey *shortcutKey, Input_ShortcutKeyCallback callback)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(shortcutKey);
+    CHKPV(callback);
+    std::lock_guard guard(g_CallBacksMutex);
+
+    Input_KeyEventMonitorInfo *event = new (std::nothrow) Input_KeyEventMonitorInfo();
+    auto keyOption = std::make_shared<OHOS::MMI::KeyOption>();
+    if (GetEventInfo(shortcutKey, event, keyOption) != INPUT_SUCCESS) {
+        delete event;
+        MMI_HILOGE("Get eventInfo failed");
+        return;
+    }
+    event->callback = callback;
+    int32_t subscribeId = -1;
+    if (DelEventCallback(event, subscribeId) == INPUT_PARAMETER_ERROR) {
+        delete event;
+        MMI_HILOGE("DelEventCallback failed");
+        return;
+    }
+    MMI_HILOGD("SubscribeId:%{public}d", subscribeId);
+    if (subscribeId >= 0) {
+        OHOS::MMI::InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
+    }
+    delete event;
+    return;
 }

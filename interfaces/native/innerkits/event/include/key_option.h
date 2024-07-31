@@ -116,6 +116,20 @@ public:
      */
     void SetFinalKeyUpDelay(int32_t delay);
 
+    /**
+     * @brief Get whether the prekeys are repeated.
+     * @return void
+     * @since 13
+     */
+    bool GetIsRepeat() const;
+
+    /**
+     * @brief Set whether the prekeys are repeated.
+     * @param repeat Is the button repeated.
+     * @return void
+     * @since 13
+     */
+    void SetIsRepeat(bool repeat);
 public:
     /**
      * @brief Writes data to a <b>Parcel</b> object.
@@ -139,6 +153,7 @@ private:
     bool isFinalKeyDown_ { false };
     int32_t finalKeyDownDuration_ { 0 };
     int32_t finalKeyUpDelay_ { 0 };
+    bool isRepeat_ { false };
 };
 } // namespace MMI
 } // namespace OHOS
