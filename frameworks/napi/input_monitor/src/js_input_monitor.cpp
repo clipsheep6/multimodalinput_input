@@ -211,9 +211,8 @@ void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) cons
             SetConsumeState(pointerEvent);
         }
         if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
-            if (JS_INPUT_MONITOR_MGR.GetMonitor(id_, fingers_)->GetTypeName() != "mouse" &&
-                JS_INPUT_MONITOR_MGR.GetMonitor(id_, fingers_)->GetTypeName() != "pinch" &&
-                JS_INPUT_MONITOR_MGR.GetMonitor(id_, fingers_)->GetTypeName() != "rotate") {
+            auto typeName = JS_INPUT_MONITOR_MGR.GetMonitor(id_, fingers_)->GetTypeName();
+            if (typeName != "mouse" && typeName != "pinch" && typeName != "rotate") {
                 return;
             }
             SetConsumeState(pointerEvent);
