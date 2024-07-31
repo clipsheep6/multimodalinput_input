@@ -42,6 +42,7 @@ constexpr int32_t MT_TOOL_PALM { 2 };
 
 InputEventHandler::InputEventHandler()
 {
+    lastEventBeginTime_ = GetSysClockTime();
     udsServer_ = nullptr;
 }
 
@@ -72,6 +73,7 @@ void InputEventHandler::OnEvent(void *event, int64_t frameTime)
     CHKPV(lpEvent);
     int32_t eventType = libinput_event_get_type(lpEvent);
     int64_t beginTime = GetSysClockTime();
+    lastEventBeginTime_ = beginTime;
     MMI_HILOGD("Event reporting. id:%{public}" PRId64 ",tid:%{public}" PRId64 ",eventType:%{public}d,"
                "beginTime:%{public}" PRId64, idSeed_, GetThisThreadId(), eventType, beginTime);
     if (IsTouchpadMistouch(lpEvent)) {
@@ -203,6 +205,13 @@ int32_t InputEventHandler::BuildInputHandlerChain()
 UDSServer* InputEventHandler::GetUDSServer() const
 {
     return udsServer_;
+}
+
+int32_t InputEventHandler::GetIntervalSinceLastInput(int64_t &timeInterval)
+{
+    int64_t currentSystemTime = GetSysClockTime();
+    timeInterval = currentSystemTime - lastEventBeginTime_;
+    return RET_OK;
 }
 
 std::shared_ptr<EventNormalizeHandler> InputEventHandler::GetEventNormalizeHandler() const

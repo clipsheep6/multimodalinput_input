@@ -2750,6 +2750,16 @@ void MMIService::PrintLog(const std::string &flag, int32_t duration)
     MMI_HILOGW("MMIBlockTask name : %{public}s, duration Time : %{public}d", flag.c_str(), duration);
 }
 
-
+int32_t MMIService::GetIntervalSinceLastInput(int64_t &timeInterval)
+{
+    CALL_INFO_TRACE;
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputEventHandler::GetIntervalSinceLastInput,
+                                                        InputHandler, std::ref(timeInterval)));
+    MMI_HILOGD("timeInterval:%{public}" PRId64, timeInterval);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to GetIntervalSinceLastInput, ret:%{public}d", ret);
+    }
+    return ret;
+}
 } // namespace MMI
 } // namespace OHOS
