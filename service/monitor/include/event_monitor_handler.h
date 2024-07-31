@@ -26,8 +26,8 @@
 #include "i_input_event_collection_handler.h"
 #include "i_input_event_handler.h"
 #include "input_handler_type.h"
-#include "uds_session.h"
 #include "nap_process.h"
+#include "uds_session.h"
 
 namespace OHOS {
 namespace MMI {
