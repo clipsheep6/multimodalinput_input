@@ -799,8 +799,9 @@ HWTEST_F(InputNativeTest, InputNativeTest_InjectTouchEvent_005, TestSize.Level1)
  */
 HWTEST_F(InputNativeTest, InputNativeTest_GetIntervalSinceLastInput_001, TestSize.Level1)
 {
-    int64_t IntervalSinceLastInput = 0;
-    OH_Input_GetIntervalSinceLastInput(IntervalSinceLastInput);
+    int64_t *intervalSinceLastInput = nullptr;
+    int32_t retResult = OH_Input_GetIntervalSinceLastInput(intervalSinceLastInput);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
 }
 } // namespace MMI
 } // namespace OHOS

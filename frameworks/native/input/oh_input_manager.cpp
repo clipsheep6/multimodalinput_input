@@ -703,15 +703,17 @@ void OH_Input_CancelInjection()
     OHOS::Singleton<OHOS::MMI::InputManagerImpl>::GetInstance().CancelInjection();
 }
 
-void GetIntervalSinceLastInputCallback(int64_t interval)
-{
-    MMI_HILOGI("GetIntervalSinceLastInputCallback interval:%{public}lld", interval);
-    return;
-}
-
-int32_t OH_Input_GetIntervalSinceLastInput(int64_t &intervalSinceLastInput)
+int32_t OH_Input_GetIntervalSinceLastInput(int64_t *intervalSinceLastInput)
 {
     CALL_DEBUG_ENTER;
-    OHOS::MMI::InputManager::GetInstance()->GetIntervalSinceLastInput(GetIntervalSinceLastInputCallback);
+    CHKPR(intervalSinceLastInput, INPUT_PARAMETER_ERROR);
+    std::promise<int64_t> prom;
+    auto fut = prom.get_future();
+    auto callback = [&prom](int64_t interval) {
+        MMI_HILOGD("GetIntervalSinceLastInputCallback interval:%{public}" PRId64, interval);
+        prom.set_value(interval);
+    };
+    OHOS::MMI::InputManager::GetInstance()->GetIntervalSinceLastInput(callback);
+    *intervalSinceLastInput = fut.get();
     return INPUT_SUCCESS;
 }

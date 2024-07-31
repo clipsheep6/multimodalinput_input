@@ -689,7 +689,7 @@ void OH_Input_CancelInjection();
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 13
  */
-int32_t OH_Input_GetIntervalSinceLastInput(int64_t &intervalSinceLastInput);
+int32_t OH_Input_GetIntervalSinceLastInput(int64_t *intervalSinceLastInput);
 
 #ifdef __cplusplus
 }

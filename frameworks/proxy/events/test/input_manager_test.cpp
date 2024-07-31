@@ -3208,7 +3208,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetPointerSnapshot, TestSize.Level1)
 
 static void GetIntervalSinceLastInputCallback(int64_t timeInterval)
 {
-    MMI_HILOGD("GetIntervalSinceLastInput:%{public}lld", timeInterval);
+    MMI_HILOGD("GetIntervalSinceLastInput:%{public}" PRId64, timeInterval);
 }
 
 HWTEST_F(InputManagerTest, InputManagerTest_GetIntervalSinceLastInput001, TestSize.Level1)
@@ -3245,6 +3245,12 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetIntervalSinceLastInput003, TestSi
     keyEvent->AddKeyItem(itemSecond);
     InputManager::GetInstance()->SimulateInputEvent(keyEvent);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetIntervalSinceLastInput(GetIntervalSinceLastInputCallback));
+}
+
+HWTEST_F(InputManagerTest, InputManagerTest_GetIntervalSinceLastInput004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
     ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetIntervalSinceLastInput(GetIntervalSinceLastInputCallback));
 }
 } // namespace MMI
