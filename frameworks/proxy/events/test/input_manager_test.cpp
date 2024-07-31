@@ -3247,11 +3247,5 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetIntervalSinceLastInput003, TestSi
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetIntervalSinceLastInput(GetIntervalSinceLastInputCallback));
 }
-
-HWTEST_F(InputManagerTest, InputManagerTest_GetIntervalSinceLastInput004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetIntervalSinceLastInput(GetIntervalSinceLastInputCallback));
-}
 } // namespace MMI
 } // namespace OHOS
