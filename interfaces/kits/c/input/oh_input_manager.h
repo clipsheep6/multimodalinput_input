@@ -179,7 +179,6 @@ struct Input_TouchEvent;
  *
  * @since 13
  */
-struct Input_ShortcutKey;
 typedef struct Input_ShortcutKey Input_ShortcutKey;
 
 /**
@@ -703,7 +702,7 @@ void OH_Input_CancelInjection();
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 13
  */
-struct Input_ShortcutKey* OH_Input_CreateShortcutKey();
+Input_ShortcutKey* OH_Input_CreateShortcutKey();
 
 /**
  * @brief Destroys a shortcutKey object.
