@@ -50,8 +50,8 @@ public:
     int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg);
     int32_t SetMouseScrollRows(int32_t rows);
     int32_t GetMouseScrollRows(int32_t &rows);
-    int32_t SetPointerSize(int32_t size);
-    int32_t GetPointerSize(int32_t &size);
+    int32_t SetPointerSizeGlobal(int32_t size);
+    int32_t GetPointerSizeGlobal(int32_t &size);
     int32_t SetCustomCursor(int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap);
     int32_t SetMouseIcon(int32_t windowId, void* pixelMap);
     int32_t SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY);
@@ -62,7 +62,9 @@ public:
     int32_t SetPointerVisible(bool visible, int32_t priority);
     int32_t IsPointerVisible(bool &visible);
     int32_t MarkProcessed(int32_t eventType, int32_t eventId);
+    int32_t SetPointerColorGlobal(int32_t color);
     int32_t SetPointerColor(int32_t color);
+    int32_t GetPointerColorGlobal(int32_t &color);
     int32_t GetPointerColor(int32_t &color);
     int32_t EnableCombineKey(bool enable);
     int32_t SetPointerSpeed(int32_t speed);

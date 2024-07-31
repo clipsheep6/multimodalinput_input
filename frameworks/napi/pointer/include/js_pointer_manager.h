@@ -61,6 +61,10 @@ public:
     napi_value SetPointerVisibleSync(napi_env env, bool visible);
     napi_value IsPointerVisible(napi_env env, napi_value handle = nullptr);
     napi_value IsPointerVisibleSync(napi_env env);
+    napi_value SetPointerColorGlobal(napi_env env, int32_t color, napi_value handle = nullptr);
+    napi_value GetPointerColorGlobal(napi_env env, napi_value handle = nullptr);
+    napi_value SetPointerColorGlobalSync(napi_env env, int32_t color);
+    napi_value GetPointerColorGlobalSync(napi_env env);
     napi_value SetPointerColor(napi_env env, int32_t color, napi_value handle = nullptr);
     napi_value GetPointerColor(napi_env env, napi_value handle = nullptr);
     napi_value SetPointerColorSync(napi_env env, int32_t color);
@@ -80,6 +84,10 @@ public:
     napi_value GetMouseScrollRows(napi_env env, napi_value handle = nullptr);
     napi_value SetCustomCursor(napi_env env, int32_t windowId, void* pixelMap, CursorFocus focus);
     napi_value SetCustomCursorSync(napi_env env, int32_t windowId, void* pixelMap, CursorFocus focus);
+    napi_value SetPointerSizeGlobal(napi_env env, int32_t size, napi_value handle = nullptr);
+    napi_value GetPointerSizeGlobal(napi_env env, napi_value handle = nullptr);
+    napi_value SetPointerSizeGlobalSync(napi_env env, int32_t size);
+    napi_value GetPointerSizeGlobalSync(napi_env env);
     napi_value SetPointerSize(napi_env env, int32_t size, napi_value handle = nullptr);
     napi_value GetPointerSize(napi_env env, napi_value handle = nullptr);
     napi_value SetPointerSizeSync(napi_env env, int32_t size);

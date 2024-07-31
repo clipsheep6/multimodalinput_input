@@ -380,7 +380,15 @@ public:
      * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 9
      */
-    int32_t SetPointerSize(int32_t size);
+    int32_t SetPointerSizeGlobal(int32_t size);
+
+    /**
+     * @brief Gets pointer size.
+     * @param size Indicates pointer size.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 9
+     */
+    int32_t GetPointerSizeGlobal(int32_t &size);
 
     /**
      * @brief Gets pointer size.
@@ -475,9 +483,25 @@ public:
      * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 9
      */
+    int32_t SetPointerColorGlobal(int32_t color);
+
+    /**
+     * @brief Sets pointer color.
+     * @param color Indicates pointer color.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 9
+     */
     int32_t SetPointerColor(int32_t color);
 
     /**
+     * @brief Gets pointer color.
+     * @param color Indicates pointer color.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 9
+     */
+    int32_t GetPointerColorGlobal(int32_t &color);
+
+     /**
      * @brief Gets pointer color.
      * @param color Indicates pointer color.
      * @return Returns <b>0</b> if success; returns a non-0 value otherwise.

@@ -238,14 +238,19 @@ int32_t InputManager::SetMouseIcon(int32_t windowId, void* pixelMap)
     return InputMgrImpl.SetMouseIcon(windowId, pixelMap);
 }
 
-int32_t InputManager::SetPointerSize(int32_t size)
+int32_t InputManager::SetPointerSizeGlobal(int32_t size)
 {
-    return InputMgrImpl.SetPointerSize(size);
+    return InputMgrImpl.SetPointerSizeGlobal(size);
+}
+
+int32_t InputManager::GetPointerSizeGlobal(int32_t &size)
+{
+    return InputMgrImpl.GetPointerSizeGlobal(size);
 }
 
 int32_t InputManager::GetPointerSize(int32_t &size)
 {
-    return InputMgrImpl.GetPointerSize(size);
+    return InputMgrImpl.GetPointerSizeGlobal(size);
 }
 
 int32_t InputManager::SetMouseHotSpot(int32_t windowId, int32_t hotSpotX, int32_t hotSpotY)
@@ -283,9 +288,19 @@ bool InputManager::IsPointerVisible()
     return InputMgrImpl.IsPointerVisible();
 }
 
+int32_t InputManager::SetPointerColorGlobal(int32_t color)
+{
+    return InputMgrImpl.SetPointerColorGlobal(color);
+}
+
 int32_t InputManager::SetPointerColor(int32_t color)
 {
     return InputMgrImpl.SetPointerColor(color);
+}
+
+int32_t InputManager::GetPointerColorGlobal(int32_t &color)
+{
+    return InputMgrImpl.GetPointerColorGlobal(color);
 }
 
 int32_t InputManager::GetPointerColor(int32_t &color)

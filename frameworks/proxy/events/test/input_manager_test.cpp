@@ -2311,9 +2311,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetPointerColor_001, TestSize.Level1
 {
     CALL_TEST_DEBUG;
     int32_t setColor = 0x000000;
-    InputManager::GetInstance()->SetPointerColor(setColor);
+    InputManager::GetInstance()->SetPointerColorGlobal(setColor);
     int32_t getColor = 3;
-    ASSERT_TRUE(InputManager::GetInstance()->GetPointerColor(getColor) == RET_OK);
+    ASSERT_TRUE(InputManager::GetInstance()->GetPointerColorGlobal(getColor) == RET_OK);
 }
 
 /**
@@ -2905,7 +2905,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetMouseHotSpot_001, TestSize.Level1
 
 /**
  * @tc.name: InputManagerTest_PointerSize_001
- * @tc.desc: SetPointerSize and GetPointerSize interface detection
+ * @tc.desc: SetPointerSizeGlobal and GetPointerSizeGlobal interface detection
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2913,9 +2913,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_PointerSize_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     int32_t size = 5;
-    int32_t result = InputManager::GetInstance()->SetPointerSize(size);
+    int32_t result = InputManager::GetInstance()->SetPointerSizeGlobal(size);
     ASSERT_EQ(result, RET_OK);
-    result = InputManager::GetInstance()->GetPointerSize(size);
+    result = InputManager::GetInstance()->GetPointerSizeGlobal(size);
     ASSERT_EQ(size, 5);
     ASSERT_EQ(result, RET_OK);
 }

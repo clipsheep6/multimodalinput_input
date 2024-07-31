@@ -168,11 +168,11 @@ int32_t MultimodalInputConnectManager::GetMouseScrollRows(int32_t &rows)
     return multimodalInputConnectService_->GetMouseScrollRows(rows);
 }
 
-int32_t MultimodalInputConnectManager::SetPointerSize(int32_t size)
+int32_t MultimodalInputConnectManager::SetPointerSizeGlobal(int32_t size)
 {
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->SetPointerSize(size);
+    return multimodalInputConnectService_->SetPointerSizeGlobal(size);
 }
 
 int32_t MultimodalInputConnectManager::SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napStatus)
@@ -182,11 +182,11 @@ int32_t MultimodalInputConnectManager::SetNapStatus(int32_t pid, int32_t uid, st
     return multimodalInputConnectService_->SetNapStatus(pid, uid, bundleName, napStatus);
 }
 
-int32_t MultimodalInputConnectManager::GetPointerSize(int32_t &size)
+int32_t MultimodalInputConnectManager::GetPointerSizeGlobal(int32_t &size)
 {
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->GetPointerSize(size);
+    return multimodalInputConnectService_->GetPointerSizeGlobal(size);
 }
 
 int32_t MultimodalInputConnectManager::SetMousePrimaryButton(int32_t primaryButton)
@@ -238,11 +238,25 @@ int32_t MultimodalInputConnectManager::MarkProcessed(int32_t eventType, int32_t 
     return multimodalInputConnectService_->MarkProcessed(eventType, eventId);
 }
 
+int32_t MultimodalInputConnectManager::SetPointerColorGlobal(int32_t color)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetPointerColorGlobal(color);
+}
+
 int32_t MultimodalInputConnectManager::SetPointerColor(int32_t color)
 {
     std::lock_guard<std::mutex> guard(lock_);
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetPointerColor(color);
+}
+
+int32_t MultimodalInputConnectManager::GetPointerColorGlobal(int32_t &color)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->GetPointerColorGlobal(color);
 }
 
 int32_t MultimodalInputConnectManager::GetPointerColor(int32_t &color)

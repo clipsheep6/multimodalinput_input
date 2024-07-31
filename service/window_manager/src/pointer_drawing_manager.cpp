@@ -221,7 +221,7 @@ int32_t PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physic
     }
     lastMouseStyle_ = pointerStyle;
     surfaceNode_->SetVisible(false);
-    int32_t ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id));
+    int32_t ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id), lastMouseStyle_.size, lastMouseStyle_.color);
     if (ret != RET_OK) {
         mouseIconUpdate_ = false;
         MMI_HILOGE("Init layer failed");
@@ -271,7 +271,8 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
             physicalX, physicalY);
     }
     // Log printing only occurs when the mouse style changes
-    if (currentMouseStyle_.id != lastMouseStyle_.id) {
+    if (currentMouseStyle_.id != lastMouseStyle_.id && currentMouseStyle_.color != lastMouseStyle_.color
+        && currentMouseStyle_.size != lastMouseStyle_.size) {
         MMI_HILOGD("MagicCursor AdjustMouseFocus:%{public}d",
             ICON_TYPE(GetMouseIconPath()[MOUSE_ICON(pointerStyle.id)].alignmentWay));
     }
@@ -290,7 +291,7 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     CHKPV(surfaceNode_);
     UpdateMouseStyle();
-    int32_t ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id));
+    int32_t ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id), pointerStyle.size, pointerStyle.color);
     if (ret != RET_OK) {
         MMI_HILOGE("Init layer failed");
         return;
@@ -317,7 +318,7 @@ void PointerDrawingManager::UpdateMouseStyle()
 int32_t PointerDrawingManager::SwitchPointerStyle()
 {
     CALL_DEBUG_ENTER;
-    int32_t size = GetPointerSize();
+    int32_t size = GetPointerSizeGlobal();
     if (size < MIN_POINTER_SIZE) {
         size = MIN_POINTER_SIZE;
     } else if (size > MAX_POINTER_SIZE) {
@@ -328,7 +329,7 @@ int32_t PointerDrawingManager::SwitchPointerStyle()
     canvasWidth_ = (imageWidth_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
     canvasHeight_ = (imageHeight_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-    MAGIC_CURSOR->SetPointerSize(imageWidth_, imageHeight_);
+    MAGIC_CURSOR->SetPointerSizeGlobal(imageWidth_, imageHeight_);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     Direction direction = DIRECTION0;
     int32_t physicalX = lastPhysicalX_;
@@ -344,7 +345,7 @@ int32_t PointerDrawingManager::SwitchPointerStyle()
         CreatePointerWindow(displayInfo_.id, physicalX, physicalY, direction);
     }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
-    int32_t ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id));
+    int32_t ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id), lastMouseStyle_.size, lastMouseStyle_.color);
     if (ret != RET_OK) {
         MMI_HILOGE("Init layer failed");
         return ret;
@@ -467,24 +468,25 @@ bool PointerDrawingManager::HasMagicCursor()
     return hasMagicCursor_.isShow;
 }
 
-int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle)
+int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle, const int32_t size, const int32_t color)
 {
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     if (HasMagicCursor() && mouseStyle != MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
         MMI_HILOGD("magiccursor enter MAGIC_CURSOR->Initlayer");
-        return MAGIC_CURSOR->InitLayer(mouseStyle);
+        return MAGIC_CURSOR->InitLayer(mouseStyle, size, color);
     } else {
         MMI_HILOGD("magiccursor not enter MAGIC_CURSOR->Initlayer");
-        return DrawCursor(mouseStyle);
+        return DrawCursor(mouseStyle, size, color);
     }
 #else
-    return DrawCursor(mouseStyle);
+    return DrawCursor(mouseStyle, size, color);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 }
 
-int32_t PointerDrawingManager::DrawCursor(const MOUSE_ICON mouseStyle)
+int32_t PointerDrawingManager::DrawCursor(const MOUSE_ICON mouseStyle, const int32_t size, const int32_t color)
 {
     CALL_DEBUG_ENTER;
+    DrawRunningPointerColor(color);
     CHKPR(surfaceNode_, RET_ERR);
     DrawLoadingPointerStyle(mouseStyle);
     DrawRunningPointerAnimate(mouseStyle);
@@ -526,6 +528,25 @@ int32_t PointerDrawingManager::DrawCursor(const MOUSE_ICON mouseStyle)
     }
     MMI_HILOGD("Init layer success");
     return RET_OK;
+}
+
+int32_t PointerDrawingManager::DrawRunningPointerColor(const int32_t color)
+{
+    CALL_DEBUG_ENTER;
+    std::string name = POINTER_COLOR;
+    GetPreferenceKey(name);
+    int32_t result = PREFERENCES_MGR->SetIntValue(name, MOUSE_FILE_NAME, color);
+    if (result != RET_OK) {
+        MMI_HILOGE("Set pointer color failed, color:%{public}d", color);
+        return result;
+    }
+    MMI_HILOGD("Set pointer color successfully, color:%{public}d", color);
+    #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
+        if (HasMagicCursor()) {
+            result = MAGIC_CURSOR->SetPointerColor(color);
+        }
+    #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+    return result;
 }
 
 void PointerDrawingManager::DrawLoadingPointerStyle(const MOUSE_ICON mouseStyle)
@@ -866,7 +887,7 @@ void PointerDrawingManager::SetMouseDisplayState(bool state)
     if (mouseDisplayState_ != state) {
         mouseDisplayState_ = state;
         if (mouseDisplayState_) {
-            InitLayer(MOUSE_ICON(lastMouseStyle_.id));
+            InitLayer(MOUSE_ICON(lastMouseStyle_.id), lastMouseStyle_.size, lastMouseStyle_.color);
         }
         MMI_HILOGI("state:%{public}s", state ? "true" : "false");
         UpdatePointerVisible();
@@ -1162,7 +1183,7 @@ int32_t PointerDrawingManager::UpdateCursorProperty(void* pixelMap, const int32_
     CHKPR(newPixelMap, RET_ERR);
     Media::ImageInfo imageInfo;
     newPixelMap->GetImageInfo(imageInfo);
-    int32_t cursorSize = GetPointerSize();
+    int32_t cursorSize = GetPointerSizeGlobal();
     int32_t cursorWidth =
         pow(INCREASE_RATIO, cursorSize - 1) * displayInfo_.dpi * GetIndependentPixels() / BASELINE_DENSITY;
     int32_t cursorHeight =
@@ -1252,7 +1273,7 @@ std::shared_ptr<OHOS::Media::PixelMap> PointerDrawingManager::DecodeImageToPixel
         .width = imageWidth_,
         .height = imageHeight_
     };
-    int32_t pointerColor = GetPointerColor();
+    int32_t pointerColor = GetPointerColorGlobal();
     if (tempPointerColor_ != DEFAULT_VALUE) {
         decodeOpts.SVGOpts.fillColor = {.isValidColor = true, .color = pointerColor};
         if (pointerColor == MAX_POINTER_COLOR) {
@@ -1280,7 +1301,7 @@ void PointerDrawingManager::GetPreferenceKey(std::string &name)
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 }
 
-int32_t PointerDrawingManager::SetPointerColor(int32_t color)
+int32_t PointerDrawingManager::SetPointerColorGlobal(int32_t color)
 {
     CALL_DEBUG_ENTER;
     if (surfaceNode_ != nullptr) {
@@ -1308,10 +1329,10 @@ int32_t PointerDrawingManager::SetPointerColor(int32_t color)
     if (HasMagicCursor()) {
         ret = MAGIC_CURSOR->SetPointerColor(color);
     } else {
-        ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id));
+        ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id), lastMouseStyle_.size, color);
     }
 #else
-    ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id));
+    ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id), lastMouseStyle_.size, color);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     if (ret != RET_OK) {
         MMI_HILOGE("Init layer failed");
@@ -1321,7 +1342,38 @@ int32_t PointerDrawingManager::SetPointerColor(int32_t color)
     return RET_OK;
 }
 
-int32_t PointerDrawingManager::GetPointerColor()
+int32_t PointerDrawingManager::SetPointerColor(int32_t pid, int32_t color)
+{
+    CALL_DEBUG_ENTER;
+    if (surfaceNode_ != nullptr) {
+        float alphaRatio = (static_cast<uint32_t>(color) >> RGB_CHANNEL_BITS_LENGTH) / MAX_ALPHA_VALUE;
+        if (alphaRatio > 1) {
+            MMI_HILOGW("Invalid alphaRatio:%{public}f", alphaRatio);
+        } else {
+            surfaceNode_->SetAlpha(1 - alphaRatio);
+        }
+    }
+    MMI_HILOGI("libo PointerColor:%{public}x", color);
+    // ARGB从表面看比RGB多了个A，也是一种色彩模式，是在RGB的基础上添加了Alpha（透明度）通道。
+    // 透明度也是以0到255表示的，所以也是总共有256级，透明是0，不透明是255。
+    // 这个color每8位代表一个通道值，分别是alpha和rgb，总共32位。
+    color = static_cast<int32_t>(static_cast<uint32_t>(color) & static_cast<uint32_t>(MAX_POINTER_COLOR));
+    MMI_HILOGI("PointerColor:%{public}d", color);
+    int32_t size = 0;
+    if (WIN_MGR->SetPointerColor(pid, color, size) != RET_OK) {
+        MMI_HILOGE("Set pointer color failed");
+        return RET_ERR;
+    }
+    int ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id), lastMouseStyle_.size, color);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Init layer failed");
+        return RET_ERR;
+    }
+    UpdatePointerVisible();
+    return RET_OK;
+}
+
+int32_t PointerDrawingManager::GetPointerColorGlobal()
 {
     CALL_DEBUG_ENTER;
     std::string name = POINTER_COLOR;
@@ -1335,6 +1387,15 @@ int32_t PointerDrawingManager::GetPointerColor()
     return pointerColor;
 }
 
+int32_t PointerDrawingManager::GetPointerColor(int32_t pid)
+{
+    CALL_DEBUG_ENTER;
+    PointerStyle pointerStyle;
+    WIN_MGR->GetPointerColor(pid, pointerStyle);
+    MMI_HILOGD("Get pointer color successfully, pointerColor:%{public}d", pointerStyle.color);
+    return pointerStyle.color;
+}
+
 void PointerDrawingManager::UpdateDisplayInfo(const DisplayInfo &displayInfo)
 {
     CALL_DEBUG_ENTER;
@@ -1344,7 +1405,7 @@ void PointerDrawingManager::UpdateDisplayInfo(const DisplayInfo &displayInfo)
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     hasDisplay_ = true;
     displayInfo_ = displayInfo;
-    int32_t size = GetPointerSize();
+    int32_t size = GetPointerSizeGlobal();
     imageWidth_ = pow(INCREASE_RATIO, size - 1) * displayInfo.dpi * GetIndependentPixels() / BASELINE_DENSITY;
     imageHeight_ = pow(INCREASE_RATIO, size - 1) * displayInfo.dpi * GetIndependentPixels() / BASELINE_DENSITY;
     canvasWidth_ = (imageWidth_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
@@ -1368,7 +1429,7 @@ int32_t PointerDrawingManager::GetIndependentPixels()
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
 }
 
-int32_t PointerDrawingManager::SetPointerSize(int32_t size)
+int32_t PointerDrawingManager::SetPointerSizeGlobal(int32_t size)
 {
     CALL_DEBUG_ENTER;
     if (size < MIN_POINTER_SIZE) {
@@ -1395,7 +1456,7 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t size)
     int32_t physicalX = lastPhysicalX_;
     int32_t physicalY = lastPhysicalY_;
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
-    MAGIC_CURSOR->SetPointerSize(imageWidth_, imageHeight_);
+    MAGIC_CURSOR->SetPointerSizeGlobal(imageWidth_, imageHeight_);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     Direction direction = DIRECTION0;
     if (IsWindowRotation()) {
@@ -1412,7 +1473,7 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t size)
 #else
     CreatePointerWindow(displayInfo_.id, physicalX, physicalY, direction);
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
-    ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id));
+    ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id), lastMouseStyle_.size, lastMouseStyle_.color);
     if (ret != RET_OK) {
         MMI_HILOGE("Init layer failed");
         return RET_ERR;
@@ -1421,7 +1482,7 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t size)
     return RET_OK;
 }
 
-int32_t PointerDrawingManager::GetPointerSize()
+int32_t PointerDrawingManager::GetPointerSizeGlobal()
 {
     CALL_DEBUG_ENTER;
     std::string name = POINTER_SIZE;
@@ -1594,7 +1655,7 @@ void PointerDrawingManager::DeletePointerVisible(int32_t pid)
     }
     if (it != pidInfos_.end()) {
         if (IsPointerVisible()) {
-            InitLayer(MOUSE_ICON(lastMouseStyle_.id));
+            InitLayer(MOUSE_ICON(lastMouseStyle_.id), lastMouseStyle_.size, lastMouseStyle_.color);
         }
         UpdatePointerVisible();
     }

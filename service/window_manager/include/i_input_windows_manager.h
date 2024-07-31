@@ -98,6 +98,8 @@ public:
     virtual bool GetHoverScrollState() const = 0;
     virtual int32_t SetPointerStyle(int32_t pid, int32_t windowId,
         PointerStyle pointerStyle, bool isUiExtension = false) = 0;
+    virtual int32_t SetPointerColor(int32_t pid, int32_t color, int32_t size) = 0;
+    virtual int32_t GetPointerColor(int32_t pid, PointerStyle &pointerStyle) = 0;
     virtual int32_t GetPointerStyle(int32_t pid, int32_t windowId,
         PointerStyle &pointerStyle, bool isUiExtension = false) const = 0;
     virtual void DispatchPointer(int32_t pointerAction, int32_t windowId = -1) = 0;

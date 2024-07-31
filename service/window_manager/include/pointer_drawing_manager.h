@@ -70,8 +70,10 @@ public:
     void OnWindowInfo(const WinInfo &info) override;
     void UpdatePointerDevice(bool hasPointerDevice, bool isPointerVisible, bool isHotPlug) override;
     bool Init() override;
-    int32_t SetPointerColor(int32_t color) override;
-    int32_t GetPointerColor() override;
+    int32_t SetPointerColorGlobal(int32_t color) override;
+    int32_t SetPointerColor(int32_t pid, int32_t color) override;
+    int32_t GetPointerColorGlobal() override;
+    int32_t GetPointerColor(int32_t pid) override;
     void DeletePointerVisible(int32_t pid) override;
     int32_t SetPointerVisible(int32_t pid, bool visible, int32_t priority, bool isHap) override;
     bool GetPointerVisible(int32_t pid) override;
@@ -80,8 +82,8 @@ public:
     int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId) override;
     int32_t GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle,
         bool isUiExtension = false) override;
-    int32_t SetPointerSize(int32_t size) override;
-    int32_t GetPointerSize() override;
+    int32_t SetPointerSizeGlobal(int32_t size) override;
+    int32_t GetPointerSizeGlobal() override;
     void DrawPointerStyle(const PointerStyle& pointerStyle, bool simulate = false) override;
     bool IsPointerVisible() override;
     void SetPointerLocation(int32_t x, int32_t y) override;
@@ -95,7 +97,8 @@ public:
     std::map<MOUSE_ICON, IconStyle> GetMouseIconPath() override;
     IconStyle GetIconStyle(const MOUSE_ICON mouseStyle) override;
     bool HasMagicCursor();
-    int32_t DrawCursor(const MOUSE_ICON mouseStyle);
+    int32_t DrawCursor(const MOUSE_ICON mouseStyle, int32_t size, int32_t color);
+    int32_t DrawRunningPointerColor(const int32_t color);
     int32_t SwitchPointerStyle() override;
     void DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY) override;
     void Dump(int32_t fd, const std::vector<std::string> &args) override;
@@ -124,7 +127,7 @@ private:
     int32_t UpdateDefaultPointerStyle(int32_t pid, int32_t windowId, PointerStyle style, bool isUiExtension = false);
     void CheckMouseIconPath();
     void InitStyle();
-    int32_t InitLayer(const MOUSE_ICON mouseStyle);
+    int32_t InitLayer(const MOUSE_ICON mouseStyle, int32_t size, int32_t color);
     int32_t SetPointerStylePreference(PointerStyle pointerStyle);
     void UpdateMouseStyle();
     int32_t UpdateCursorProperty(void* pixelMap, const int32_t &focusX, const int32_t &focusY);
