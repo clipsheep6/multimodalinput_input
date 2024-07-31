@@ -133,7 +133,7 @@ void OnReceiveEvent(const EventFwk::CommonEventData &data)
         }
     }
 }
-};    
+};
 
 static bool IsSingleDisplayFoldDevice()
 {
