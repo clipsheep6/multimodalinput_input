@@ -4846,7 +4846,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetUIExtentionWindowIn
     windowInfo.id = 5;
     std::vector<WindowInfo> uiExtentionWindowInfo;
     int32_t windowId = 10;
-    WindowInfo *touchWindow;
+    const WindowInfo *touchWindow;
     bool isUiExtentionWindow = false;
     uiExtentionWindowInfo.push_back(windowInfo);
     windowInfo.id = 10;
@@ -5111,7 +5111,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetUIExtentionWindowIn
     CALL_TEST_DEBUG;
     InputWindowsManager manager;
     std::vector<WindowInfo> windows = {{1}, {2}, {3}};
-    WindowInfo *touchWindow = nullptr;
+    const WindowInfo *touchWindow = nullptr;
     bool isUiExtentionWindow = false;
     EXPECT_NO_FATAL_FAILURE(WIN_MGR->GetUIExtentionWindowInfo(windows, 2, &touchWindow, isUiExtentionWindow));
     EXPECT_NO_FATAL_FAILURE(WIN_MGR->GetUIExtentionWindowInfo(windows, 4, &touchWindow, isUiExtentionWindow));
