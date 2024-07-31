@@ -32,6 +32,7 @@
 #include "app_state_observer.h"
 #include "device_event_monitor.h"
 #include "dfx_hisysevent.h"
+#include "setting_datashare.h"
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 #include "display_event_monitor.h"
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -1464,6 +1465,7 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
     }
     if (systemAbilityId == COMMON_EVENT_SERVICE_ID) {
         DEVICE_MONITOR->InitCommonEventSubscriber();
+        IPointerDrawingManager::GetInstance()->InitSubscribeCommonEvent();
         MMI_HILOGD("Common event service started");
     }
     if (systemAbilityId == RENDER_SERVICE) {
@@ -1472,6 +1474,11 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
     }
     if (systemAbilityId == DISPLAY_MANAGER_SERVICE_SA_ID) {
         MMI_HILOGI("Init render service state observer start");
+    }
+    if (systemAbilityId == DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID) {
+        if (SettingDataShare::GetInstance(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID).CheckIfSettingsDataReady()) {
+            IPointerDrawingManager::GetInstance()->InitPointerObserver();
+        }
     }
 }
 

@@ -138,6 +138,7 @@ public:
     virtual void ForceClearPointerVisiableStatus();
     virtual void InitPointerObserver() {}
     virtual void OnSessionLost(int32_t pid) {}
+    virtual void InitSubscribeCommonEvent() {}
 public:
     static inline std::shared_ptr<IPointerDrawingManager> iPointDrawMgr_ { nullptr };
 };
