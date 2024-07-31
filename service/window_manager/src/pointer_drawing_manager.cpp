@@ -43,6 +43,11 @@
 #include "util.h"
 #include "dfx_hisysevent.h"
 #include "timer_manager.h"
+#include "common_event_data.h"
+#include "common_event_manager.h"
+#include "common_event_support.h"
+#include "want.h"
+#include "setting_datashare.h"
 
 #undef MMI_LOG_DOMAIN
 #define MMI_LOG_DOMAIN MMI_LOG_CURSOR
@@ -106,6 +111,29 @@ constexpr int32_t QUEUE_SIZE { 5 };
 
 namespace OHOS {
 namespace MMI {
+
+class PointerChangedReceiver : public EventFwk::CommonEventSubscriber {
+public:
+    explicit PointerChangedReceiver(const OHOS::EventFwk::CommonEventSubscribeInfo& subscribeInfo)
+        : OHOS::EventFwk::CommonEventSubscriber(subscribeInfo)
+    {
+        MMI_HILOGD("PointerDrawingManager register");
+    }
+
+    virtual ~PointerChangedReceiver() = default;
+    __attribute__((no_sanitize("cfi")))
+
+void OnReceiveEvent(const EventFwk::CommonEventData &data)
+{
+    auto const &want = data.GetWant();
+    std::string action = want.GetAction();
+    if (action == EventFwk::CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY) {
+        if (SettingDataShare::GetInstance(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID).CheckIfSettingsDataReady()) {
+            IPointerDrawingManager::GetInstance()->InitPointerObserver();
+        }
+    }
+}
+};
 
 static bool IsSingleDisplayFoldDevice()
 {
@@ -406,6 +434,20 @@ void PointerDrawingManager::InitPointerObserver()
         MMI_HILOGD("Create pointer switch observer success");
     }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+}
+
+void PointerDrawingManager::InitSubscribeCommonEvent()
+{
+    CALL_DEBUG_ENTER;
+    if (hasInitSubscriber_) {
+        MMI_HILOGE("current common event has subscribered");
+        return;
+    }
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY);
+    EventFwk::CommonEventSubscribeInfo commonEventSubscribeInfo(matchingSkills);
+    hasInitSubscriber_ = OHOS::EventFwk::CommonEventManager::SubscribeCommonEvent(
+        std::make_shared<PointerChangedReceiver>(commonEventSubscribeInfo));
 }
  
 int32_t PointerDrawingManager::CreatePointerSwitchObserver(isMagicCursor& item)

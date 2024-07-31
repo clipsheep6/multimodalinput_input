@@ -103,6 +103,9 @@ bool InputDisplayBindHelper::IsDisplayAdd(int32_t id, const std::string &name)
     return false;
 }
 
+void PointerDrawingManager::InitSubscribeCommonEvent()
+{}
+
 void InputDisplayBindHelper::AddDisplay(int32_t id, const std::string &name)
 {}
 
