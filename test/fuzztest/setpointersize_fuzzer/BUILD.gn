@@ -68,6 +68,7 @@ ohos_fuzztest("SetPointerSizeFuzzTest") {
     "ipc:ipc_single",
     "ipc:ipc_single",
     "libinput:libinput-third-mmi",
+    "player_framework:media_client",
     "security_component_manager:libsecurity_component_sdk",
     "window_manager:libwm",
   ]

@@ -67,6 +67,7 @@
 #include "res_type.h"
 #include "system_ability_definition.h"
 #endif // OHOS_RSS_CLIENT
+#include "screen_capture_monitor.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MMIService"
@@ -362,6 +363,11 @@ void MMIService::OnStart()
     MMI_HILOGI("Add app manager service listener end");
     AddAppDebugListener();
     AddSystemAbilityListener(DISPLAY_MANAGER_SERVICE_SA_ID);
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    MMI_HILOGI("Add system ability listener start");
+    AddSystemAbilityListener(PLAYER_DISTRIBUTED_SERVICE_ID);
+    MMI_HILOGI("Add system ability listener end");
+#endif
 #ifdef OHOS_BUILD_ENABLE_ANCO
     InitAncoUds();
 #endif // OHOS_BUILD_ENABLE_ANCO
@@ -400,6 +406,9 @@ void MMIService::OnStop()
     RemoveSystemAbilityListener(RENDER_SERVICE);
     RemoveAppDebugListener();
     RemoveSystemAbilityListener(DISPLAY_MANAGER_SERVICE_SA_ID);
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    RemoveSystemAbilityListener(PLAYER_DISTRIBUTED_SERVICE_ID);
+#endif
 #ifdef OHOS_BUILD_ENABLE_ANCO
     StopAncoUds();
 #endif // OHOS_BUILD_ENABLE_ANCO
@@ -1222,6 +1231,29 @@ int32_t MMIService::CheckAddInput(int32_t pid, InputHandlerType handlerType, Han
 }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+void MMIService::SaveScreenCapturePid(int32_t pid)
+{
+    MMI_HILOGD("Save screen capture pid: %{public}d", pid);
+    screenCapturePid_ = pid;
+}
+
+void MMIService::RemoveScreenCaptureMonitor(int32_t pid)
+{
+    if (screenCapturePid_ != pid) {
+        return;
+    }
+    auto sess = GetSessionByPid(pid);
+    if (sess == nullptr) {
+        return;
+    }
+    NetPacket pkt(MmiMessageId::REMOVE_MONITOR);
+    if (!sess->SendMsg(pkt)) {
+        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+    }
+}
+#endif
+
 int32_t MMIService::AddInputHandler(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
     uint32_t deviceTags)
 {
@@ -1473,6 +1505,14 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
     if (systemAbilityId == DISPLAY_MANAGER_SERVICE_SA_ID) {
         MMI_HILOGI("Init render service state observer start");
     }
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    if (systemAbilityId == PLAYER_DISTRIBUTED_SERVICE_ID) {
+        MMI_HILOGI("Init screen capture monitor listener start");
+        screenCaptureMonitorListener_ = new (std::nothrow) InputScreenCaptureMonitorListener();
+        CHKPV(screenCaptureMonitorListener_);
+        Media::ScreenCaptureMonitor::GetInstance()->RegisterScreenCaptureMonitorListener(screenCaptureMonitorListener_);
+    }
+#endif
 }
 
 int32_t MMIService::SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option)

@@ -103,6 +103,7 @@ ohos_fuzztest("InjectEventFuzzTest") {
     "ipc:ipc_single",
     "libinput:libinput-third-mmi",
     "napi:ace_napi",
+    "player_framework:media_client",
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
     "window_manager:libwm",
