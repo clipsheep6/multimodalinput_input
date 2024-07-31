@@ -32,12 +32,18 @@ public:
     DISALLOW_COPY_AND_MOVE(InputMonitorManager);
     int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> monitor,
         HandleEventType eventType = HANDLE_EVENT_TYPE_ALL);
-    void RemoveMonitor(int32_t monitorId);
+    int32_t RemoveMonitor(int32_t monitorId);
     void MarkConsumed(int32_t monitorId, int32_t eventId);
     InputHandlerType GetHandlerType() const override;
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    int32_t SetRemoveMonitorCallback(std::function<void()> callback);
+    void OnRemoveMonitor();
+#endif
 
 public:
     static bool IsValidMonitorId(int32_t monitorId);
+private:
+    std::function<void()> removeMonitorCallback_ { nullptr };
 };
 
 inline InputHandlerType InputMonitorManager::GetHandlerType() const
