@@ -2439,7 +2439,7 @@ bool InputWindowsManager::SkipNavigationWindow(WindowInputType windowType, int32
     return false;
 }
 
-void InputWindowsManager::GetUIExtentionWindowInfo(std::vector<WindowInfo> &uiExtentionWindowInfo, int32_t windowId,
+void InputWindowsManager::GetUIExtentionWindowInfo(const std::vector<WindowInfo> &uiExtentionWindowInfo, int32_t windowId,
     const WindowInfo **touchWindow, bool &isUiExtentionWindow)
 {
     for (auto &windowinfo : uiExtentionWindowInfo) {
