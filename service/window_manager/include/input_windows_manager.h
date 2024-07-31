@@ -74,6 +74,7 @@ public:
     ExtraData GetExtraData() const;
     const std::vector<WindowInfo>& GetWindowGroupInfoByDisplayId(int32_t displayId) const;
     std::pair<double, double> TransformWindowXY(const WindowInfo &window, double logicX, double logicY) const;
+    std::pair<double, double> TransformDisplayXY(const DisplayInfo &info, double logicX, double logicY) const;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     std::vector<std::pair<int32_t, TargetInfo>> GetPidAndUpdateTarget(std::shared_ptr<KeyEvent> keyEvent);
     std::vector<std::pair<int32_t, TargetInfo>> UpdateTarget(std::shared_ptr<KeyEvent> keyEvent);
@@ -115,6 +116,7 @@ public:
         int32_t& targetDisplayId, PhysicalCoordinate& coord) const;
     const DisplayInfo *GetDefaultDisplayInfo() const;
     void ReverseXY(int32_t &x, int32_t &y);
+    void SendCancelEventWhenLock();
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
@@ -212,6 +214,7 @@ private:
     bool SelectPointerChangeArea(const WindowInfo &windowInfo, PointerStyle &pointerStyle,
         int32_t logicalX, int32_t logicalY);
     void UpdatePointerChangeAreas(const DisplayGroupInfo &displayGroupInfo);
+    void AdjustDisplayRotation();
 #endif // OHOS_BUILD_ENABLE_POINTER
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
@@ -223,6 +226,10 @@ bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
     bool SkipAnnotationWindow(uint32_t flag, int32_t toolType);
     bool SkipNavigationWindow(WindowInputType windowType, int32_t toolType);
     int32_t UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent);
+    bool IsValidNavigationWindow(const WindowInfo& touchWindow, double physicalX, double physicalY);
+    bool IsNavigationWindowInjectEvent(std::shared_ptr<PointerEvent> pointerEvent);
+    void UpdateTransformDisplayXY(std::shared_ptr<PointerEvent> pointerEvent,
+        const std::vector<WindowInfo>& windowsInfo, const DisplayInfo& displayInfo);
     void PullEnterLeaveEvent(int32_t logicalX, int32_t logicalY,
         const std::shared_ptr<PointerEvent> pointerEvent, const WindowInfo* touchWindow);
     void DispatchTouch(int32_t pointerAction);
@@ -277,6 +284,7 @@ private:
     int32_t lastTouchLogicY_ { -1 };
     WindowInfo lastTouchWindowInfo_;
     std::shared_ptr<PointerEvent> lastTouchEvent_ { nullptr };
+    std::shared_ptr<PointerEvent> lastTouchEventOnBackGesture_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_POINTER
     DisplayGroupInfo displayGroupInfoTmp_;
     DisplayGroupInfo displayGroupInfo_;

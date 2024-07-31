@@ -269,6 +269,11 @@ ohos_shared_library("libmmi-server") {
     external_deps += [ "call_manager:tel_call_manager_api" ]
   }
 
+  if (screenlock_manager_enabled) {
+    defines += [ "SCREENLOCK_MANAGER_ENABLED" ]
+    external_deps += [ "screenlock_mgr:screenlock_client" ]
+  }
+
   external_deps += [
     "ability_base:want",
     "ability_base:zuri",
@@ -291,6 +296,7 @@ ohos_shared_library("libmmi-server") {
     "graphic_2d:librender_service_client",
     "graphic_2d:window_animation",
     "hdf_core:libhdi",
+    "hicollie:libhicollie",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
@@ -754,6 +760,7 @@ ohos_unittest("PointerDrawingManagerTest") {
     cfi = true
     cfi_cross_dso = true
     debug = false
+    blocklist = "./ipc_blocklist.txt"
   }
 
   sources = [ "window_manager/test/pointer_drawing_manager_test.cpp" ]
@@ -799,6 +806,7 @@ ohos_unittest("TouchDrawingManagerTest") {
     cfi = true
     cfi_cross_dso = true
     debug = false
+    blocklist = "./ipc_blocklist.txt"
   }
 
   sources = [ "window_manager/test/touch_drawing_manager_test.cpp" ]

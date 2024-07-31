@@ -78,6 +78,7 @@ public:
     MOCK_METHOD(bool, CalculateTipPoint, (struct libinput_event_tablet_tool*, int32_t&, PhysicalCoordinate&), (const));
     MOCK_METHOD(const DisplayInfo*, GetDefaultDisplayInfo, (), (const));
     MOCK_METHOD(void, ReverseXY, (int32_t&, int32_t&));
+    MOCK_METHOD(void, SendCancelEventWhenLock, ());
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -98,6 +99,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_ANCO
     MOCK_METHOD(int32_t, AncoAddChannel, (sptr<IAncoChannel>));
     MOCK_METHOD(int32_t, AncoRemoveChannel, (sptr<IAncoChannel>));
+    MOCK_METHOD(void, CleanShellWindowIds, ());
 #endif // OHOS_BUILD_ENABLE_ANCO
 
     static std::shared_ptr<InputWindowsManagerMock> GetInstance();

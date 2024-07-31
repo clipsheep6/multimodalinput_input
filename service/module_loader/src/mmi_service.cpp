@@ -56,9 +56,12 @@
 #include "multimodal_input_connect_def_parcel.h"
 #include "permission_helper.h"
 #include "timer_manager.h"
+#include "tokenid_kit.h"
 #include "touch_event_normalize.h"
 #include "util.h"
 #include "util_ex.h"
+#include "xcollie/xcollie.h"
+#include "xcollie/xcollie_define.h"
 #ifdef OHOS_RSS_CLIENT
 #include "res_sched_client.h"
 #include "res_type.h"
@@ -727,11 +730,17 @@ int32_t MMIService::GetMousePrimaryButton(int32_t &primaryButton)
 int32_t MMIService::SetPointerVisible(bool visible, int32_t priority)
 {
     CALL_INFO_TRACE;
+    auto tokenId = IPCSkeleton::GetCallingTokenID();
+    auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    bool isHap = false;
+    if (tokenType == OHOS::Security::AccessToken::TOKEN_HAP) {
+        isHap = true;
+    }
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t clientPid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [clientPid, visible, priority] {
-            return IPointerDrawingManager::GetInstance()->SetPointerVisible(clientPid, visible, priority);
+        [clientPid, visible, priority, isHap] {
+            return IPointerDrawingManager::GetInstance()->SetPointerVisible(clientPid, visible, priority, isHap);
         }
         );
     if (ret != RET_OK) {
@@ -1712,7 +1721,8 @@ void MMIService::OnThread()
         for (int32_t i = 0; i < count && state_ == ServiceRunningState::STATE_RUNNING; i++) {
             auto mmiEdIter = epollEventMap_.find(ev[i].data.fd);
             if (mmiEdIter == epollEventMap_.end()) {
-                return;
+                MMI_HILOGW("Invalid event %{public}d %{public}d", ev[i].data.fd, count);
+                continue;
             }
             std::shared_ptr<mmi_epoll_event> mmiEd = mmiEdIter->second;
             CHKPC(mmiEd);
@@ -2728,16 +2738,16 @@ int32_t MMIService::TransferBinderClientSrv(const sptr<IRemoteObject> &binderCli
 
 void MMIService::CalculateFuntionRunningTime(std::function<void()> func, const std::string &flag)
 {
-    auto startTime = std::chrono::steady_clock::now();
+    static int32_t BLOCK_TIME = 1;
+    std::function<void (void *)> printLog = std::bind(&MMIService::PrintLog, this, flag, BLOCK_TIME);
+    int32_t id = HiviewDFX::XCollie::GetInstance().SetTimer(flag, BLOCK_TIME, printLog, nullptr, HiviewDFX::XCOLLIE_FLAG_NOOP);
     func();
-    auto endTime = std::chrono::steady_clock::now();
-    auto duration = endTime - startTime;
-    int64_t durationTime = std::chrono::duration_cast<std::chrono::milliseconds>
-        (duration).count();
-    if (duration > std::chrono::milliseconds(DISTRIBUTE_TIME)) {
-        MMI_HILOGW("BlockMonitor event name: %{public}s, Duration Time: %{public}" PRId64 " ms",
-            flag.c_str(), durationTime);
-    }
+    HiviewDFX::XCollie::GetInstance().CancelTimer(id);
+}
+
+void MMIService::PrintLog(const std::string &flag, int32_t duration)
+{
+    MMI_HILOGW("MMIBlockTask name : %{public}s, duration Time : %{public}d", flag.c_str(), duration);
 }
 
 int32_t MMIService::GetIntervalSinceLastInput(int64_t &timeInterval)

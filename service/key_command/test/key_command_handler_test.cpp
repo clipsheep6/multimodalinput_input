@@ -1953,7 +1953,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsEnableCombineKey, TestSi
     key->SetKeyCode(KeyEvent::KEYCODE_POWER);
     key->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     key->AddKeyItem(item);
-    ASSERT_TRUE(handler.IsEnableCombineKey(key));
+    ASSERT_FALSE(handler.IsEnableCombineKey(key));
     item.SetKeyCode(KeyEvent::KEYCODE_B);
     key->AddKeyItem(item);
     ASSERT_FALSE(handler.IsEnableCombineKey(key));
@@ -3508,11 +3508,11 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_OnHandleEvent_001, TestSiz
     timerIds.push_back(100);
     handler.specialTimers_.insert(std::make_pair(keyCode, timerIds));
     ret = handler.OnHandleEvent(key);
-    EXPECT_TRUE(ret);
+    EXPECT_FALSE(ret);
     keyCode = KeyEvent::KEYCODE_VOLUME_UP;
     handler.specialTimers_.insert(std::make_pair(keyCode, timerIds));
     ret = handler.OnHandleEvent(key);
-    EXPECT_TRUE(ret);
+    EXPECT_FALSE(ret);
 }
 
 /**

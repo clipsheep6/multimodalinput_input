@@ -248,11 +248,11 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
             if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
                 break;
             } else if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_HIDE_POINTER)) {
-                IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), false, 0);
+                IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), false, 0, false);
             } else if (((pointerEvent->GetPointerAction() < PointerEvent::POINTER_ACTION_PULL_DOWN) ||
                 (pointerEvent->GetPointerAction() > PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW)) &&
                 !IPointerDrawingManager::GetInstance()->IsPointerVisible()) {
-                IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), true, 0);
+                IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), true, 0, false);
             }
 #endif // OHOS_BUILD_ENABLE_POINTER
             break;
@@ -290,7 +290,7 @@ int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointer
     auto displayInfo = WIN_MGR->GetPhysicalDisplay(cursorPos.displayId);
     CHKPR(displayInfo, ERROR_NULL_POINTER);
 #ifndef OHOS_BUILD_EMULATOR
-    if (ROTATE_POLICY == WINDOW_ROTATE) {
+    if (TOUCH_DRAWING_MGR->IsWindowRotation()) {
         CalculateOffset(displayInfo->direction, offset);
     }
 #endif // OHOS_BUILD_EMULATOR
@@ -489,7 +489,7 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
     for (uint32_t i = 0; i < num; i++) {
         DisplayInfo info;
         pkt >> info.id >> info.x >> info.y >> info.width >> info.height >> info.dpi >> info.name
-            >> info.uniq >> info.direction >> info.displayDirection >> info.displayMode;
+            >> info.uniq >> info.direction >> info.displayDirection >> info.displayMode >> info.transform;
         displayGroupInfo.displaysInfo.push_back(info);
         if (pkt.ChkRWError()) {
             MMI_HILOGE("Packet read display info failed");

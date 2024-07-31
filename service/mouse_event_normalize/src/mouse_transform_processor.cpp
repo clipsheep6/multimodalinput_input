@@ -68,7 +68,10 @@ const std::string DEVICE_TYPE_HARDEN { "HAD" };
 const std::string PRODUCT_TYPE = OHOS::system::GetParameter("const.build.product", "HYM");
 const std::string MOUSE_FILE_NAME { "mouse_settings.xml" };
 const int32_t ROTATE_POLICY = system::GetIntParameter("const.window.device.rotate_policy", 0);
+const std::string FOLDABLE_DEVICE_POLICY = system::GetParameter("const.window.foldabledevice.rotate_policy", "");
 constexpr int32_t WINDOW_ROTATE { 0 };
+constexpr char ROTATE_WINDOW_ROTATE { '0' };
+constexpr int32_t FOLDABLE_DEVICE { 2 };
 constexpr int32_t WAIT_TIME_FOR_BUTTON_UP { 15 };
 } // namespace
 
@@ -105,7 +108,7 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
     auto displayInfo = WIN_MGR->GetPhysicalDisplay(cursorPos.displayId);
     CHKPR(displayInfo, ERROR_NULL_POINTER);
 #ifndef OHOS_BUILD_EMULATOR
-    if (ROTATE_POLICY == WINDOW_ROTATE && Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+    if (IsWindowRotation(displayInfo) && Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         CalculateOffset(displayInfo->direction, offset);
     }
 #endif // OHOS_BUILD_EMULATOR
@@ -134,6 +137,18 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
     MMI_HILOGD("Change coordinate: x:%.2f, y:%.2f, currentDisplayId:%d",
         cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
     return RET_OK;
+}
+
+bool MouseTransformProcessor::IsWindowRotation(const DisplayInfo* displayInfo)
+{
+    MMI_HILOGD("ROTATE_POLICY: %{public}d, FOLDABLE_DEVICE_POLICY:%{public}s",
+        ROTATE_POLICY, FOLDABLE_DEVICE_POLICY.c_str());
+    return (ROTATE_POLICY == WINDOW_ROTATE ||
+        (ROTATE_POLICY == FOLDABLE_DEVICE &&
+        ((displayInfo->displayMode == DisplayMode::MAIN &&
+        FOLDABLE_DEVICE_POLICY[0] == ROTATE_WINDOW_ROTATE) ||
+        (displayInfo->displayMode == DisplayMode::FULL &&
+        FOLDABLE_DEVICE_POLICY[FOLDABLE_DEVICE] == ROTATE_WINDOW_ROTATE))));
 }
 
 void MouseTransformProcessor::CalculateOffset(Direction direction, Offset &offset)
@@ -211,6 +226,16 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
         buttonMapping_[originButton] = buttonId;
         isPressed_ = true;
         buttonId_ = pointerEvent_->GetButtonId();
+        CursorPosition cursorPos = WIN_MGR->GetCursorPos();
+        if (cursorPos.displayId < 0) {
+            MMI_HILOGE("No display");
+            return RET_ERR;
+        }
+        auto displayInfo = WIN_MGR->GetPhysicalDisplay(cursorPos.displayId);
+        CHKPR(displayInfo, ERROR_NULL_POINTER);
+        if (cursorPos.direction != displayInfo->direction) {
+            WIN_MGR->UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y);
+        }
     } else {
         MMI_HILOGE("Unknown state, state:%{public}u", state);
         return RET_ERR;
@@ -348,8 +373,7 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
     if (libinput_event_pointer_has_axis(data, LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL)) {
         double axisValue = libinput_event_pointer_get_axis_value(data, LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL);
         if (source == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
-            axisValue = TouchPadTransformProcessor::GetTouchpadScrollRows() * (axisValue / initRows)
-                * tpScrollDirection;
+            axisValue = TouchPadTransformProcessor::GetTouchpadScrollRows() * (axisValue / initRows);
             axisValue = HandleAxisAccelateTouchPad(axisValue) * tpScrollDirection;
         } else {
             axisValue = GetMouseScrollRows() * axisValue * tpScrollDirection;
@@ -359,8 +383,7 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
     if (libinput_event_pointer_has_axis(data, LIBINPUT_POINTER_AXIS_SCROLL_HORIZONTAL)) {
         double axisValue = libinput_event_pointer_get_axis_value(data, LIBINPUT_POINTER_AXIS_SCROLL_HORIZONTAL);
         if (source == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
-            axisValue = TouchPadTransformProcessor::GetTouchpadScrollRows() * (axisValue / initRows)
-                * tpScrollDirection;
+            axisValue = TouchPadTransformProcessor::GetTouchpadScrollRows() * (axisValue / initRows);
             axisValue = HandleAxisAccelateTouchPad(axisValue) * tpScrollDirection;
         } else {
             axisValue = GetMouseScrollRows() * axisValue * tpScrollDirection;
@@ -381,7 +404,7 @@ double MouseTransformProcessor::HandleAxisAccelateTouchPad(double axisValue)
         HandleAxisAccelerateTouchpad(WIN_MGR->GetMouseIsCaptureMode(), &axisValue, static_cast<int32_t>(deviceType));
     if (ret != RET_OK) {
         MMI_HILOGW("Fail accelerate axis");
-        axisValue = GetMouseScrollRows() * (axisValue / initRows);
+        axisValue = TouchPadTransformProcessor::GetTouchpadScrollRows() * (axisValue / initRows);
     }
     return axisValue;
 }
@@ -458,7 +481,6 @@ bool MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* dat
     PointerEvent::PointerItem &pointerItem)
 {
     CALL_DEBUG_ENTER;
-    CHKPF(data);
     CHKPF(pointerEvent_);
     auto mouseInfo = WIN_MGR->GetMouseInfo();
     MouseState->SetMouseCoords(mouseInfo.physicalX, mouseInfo.physicalY);
@@ -474,12 +496,6 @@ bool MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* dat
     pointerItem.SetWidth(0);
     pointerItem.SetHeight(0);
     pointerItem.SetPressure(0);
-    if (libinput_event_pointer_get_axis_source(data) == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
-        pointerItem.SetToolType(PointerEvent::TOOL_TYPE_TOUCHPAD);
-        MMI_HILOGD("ToolType is touchpad");
-    } else {
-        pointerItem.SetToolType(PointerEvent::TOOL_TYPE_MOUSE);
-    }
     pointerItem.SetDeviceId(deviceId_);
     pointerItem.SetRawDx(static_cast<int32_t>(unaccelerated_.dx));
     pointerItem.SetRawDy(static_cast<int32_t>(unaccelerated_.dy));
@@ -495,6 +511,15 @@ bool MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* dat
     pointerEvent_->SetTargetDisplayId(mouseInfo.displayId);
     pointerEvent_->SetTargetWindowId(-1);
     pointerEvent_->SetAgentWindowId(-1);
+    if (data == nullptr) {
+        return false;
+    }
+    if (libinput_event_pointer_get_axis_source(data) == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
+        pointerItem.SetToolType(PointerEvent::TOOL_TYPE_TOUCHPAD);
+        MMI_HILOGD("ToolType is touchpad");
+    } else {
+        pointerItem.SetToolType(PointerEvent::TOOL_TYPE_MOUSE);
+    }
     return true;
 }
 
@@ -553,7 +578,6 @@ int32_t MouseTransformProcessor::Normalize(struct libinput_event *event)
     if (type == LIBINPUT_EVENT_TOUCHPAD_DOWN || type == LIBINPUT_EVENT_TOUCHPAD_UP) {
         HandleAxisPostInner(pointerItem);
     } else if (!HandlePostInner(data, pointerItem)) {
-        CHKPL(data);
         CHKPL(pointerEvent_);
         return RET_ERR;
     }
@@ -573,8 +597,8 @@ int32_t MouseTransformProcessor::NormalizeRotateEvent(struct libinput_event *eve
     pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_ROTATE, angle);
     PointerEvent::PointerItem pointerItem;
     if (!HandlePostInner(data, pointerItem)) {
-        CHKPL(data);
         CHKPL(pointerEvent_);
+        WIN_MGR->UpdateTargetPointer(pointerEvent_);
         return ERROR_NULL_POINTER;
     }
     WIN_MGR->UpdateTargetPointer(pointerEvent_);
@@ -663,9 +687,8 @@ void MouseTransformProcessor::DumpInner()
     EventLogHelper::PrintEventData(pointerEvent_, MMI_LOG_FREEZE);
     auto device = INPUT_DEV_MGR->GetInputDevice(pointerEvent_->GetDeviceId());
     CHKPV(device);
-    aggregator_.Record(MMI_LOG_FREEZE, "Pointer event created by: " + device->GetName() + ", target window: " +
-        std::to_string(pointerEvent_->GetTargetWindowId()) + ", action: " + pointerEvent_->DumpPointerAction(),
-        std::to_string(pointerEvent_->GetId()));
+    aggregator_.Record(MMI_LOG_FREEZE, device->GetName() + ", TW: " +
+        std::to_string(pointerEvent_->GetTargetWindowId()), std::to_string(pointerEvent_->GetId()));
 }
 
 DeviceType MouseTransformProcessor::CheckDeviceType(int32_t width, int32_t height)

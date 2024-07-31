@@ -198,6 +198,7 @@ void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<Point
             break;
         }
     }
+    CheckAndUpdateTappingCountAtDown(touchEvent);
 }
 
 void KeyCommandHandler::HandlePointerActionMoveEvent(const std::shared_ptr<PointerEvent> touchEvent)
@@ -249,6 +250,7 @@ void KeyCommandHandler::HandlePointerActionUpEvent(const std::shared_ptr<Pointer
             break;
         }
     }
+    previousUpTime_ = touchEvent->GetActionTime();
 }
 
 void KeyCommandHandler::HandleFingerGestureDownEvent(const std::shared_ptr<PointerEvent> touchEvent)
@@ -316,7 +318,6 @@ void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<Poin
     } else {
         MMI_HILOGW("Other kunckle pointercnt not process, pointercnt:%{public}zu", pointercnt);
     }
-    CheckAndUpdateTappingCountAtDown(touchEvent);
 }
 
 void KeyCommandHandler::HandleKnuckleGestureUpEvent(const std::shared_ptr<PointerEvent> touchEvent)
@@ -331,7 +332,6 @@ void KeyCommandHandler::HandleKnuckleGestureUpEvent(const std::shared_ptr<Pointe
     } else {
         MMI_HILOGW("Other kunckle pointercnt not process, pointercnt:%{public}zu", pointercnt);
     }
-    previousUpTime_ = touchEvent->GetActionTime();
 }
 
 void KeyCommandHandler::SingleKnuckleGestureProcesser(const std::shared_ptr<PointerEvent> touchEvent)
@@ -1403,7 +1403,7 @@ bool KeyCommandHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent
         } else if (shortcutKey.triggerType == KeyEvent::KEY_ACTION_UP) {
             bool handleResult = HandleKeyUp(keyEvent, shortcutKey);
             result = handleResult || result;
-            if (handleResult) {
+            if (handleResult && shortcutKey.keyDownDuration > 0) {
                 upAbilities.push_back(shortcutKey);
             }
         } else {
@@ -1422,6 +1422,10 @@ bool KeyCommandHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent
         BytraceAdapter::StopLaunchAbility();
     }
     if (result) {
+        if (currentLaunchAbilityKey_.finalKey == keyEvent->GetKeyCode()
+            && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
+            ResetCurrentLaunchAbilityKey();
+        }
         return result;
     }
     return HandleConsumedKeyEvent(keyEvent);
@@ -2133,6 +2137,9 @@ void KeyCommandHandler::CheckAndUpdateTappingCountAtDown(std::shared_ptr<Pointer
     tappingCount_++;
     int64_t timeDiffToPrevKnuckleUpTime = currentDownTime - previousUpTime_;
     if (timeDiffToPrevKnuckleUpTime <= downToPrevUpTimeConfig_) {
+        if (tappingCount_ == MAX_TAP_COUNT) {
+            DfxHisysevent::ReportFailIfOneSuccTwoFail(touchEvent);
+        }
         if (tappingCount_ > MAX_TAP_COUNT) {
             DfxHisysevent::ReportFailIfKnockTooFast();
         }

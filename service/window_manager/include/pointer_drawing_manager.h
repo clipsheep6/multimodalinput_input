@@ -73,7 +73,7 @@ public:
     int32_t SetPointerColor(int32_t color) override;
     int32_t GetPointerColor() override;
     void DeletePointerVisible(int32_t pid) override;
-    int32_t SetPointerVisible(int32_t pid, bool visible, int32_t priority) override;
+    int32_t SetPointerVisible(int32_t pid, bool visible, int32_t priority, bool isHap) override;
     bool GetPointerVisible(int32_t pid) override;
     int32_t SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle,
         bool isUiExtension = false) override;
@@ -82,7 +82,7 @@ public:
         bool isUiExtension = false) override;
     int32_t SetPointerSize(int32_t size) override;
     int32_t GetPointerSize() override;
-    void DrawPointerStyle(const PointerStyle& pointerStyle) override;
+    void DrawPointerStyle(const PointerStyle& pointerStyle, bool simulate = false) override;
     bool IsPointerVisible() override;
     void SetPointerLocation(int32_t x, int32_t y) override;
     void AdjustMouseFocus(Direction direction, ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
@@ -105,6 +105,7 @@ public:
     int32_t GetPointerSnapshot(void *pixelMapPtr) override;
     void InitPointerCallback() override;
     void InitPointerObserver() override;
+    void OnSessionLost(int32_t pid) override;
 
 private:
     IconStyle GetIconType(MOUSE_ICON mouseIcon);
@@ -138,6 +139,7 @@ private:
     int32_t CreatePointerSwitchObserver(isMagicCursor& item);
     void UpdateStyleOptions();
     int32_t GetIndependentPixels();
+    bool IsWindowRotation();
     bool CheckPointerStyleParam(int32_t windowId, PointerStyle pointerStyle);
     std::map<MOUSE_ICON, IconStyle>& GetMouseIcons();
     void UpdateIconPath(const MOUSE_ICON mouseStyle, std::string iconPath);
@@ -170,6 +172,7 @@ private:
     int32_t canvasHeight_ = 64;
     std::map<MOUSE_ICON, IconStyle> mouseIcons_;
     std::list<PidInfo> pidInfos_;
+    std::list<PidInfo> hapPidInfos_;
     bool mouseDisplayState_ { false };
     bool mouseIconUpdate_ { false };
     std::shared_ptr<OHOS::Media::PixelMap> userIcon_ { nullptr };
@@ -184,6 +187,7 @@ private:
     isMagicCursor hasMagicCursor_;
     bool hasInitObserver_ { false };
     bool isInit_ { false };
+    bool simulate_ { false };
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     std::shared_ptr<HardwareCursorPointerManager> hardwareCursorPointerManager_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
