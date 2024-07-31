@@ -196,7 +196,7 @@
         "name": "OH_Input_CancelInjection"
     },
     {
-        "first_introduced": "12",
+        "first_introduced": "13",
         "name": "OH_Input_GetIntervalSinceLastInput"
     }
 ]

@@ -2351,7 +2351,7 @@ int32_t MultimodalInputConnectProxy::GetIntervalSinceLastInput(int64_t &timeInte
     } else {
         READINT64(reply, timeInterval);
     }
-    return RET_OK;
+    return ret;
 }
 } // namespace MMI
 } // namespace OHOS

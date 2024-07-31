@@ -3214,7 +3214,8 @@ static void GetIntervalSinceLastInputCallback(int64_t timeInterval)
 HWTEST_F(InputManagerTest, InputManagerTest_GetIntervalSinceLastInput001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetIntervalSinceLastInput(GetIntervalSinceLastInputCallback));
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetIntervalSinceLastInput(
+        GetIntervalSinceLastInputCallback));
 }
 
 HWTEST_F(InputManagerTest, InputManagerTest_GetIntervalSinceLastInput002, TestSize.Level1)
@@ -3225,7 +3226,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetIntervalSinceLastInput002, TestSi
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetIntervalSinceLastInput(GetIntervalSinceLastInputCallback));
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetIntervalSinceLastInput(
+        GetIntervalSinceLastInputCallback));
 }
 
 HWTEST_F(InputManagerTest, InputManagerTest_GetIntervalSinceLastInput003, TestSize.Level1)
@@ -3245,7 +3247,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetIntervalSinceLastInput003, TestSi
     keyEvent->AddKeyItem(itemSecond);
     InputManager::GetInstance()->SimulateInputEvent(keyEvent);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetIntervalSinceLastInput(GetIntervalSinceLastInputCallback));
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetIntervalSinceLastInput(
+        GetIntervalSinceLastInputCallback));
 }
 } // namespace MMI
 } // namespace OHOS
