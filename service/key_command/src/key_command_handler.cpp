@@ -2062,8 +2062,8 @@ void KeyCommandHandler::KnuckleDoubleClickProcess(const std::string bundleName,
     const std::string abilityName, const std::string action)
 {
     std::string screenStatus = DISPLAY_MONITOR->GetScreenStatus();
-    if (screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF ||
-        screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED) {
+    bool isScreenLocked = DISPLAY_MONITOR->GetScreenLocked();
+    if (screenStatus == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF || isScreenLocked) {
         MMI_HILOGI("The current screen is not in the unlocked state with the screen on");
         return;
     }
