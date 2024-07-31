@@ -56,7 +56,7 @@ private:
     void UpdateKeyEventHandlerChain(const std::shared_ptr<KeyEvent> keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     int32_t SetOriginPointerId(std::shared_ptr<PointerEvent> pointerEvent);
-
+    bool KnuckleDoubleClickHandle(libinput_event* event);
 private:
     int32_t timerId_ { -1 };
     bool isShield_ { false };

@@ -294,7 +294,11 @@ private:
     void ReportLetterGesture();
     void ReportGestureInfo();
 #endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
-
+    bool KnuckleDoubleClickHandle(const std::shared_ptr<PointerEvent> pointerEvent);
+    void KnuckleDoubleClickProcess(const std::string bundleName, const std::string abilityName,
+        const std::string action);
+    void GetKnuckleAbilityInfo(std::string &shotBundleName, std::string &shotAbilityName,
+        std::string &recorderBundleName, std::string &recorderAbilityName);
 private:
     Sequence matchedSequence_;
     ShortcutKey lastMatchedKey_;

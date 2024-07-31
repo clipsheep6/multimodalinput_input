@@ -431,6 +431,9 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
     auto touchpad = libinput_event_get_touchpad_event(event);
     CHKPR(touchpad, ERROR_NULL_POINTER);
     auto type = libinput_event_get_type(event);
+    if (type == LIBINPUT_EVENT_TOUCHPAD_MOTION && KnuckleDoubleClickHandle(event)) {
+        return RET_OK;
+    }
     int32_t seatSlot = libinput_event_touchpad_get_seat_slot(touchpad);
     GestureIdentify(event);
     MULTI_FINGERTAP_HDR->HandleMulFingersTap(touchpad, type);
@@ -761,6 +764,32 @@ void EventNormalizeHandler::TerminateAxis(libinput_event* event)
         LogTracer lt(pointerEvent->GetId(), pointerEvent->GetEventType(), pointerEvent->GetPointerAction());
         nextHandler_->HandlePointerEvent(pointerEvent);
     }
+}
+
+bool EventNormalizeHandler::KnuckleDoubleClickHandle(libinput_event* event)
+{
+    CHKPR(event, ERROR_NULL_POINTER);
+    CHKPR(nextHandler_, ERROR_UNSUPPORT);
+    auto touchpadEvent = libinput_event_get_touchpad_event(event);
+    CHKPR(touchpadEvent, ERROR_NULL_POINTER);
+    double value = libinput_event_touchpad_get_pressure(touchpadEvent);
+    if (value >= SINGLE_KNUCKLE_ABS_PRESSURE_VALUE && value < DOUBLE_KNUCKLE_ABS_PRESSURE_VALUE) {
+        std::shared_ptr<MMI::PointerEvent>  pointerEvent = PointerEvent::Create();
+        CHKPR(pointerEvent, ERROR_NULL_POINTER);
+        pointerEvent->SetPointerAction(KNUCKLE_1F_DOUBLE_CLICK);
+        MMI_HILOGI("Current is singleKnuckle doubleClick Action");
+        nextHandler_->HandlePointerEvent(pointerEvent);
+        return true;
+    }
+    if (value == DOUBLE_KNUCKLE_ABS_PRESSURE_VALUE) {
+        std::shared_ptr<MMI::PointerEvent>  pointerEvent = PointerEvent::Create();
+        CHKPR(pointerEvent, ERROR_NULL_POINTER);
+        pointerEvent->SetPointerAction(KNUCKLE_2F_DOUBLE_CLICK);
+        MMI_HILOGI("Current is doubleKnuckle doubleClick Action");
+        nextHandler_->HandlePointerEvent(pointerEvent);
+        return true;
+    }
+    return false;
 }
 } // namespace MMI
 } // namespace OHOS
