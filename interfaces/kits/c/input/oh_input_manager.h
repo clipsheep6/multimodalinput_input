@@ -722,7 +722,7 @@ void OH_Input_DestroyShortcutKey(Input_ShortcutKey** shortcutKey);
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 13
  */
-void OH_Input_SetpressedKeys(Input_ShortcutKey* shortcutKey, int32_t* pressedKeys, int32_t pressedKeyNum);
+void OH_Input_SetpressedKeys(Input_ShortcutKey* shortcutKey, int32_t *pressedKeys, int32_t pressedKeyNum);
 
 /**
  * @brief Get the pressedKeys.
@@ -812,7 +812,7 @@ void OH_Input_SetFinalKeyDownDuration(Input_ShortcutKey* shortcutKey, int32_t du
  * @syscap SystemCapability.MultimodalInput.Input.Core
  * @since 13
  */
-int32_t OH_Input_GetFinalKeyDownDuration(const Input_ShortcutKey* shortcutKey);
+int32_t OH_Input_GetFinalKeyDownDuration(const Input_ShortcutKey* shortcutKey, int32_t *duration);
 
 /**
  * @brief Subscribe global ShortcutKey.
