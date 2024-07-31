@@ -32,9 +32,9 @@ int32_t InputMonitorManager::AddMonitor(std::shared_ptr<IInputEventConsumer> mon
     return AddHandler(InputHandlerType::MONITOR, monitor, eventType);
 }
 
-void InputMonitorManager::RemoveMonitor(int32_t monitorId)
+int32_t InputMonitorManager::RemoveMonitor(int32_t monitorId)
 {
-    RemoveHandler(monitorId, InputHandlerType::MONITOR);
+    return RemoveHandler(monitorId, InputHandlerType::MONITOR);
 }
 
 void InputMonitorManager::MarkConsumed(int32_t monitorId, int32_t eventId)
@@ -49,5 +49,24 @@ void InputMonitorManager::MarkConsumed(int32_t monitorId, int32_t eventId)
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
     }
 }
+
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+int32_t InputMonitorManager::SetRemoveMonitorCallback(std::function<void()> callback)
+{
+    if (callback == nullptr) {
+        return RET_ERR;
+    }
+    removeMonitorCallback_ = callback;
+    return RET_OK;
+}
+
+void InputMonitorManager::OnRemoveMonitor()
+{
+    if (removeMonitorCallback_ == nullptr) {
+        return;
+    }
+    removeMonitorCallback_();
+}
+#endif
 } // namespace MMI
 } // namespace OHOS
