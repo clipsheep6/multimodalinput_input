@@ -140,7 +140,7 @@ PointerDrawingManager::PointerDrawingManager()
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     MMI_HILOGI("magiccurosr InitStyle");
     hasMagicCursor_.name = "isMagicCursor";
-    TimerMgr->AddTimer(WAIT_TIME_FOR_MAGIC_CURSOR, 1, [this]() {
+    TimerMgr->AddTimer(WAIT_TIME_FOR_MAGIC_CURSOR, 2, [this]() {
         MMI_HILOGD("Timer callback");
         if (hasInitObserver_ == false) {
             int32_t ret = CreatePointerSwitchObserver(hasMagicCursor_);
