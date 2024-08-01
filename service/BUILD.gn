@@ -305,6 +305,7 @@ ohos_shared_library("libmmi-server") {
     "init:libbegetutil",
     "ipc:ipc_single",
     "libinput:libinput-third-mmi",
+    "player_framework:media_client",
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
     "window_manager:libwm_lite",
@@ -1266,6 +1267,7 @@ ohos_unittest("ModuleLoaderTest") {
     "image_framework:image_native",
     "init:libbegetutil",
     "libinput:libinput-third-mmi",
+    "player_framework:media_client",
     "security_component_manager:libsecurity_component_sdk",
     "window_manager:libwm",
   ]
@@ -1309,6 +1311,7 @@ ohos_unittest("ModuleLoaderExTest") {
     "hilog:libhilog",
     "image_framework:image_native",
     "libinput:libinput-third-mmi",
+    "player_framework:media_client",
     "security_component_manager:libsecurity_component_sdk",
     "window_manager:libwm",
   ]
@@ -1920,6 +1923,7 @@ ohos_unittest("ConnectManagerTest") {
     "init:libbegetutil",
     "ipc:ipc_single",
     "libinput:libinput-third-mmi",
+    "player_framework:media_client",
     "security_component_manager:libsecurity_component_sdk",
     "window_manager:libwm",
   ]
@@ -2012,6 +2016,7 @@ ohos_unittest("ConnectManagerEXTest") {
     "init:libbegetutil",
     "ipc:ipc_single",
     "libinput:libinput-third-mmi",
+    "player_framework:media_client",
     "security_component_manager:libsecurity_component_sdk",
     "window_manager:libwm",
   ]
