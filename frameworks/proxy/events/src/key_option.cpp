@@ -75,6 +75,16 @@ void KeyOption::SetFinalKeyUpDelay(int32_t delay)
     finalKeyUpDelay_ = delay;
 }
 
+bool KeyOption::GetIsRepeat() const
+{
+    return isRepeat_;
+}
+
+void KeyOption::SetIsRepeat(bool repeat)
+{
+    isRepeat_ = repeat;
+}
+
 bool KeyOption::ReadFromParcel(Parcel &in)
 {
     int32_t preKeysSize = 0;
@@ -96,7 +106,8 @@ bool KeyOption::ReadFromParcel(Parcel &in)
         in.ReadInt32(finalKey_) &&
         in.ReadBool(isFinalKeyDown_) &&
         in.ReadInt32(finalKeyDownDuration_) &&
-        in.ReadInt32(finalKeyUpDelay_)
+        in.ReadInt32(finalKeyUpDelay_) &&
+        in.ReadBool(isRepeat_)
     );
 }
 
@@ -116,7 +127,8 @@ bool KeyOption::WriteToParcel(Parcel &out) const
         out.WriteInt32(finalKey_) &&
         out.WriteBool(isFinalKeyDown_) &&
         out.WriteInt32(finalKeyDownDuration_) &&
-        out.WriteInt32(finalKeyUpDelay_)
+        out.WriteInt32(finalKeyUpDelay_) &&
+        out.WriteBool(isRepeat_)
     );
 }
 } // namespace MMI

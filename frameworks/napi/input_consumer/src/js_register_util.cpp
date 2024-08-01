@@ -245,6 +245,7 @@ static void AsyncWorkFn(const napi_env &env, std::shared_ptr<KeyOption> keyOptio
     MMI::SetNamedProperty(env, result, "finalKey", keyOption->GetFinalKey());
     MMI::SetNamedProperty(env, result, "isFinalKeyDown", keyOption->IsFinalKeyDown());
     MMI::SetNamedProperty(env, result, "finalKeyDownDuration", keyOption->GetFinalKeyDownDuration());
+    MMI::SetNamedProperty(env, result, "isRepeat", keyOption->GetIsRepeat());
 }
 
 struct KeyEventMonitorInfoWorker {

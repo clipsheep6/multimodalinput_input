@@ -175,11 +175,20 @@ struct Input_MouseEvent;
 struct Input_TouchEvent;
 
 /**
+ * @brief Global shortcut key.
+ *
+ * @since 13
+ */
+typedef struct Input_ShortcutKey Input_ShortcutKey;
+
+/**
  * @brief Enumerates the error codes.
  *
  * @since 12
  */
 typedef enum {
+    /** Failed */
+    INPUT_FAILED = -1,
     /** Success */
     INPUT_SUCCESS = 0,
     /** Permission verification failed */
@@ -189,6 +198,12 @@ typedef enum {
     /** Parameter check failed */
     INPUT_PARAMETER_ERROR = 401
 } Input_Result;
+
+/**
+ * @brief callback function, receive reported data.
+ * @since 13
+ */
+typedef void (*Input_ShortcutKeyCallback)(Input_ShortcutKey* shortcutKey);
 
 /**
  * @brief Queries the key state.
@@ -681,6 +696,145 @@ int64_t OH_Input_GetTouchEventActionTime(const struct Input_TouchEvent* touchEve
  */
 void OH_Input_CancelInjection();
 
+/**
+ * @brief Creates a shortcutKey object.
+ *
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_ShortcutKey* OH_Input_CreateShortcutKey();
+
+/**
+ * @brief Destroys a shortcutKey object.
+ *
+ * @param shortcutKey Shortcut key combination.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+void OH_Input_DestroyShortcutKey(Input_ShortcutKey** shortcutKey);
+
+/**
+ * @brief Set the pressedKeys.
+ *
+ * @param shortcutKey Shortcut key combination.
+ * @param pressedKeys The front key is pressed.
+ * @param size The pressedKeys size.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+void OH_Input_SetpressedKeys(Input_ShortcutKey* shortcutKey, int32_t *pressedKeys, int32_t pressedKeyNum);
+
+/**
+ * @brief Get the pressedKeys.
+ *
+ * @param shortcutKey Shortcut key combination.
+ * @return Returns pressedKeys.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+int32_t* OH_Input_GetpressedKeys(const Input_ShortcutKey* shortcutKey);
+
+/**
+ * @brief Set the finalKey.
+ *
+ * @param shortcutKey Shortcut key combination.
+ * @param finalKey The final key is pressed.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+void OH_Input_SetfinalKey(Input_ShortcutKey* shortcutKey, int32_t finalKey);
+
+/**
+ * @brief Get the finalKey.
+ *
+ * @param shortcutKey Shortcut key combination.
+ * @return Returns finalKey.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+int32_t OH_Input_GetfinalKey(const Input_ShortcutKey* shortcutKey, int32_t *finalKeyCode);
+
+/**
+ * @brief Set the isFinalKeyDown.
+ *
+ * @param shortcutKey Shortcut key combination.
+ * @param isFinalKeyDown The final key is or not pressed.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+void OH_Input_SetIsFinalKeyDown(Input_ShortcutKey* shortcutKey, bool isFinalKeyDown);
+
+/**
+ * @brief Get the isFinalKeyDown.
+ *
+ * @param shortcutKey Shortcut key combination.
+ * @return Returns IsFinalKeyDown.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+bool OH_Input_GetIsFinalKeyDown(const Input_ShortcutKey* shortcutKey);
+
+/**
+ * @brief Set the isRepeat.
+ *
+ * @param shortcutKey Shortcut key combination.
+ * @param isRepeat The key is or not repeat.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+void OH_Input_SetIsRepeat(Input_ShortcutKey* shortcutKey, bool isRepeat);
+
+/**
+ * @brief Get the isRepeat.
+ *
+ * @param shortcutKey Shortcut key combination.
+ * @return Returns isRepeat.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+bool OH_Input_GetIsRepeat(const Input_ShortcutKey* shortcutKey);
+
+/**
+ * @brief Set the duration.
+ *
+ * @param shortcutKey Shortcut key combination.
+ * @param duration The finalKey down duration.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+void OH_Input_SetFinalKeyDownDuration(Input_ShortcutKey* shortcutKey, int32_t duration);
+
+/**
+ * @brief Get the duration.
+ *
+ * @param shortcutKey Shortcut key combination.
+ * @return Returns duration.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+int32_t OH_Input_GetFinalKeyDownDuration(const Input_ShortcutKey* shortcutKey, int32_t *duration);
+
+/**
+ * @brief Subscribe global ShortcutKey.
+ *
+ * @param shortcutKey the key events about input which is to be subscribed.
+ * @param callback callback function, receive reported data.
+ * @return 401 - Parameter error.Possible causes: 1. Mandatory parameters are left unspecified;
+ * <br>2. Incorrect parameter types; 3. Parameter verification failed.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+int32_t OH_Input_AddShortcutKeyMonitor(const Input_ShortcutKey* shortcutKey, Input_ShortcutKeyCallback callback);
+
+/**
+ * @brief UnSubscribe global ShortcutKey.
+ *
+ * @param shortcutKey the key events about input which is to be Unsubscribed.
+ * @param callback callback function, receive reported data.
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+void OH_Input_RemoveShortcutKeyMonitor(const Input_ShortcutKey* shortcutKey, Input_ShortcutKeyCallback callback);
 #ifdef __cplusplus
 }
 #endif

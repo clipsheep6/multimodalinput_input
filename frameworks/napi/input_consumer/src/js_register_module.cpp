@@ -153,9 +153,18 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonit
         return nullptr;
     }
     subKeyNames += std::to_string(finalKeyDownDuration);
+    subKeyNames += ",";
     keyOption->SetFinalKeyDownDuration(finalKeyDownDuration);
-    event->eventType = subKeyNames;
     MMI_HILOGD("FinalKeyDownDuration:%{public}d", finalKeyDownDuration);
+    bool isRepeat;
+    if (!GetNamedPropertyBool(env, argv[1], "isRepeat", isRepeat)) {
+        MMI_HILOGE("GetNamedPropertyBool failed");
+        return nullptr;
+    }
+    keyOption->SetIsRepeat(isRepeat);
+    MMI_HILOGD("isRepeat:%{public}d", isRepeat);
+    subKeyNames += std::to_string(isRepeat);
+    event->eventType = subKeyNames;
     if (argc == INPUT_PARAMETER_MAX) {
         CHKRP(napi_typeof(env, argv[INPUT_PARAMETER_MIDDLE], &valueType), TYPEOF);
         if (valueType != napi_function) {
