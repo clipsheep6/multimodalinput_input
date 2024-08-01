@@ -17,15 +17,21 @@
 
 #include "input_manager.h"
 #include "key_event.h"
+#include "mmi_log.h"
 #include "oh_input_manager.h"
 #include "oh_key_code.h"
 #ifdef OHOS_BUILD_ENABLE_INFRARED_EMITTER
 #include "infrared_emitter_controller.h"
 #endif
+
+#undef MMI_LOG_TAG
+#define MMI_LOG_TAG "InputNativeTest"
+
 namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
+static struct Input_InterceptorEventCallback *g_eventCallbacks_ = nullptr;
 } // namespace
 
 class InputNativeTest : public testing::Test {
@@ -789,6 +795,335 @@ HWTEST_F(InputNativeTest, InputNativeTest_InjectTouchEvent_005, TestSize.Level1)
     OH_Input_SetTouchEventAction(touchEvent, TOUCH_ACTION_CANCEL);
     retResult = OH_Input_InjectTouchEvent(touchEvent);
     EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+}
+
+static void KeyEventMonitorCallback(const struct Input_KeyEvent* keyEvent)
+{
+    MMI_HILOGI("KeyEventMonitorCallback");
+}
+
+static void KeyEventMonitorCallbackNotAdd(const struct Input_KeyEvent* keyEvent)
+{
+    MMI_HILOGI("KeyEventMonitorCallbackNotAdd");
+}
+
+static void MouseEventMonitorCallback(const struct Input_MouseEvent* mouseEvent)
+{
+    MMI_HILOGI("MouseEventMonitorCallback");
+}
+
+static void MouseEventMonitorCallbackNotAdd(const struct Input_MouseEvent* mouseEvent)
+{
+    MMI_HILOGI("MouseEventMonitorCallbackNotAdd");
+}
+
+static void TouchEventMonitorCallback(const struct Input_TouchEvent* touchEvent)
+{
+    MMI_HILOGI("TouchEventMonitorCallback");
+}
+
+static void TouchEventMonitorCallbackNotAdd(const struct Input_TouchEvent* touchEvent)
+{
+    MMI_HILOGI("TouchEventMonitorCallbackNotAdd");
+}
+
+static void AxisEventMonitorCallbackAll(const struct Input_AxisEvent* axisEvent)
+{
+    MMI_HILOGI("AxisEventMonitorCallbackAll");
+}
+
+static void AxisEventMonitorCallback(const struct Input_AxisEvent* axisEvent)
+{
+    MMI_HILOGI("AxisEventMonitorCallback");
+}
+
+/**
+ * @tc.name: InputNativeTest_AddKeyEventMonitor_001
+ * @tc.desc: Verify the AddKeyEventMonitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_AddKeyEventMonitor_001, TestSize.Level1)
+{
+    int32_t retResult = OH_Input_AddKeyEventMonitor(nullptr);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+    retResult = OH_Input_AddKeyEventMonitor(KeyEventMonitorCallback);
+    EXPECT_EQ(retResult, INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: InputNativeTest_AddMouseEventMonitor_001
+ * @tc.desc: Verify the AddMouseEventMonitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_AddMouseEventMonitor_001, TestSize.Level1)
+{
+    Input_Result retResult = OH_Input_AddMouseEventMonitor(nullptr);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+    retResult = OH_Input_AddMouseEventMonitor(MouseEventMonitorCallback);
+    EXPECT_EQ(retResult, INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: InputNativeTest_AddTouchEventMonitor_001
+ * @tc.desc: Verify the AddTouchEventMonitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_AddTouchEventMonitor_001, TestSize.Level1)
+{
+    Input_Result retResult = OH_Input_AddTouchEventMonitor(nullptr);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+    retResult = OH_Input_AddTouchEventMonitor(TouchEventMonitorCallback);
+    EXPECT_EQ(retResult, INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: InputNativeTest_AddAxisEventMonitorAll_001
+ * @tc.desc: Verify the AddAxisEventMonitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_AddAxisEventMonitorAll_001, TestSize.Level1)
+{
+    Input_Result retResult = OH_Input_AddAxisEventMonitorForAll(nullptr);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+    retResult = OH_Input_AddAxisEventMonitorForAll(AxisEventMonitorCallbackAll);
+    EXPECT_EQ(retResult, INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: InputNativeTest_AddAxisEventMonitor_001
+ * @tc.desc: Verify the AddAxisEventMonitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_AddAxisEventMonitor_001, TestSize.Level1)
+{
+    Input_Result retResult = OH_Input_AddAxisEventMonitor(AXIS_EVENT_TYPE_PINCH, nullptr);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+    retResult = OH_Input_AddAxisEventMonitor(AXIS_EVENT_TYPE_PINCH, AxisEventMonitorCallback);
+    EXPECT_EQ(retResult, INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: InputNativeTest_RemoveKeyEventMonitor_001
+ * @tc.desc: Verify the RemoveKeyEventMonitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_RemoveKeyEventMonitor_001, TestSize.Level1)
+{
+    int32_t retResult = OH_Input_RemoveKeyEventMonitor(nullptr);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+    retResult = OH_Input_RemoveKeyEventMonitor(KeyEventMonitorCallbackNotAdd);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+    retResult = OH_Input_RemoveKeyEventMonitor(KeyEventMonitorCallback);
+    EXPECT_EQ(retResult, INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: InputNativeTest_AddMouseEventMonitor_001
+ * @tc.desc: Verify the AddMouseEventMonitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_RemoveMouseEventMonitor_001, TestSize.Level1)
+{
+    Input_Result retResult = OH_Input_RemoveMouseEventMonitor(nullptr);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+    retResult = OH_Input_RemoveMouseEventMonitor(MouseEventMonitorCallbackNotAdd);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+    retResult = OH_Input_RemoveMouseEventMonitor(MouseEventMonitorCallback);
+    EXPECT_EQ(retResult, INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: InputNativeTest_RemoveTouchEventMonitor_001
+ * @tc.desc: Verify the RemoveTouchEventMonitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_RemoveTouchEventMonitor_001, TestSize.Level1)
+{
+    Input_Result retResult = OH_Input_RemoveTouchEventMonitor(nullptr);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+    retResult = OH_Input_RemoveTouchEventMonitor(TouchEventMonitorCallbackNotAdd);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+    retResult = OH_Input_RemoveTouchEventMonitor(TouchEventMonitorCallback);
+    EXPECT_EQ(retResult, INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: InputNativeTest_RemoveAxisEventMonitorAll_001
+ * @tc.desc: Verify the RemoveAxisEventMonitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_RemoveAxisEventMonitorAll_001, TestSize.Level1)
+{
+    Input_Result retResult = OH_Input_RemoveAllAxisEventMonitor(nullptr);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+    retResult = OH_Input_RemoveAllAxisEventMonitor(AxisEventMonitorCallback);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+    retResult = OH_Input_RemoveAllAxisEventMonitor(AxisEventMonitorCallbackAll);
+    EXPECT_EQ(retResult, INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: InputNativeTest_RemoveAxisEventMonitor_001
+ * @tc.desc: Verify the RemoveAxisEventMonitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_RemoveAxisEventMonitor_001, TestSize.Level1)
+{
+    Input_Result retResult = OH_Input_RemoveAxisEventMonitor(AXIS_EVENT_TYPE_PINCH, nullptr);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+    retResult = OH_Input_RemoveAxisEventMonitor(AXIS_EVENT_TYPE_PINCH, AxisEventMonitorCallbackAll);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+    retResult = OH_Input_RemoveAxisEventMonitor(AXIS_EVENT_TYPE_SCROLL, AxisEventMonitorCallback);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+    retResult = OH_Input_RemoveAxisEventMonitor(AXIS_EVENT_TYPE_PINCH, AxisEventMonitorCallback);
+    EXPECT_EQ(retResult, INPUT_SUCCESS);
+}
+
+static void KeyEventInterceptorCallback(const struct Input_KeyEvent* keyEvent)
+{
+    MMI_HILOGI("KeyEventInterceptorCallback");
+}
+
+static void MouseEventInterceptorCallback(const struct Input_MouseEvent* mouseEvent)
+{
+    MMI_HILOGI("MouseEventInterceptorCallback");
+}
+
+static void TouchEventInterceptorCallback(const struct Input_TouchEvent* touchEvent)
+{
+    MMI_HILOGI("TouchEventInterceptorCallback");
+}
+
+static void AxisEventInterceptorCallback(const struct Input_AxisEvent* axisEvent)
+{
+    MMI_HILOGI("AxisEventInterceptorCallback");
+}
+
+/**
+ * @tc.name: InputNativeTest_AddKeyEventInterceptor_001
+ * @tc.desc: Verify the AddKeyEventInterceptor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_AddKeyEventInterceptor_001, TestSize.Level1)
+{
+    Input_Result retResult = OH_Input_AddKeyEventInterceptor(nullptr, nullptr);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+    retResult = OH_Input_AddKeyEventInterceptor(KeyEventInterceptorCallback, nullptr);
+    EXPECT_EQ(retResult, INPUT_SUCCESS);
+    retResult = OH_Input_AddKeyEventInterceptor(KeyEventInterceptorCallback, nullptr);
+    EXPECT_EQ(retResult, INPUT_REPEAT_INTERCEPTOR);
+}
+
+/**
+ * @tc.name: InputNativeTest_RemoveKeyEventInterceptor_001
+ * @tc.desc: Verify the RemoveKeyEventInterceptor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_RemoveKeyEventInterceptor_001, TestSize.Level1)
+{
+    Input_Result retResult = OH_Input_RemoveKeyEventInterceptor();
+    EXPECT_EQ(retResult, INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: InputNativeTest_AddInputEventInterceptor_001
+ * @tc.desc: Verify the AddInputEventInterceptor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_AddInputEventInterceptor_001, TestSize.Level1)
+{
+    Input_Result retResult = OH_Input_AddInputEventInterceptor(nullptr, nullptr);
+    EXPECT_EQ(retResult, INPUT_PARAMETER_ERROR);
+    g_eventCallbacks_ = new Input_InterceptorEventCallback();
+    ASSERT_NE(g_eventCallbacks_, nullptr);
+    g_eventCallbacks_->mouseCallback = MouseEventInterceptorCallback;
+    g_eventCallbacks_->touchCallback = TouchEventInterceptorCallback;
+    g_eventCallbacks_->axisCallback = AxisEventInterceptorCallback;
+    retResult = OH_Input_AddInputEventInterceptor(g_eventCallbacks_, nullptr);
+    EXPECT_EQ(retResult, INPUT_SUCCESS);
+}
+
+/**
+ * @tc.name: InputNativeTest_AddInputEventInterceptor_002
+ * @tc.desc: Verify the AddInputEventInterceptor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_AddInputEventInterceptor_002, TestSize.Level1)
+{
+    Input_Result retResult = OH_Input_AddInputEventInterceptor(g_eventCallbacks_, nullptr);
+    EXPECT_EQ(retResult, INPUT_REPEAT_INTERCEPTOR);
+}
+
+/**
+ * @tc.name: InputNativeTest_RemoveInputEventInterceptor_001
+ * @tc.desc: Verify the RemoveInputEventInterceptor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_RemoveInputEventInterceptor_001, TestSize.Level1)
+{
+    Input_Result retResult = OH_Input_RemoveInputEventInterceptor();
+    EXPECT_EQ(retResult, INPUT_SUCCESS);
+
+    delete g_eventCallbacks_;
+}
+
+/**
+ * @tc.name: InputNativeTest_CreateAxisEvent_001
+ * @tc.desc: Verify the CreateAxisEvent
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputNativeTest, InputNativeTest_CreateAxisEvent_001, TestSize.Level1)
+{
+    Input_AxisEvent* axisEvent = OH_Input_CreateAxisEvent();
+    ASSERT_NE(axisEvent, nullptr);
+    OH_Input_SetAxisEventAction(axisEvent, AXIS_ACTION_BEGIN);
+    OH_Input_SetAxisEventDisplayX(axisEvent, 300.0);
+    OH_Input_SetAxisEventDisplayY(axisEvent, 300.0);
+    OH_Input_SetAxisEventAxisValue(axisEvent, AXIS_TYPE_SCROLL_VERTICAL, 1.0);
+    OH_Input_SetAxisEventAxisValue(axisEvent, AXIS_TYPE_SCROLL_HORIZONTAL, 0);
+    OH_Input_SetAxisEventActionTime(axisEvent, 2);
+    OH_Input_SetAxisEventSourceType(axisEvent, SOURCE_TYPE_MOUSE);
+    OH_Input_SetAxisEventType(axisEvent, AXIS_EVENT_TYPE_SCROLL);
+
+    InputEvent_AxisAction action;
+    OH_Input_GetAxisEventAction(axisEvent, &action);
+    EXPECT_EQ(action, AXIS_ACTION_BEGIN);
+    float displayX = 0;
+    float displayY = 0;
+    OH_Input_GetAxisEventDisplayX(axisEvent, &displayX);
+    OH_Input_GetAxisEventDisplayY(axisEvent, &displayY);
+    EXPECT_EQ(displayX, 300.0);
+    EXPECT_EQ(displayY, 300.0);
+    double axisValue = 0;
+    OH_Input_GetAxisEventAxisValue(axisEvent, AXIS_TYPE_SCROLL_VERTICAL, &axisValue);
+    EXPECT_EQ(axisValue, 1.0);
+    OH_Input_GetAxisEventAxisValue(axisEvent, AXIS_TYPE_SCROLL_HORIZONTAL, &axisValue);
+    EXPECT_EQ(axisValue, 0);
+    int64_t actionTime = 0;
+    OH_Input_GetAxisEventActionTime(axisEvent, &actionTime);
+    EXPECT_EQ(actionTime, 2);
+    InputEvent_SourceType sourceType;
+    OH_Input_GetAxisEventSourceType(axisEvent, &sourceType);
+    EXPECT_EQ(sourceType, SOURCE_TYPE_MOUSE);
+    InputEvent_AxisEventType eventType;
+    OH_Input_GetAxisEventType(axisEvent, &eventType);
+    EXPECT_EQ(eventType, AXIS_EVENT_TYPE_SCROLL);
 }
 } // namespace MMI
 } // namespace OHOS
