@@ -50,17 +50,12 @@ private:
     int32_t ProcessPinchGesture(int32_t argc, char *argv[], int32_t indexPercent);
     int32_t InjectPinchEvent(int32_t fingerCount, int32_t scaleNumberator);
     int32_t ProcessRotateGesture(int32_t argc, char *argv[]);
-<<<<<<< HEAD
-    int32_t ProcessTouchPadFingerSwipAction();
-    int32_t ActionPinchEvent(int32_t scalePercentNumerator)
-    shared_ptr<PointerEvent> CreatePointerEvent(int32_t id, int32_t type, int32_t pointerId, int32_t sourceType, int32_t fingerCount)
-=======
-    int32_t ProcessTouchPadFingerAction(int32_t argc, char *argv[]);
-    int32_t ActionEvent(int32_t fingerCount);
     int32_t ProcessKeyboardTextInput(int32_t argc, char *argv[]);
     int32_t PrintKeyboardTextChar(int32_t keyCode, bool isPressShift);
     bool IsSpecialChar(char character, int32_t &keyCode, bool &isPressShift);
->>>>>>> 982260fab8d3422f7f98761c895b60ffb2610b1c
+    int32_t ProcessTouchPadFingerSwipAction();
+    int32_t ActionPinchEvent(int32_t scalePercentNumerator)
+    shared_ptr<PointerEvent> CreatePointerEvent(int32_t id, int32_t type, int32_t pointerId, int32_t sourceType, int32_t fingerCount);
 };
 } // namespace MMI
 } // namespace OHOS
