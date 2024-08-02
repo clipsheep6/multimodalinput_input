@@ -483,7 +483,9 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_DISPATCH_EVENT);
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
-    if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE) {
+    if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
+        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_ROTATE_UPDATE) {
         MMI_HILOG_FREEZEI("id:%{public}d recv", pointerEvent->GetId());
     }
     if (client->IsEventHandlerChanged()) {
@@ -642,7 +644,7 @@ int32_t InputManagerImpl::PackDisplayInfo(NetPacket &pkt)
     for (const auto &item : displayGroupInfo_.displaysInfo) {
         pkt << item.id << item.x << item.y << item.width
             << item.height << item.dpi << item.name << item.uniq << item.direction
-            << item.displayDirection << item.displayMode;
+            << item.displayDirection << item.displayMode << item.transform;
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write display data failed");
@@ -1369,8 +1371,6 @@ void InputManagerImpl::OnDisconnected()
         PointerEvent::POINTER_ACTION_DOWN };
     std::initializer_list<int32_t> pointerActionPullEvents { PointerEvent::POINTER_ACTION_PULL_MOVE,
         PointerEvent::POINTER_ACTION_PULL_DOWN };
-    std::initializer_list<int32_t> pointerActionSwipeEvents { PointerEvent::POINTER_ACTION_SWIPE_UPDATE,
-        PointerEvent::POINTER_ACTION_SWIPE_BEGIN };
     if (RecoverPointerEvent(pointerActionEvents, PointerEvent::POINTER_ACTION_UP)) {
         MMI_HILOGE("Up event for service exception re-sending");
         return;
@@ -1378,11 +1378,6 @@ void InputManagerImpl::OnDisconnected()
 
     if (RecoverPointerEvent(pointerActionPullEvents, PointerEvent::POINTER_ACTION_PULL_UP)) {
         MMI_HILOGE("Pull up event for service exception re-sending");
-        return;
-    }
-
-    if (RecoverPointerEvent(pointerActionSwipeEvents, PointerEvent::POINTER_ACTION_SWIPE_END)) {
-        MMI_HILOGE("Swipe end event for service exception re-sending");
         return;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
@@ -2335,6 +2330,11 @@ int32_t InputManagerImpl::AncoRemoveChannel(std::shared_ptr<IAncoConsumer> consu
 #endif // OHOS_BUILD_ENABLE_ANCO
     MMI_HILOGI("AncoRemoveChannel function does not support");
     return ERROR_UNSUPPORT;
+}
+
+int32_t InputManagerImpl::SkipPointerLayer(bool isSkip)
+{
+    return MULTIMODAL_INPUT_CONNECT_MGR->SkipPointerLayer(isSkip);
 }
 } // namespace MMI
 } // namespace OHOS

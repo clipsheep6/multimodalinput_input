@@ -18,7 +18,6 @@
 
 #include <vector>
 
-#include "display_manager.h"
 #include "nocopyable.h"
 #include "pixel_map.h"
 #include "window_manager_lite.h"
@@ -75,6 +74,7 @@ public:
     ExtraData GetExtraData() const;
     const std::vector<WindowInfo>& GetWindowGroupInfoByDisplayId(int32_t displayId) const;
     std::pair<double, double> TransformWindowXY(const WindowInfo &window, double logicX, double logicY) const;
+    std::pair<double, double> TransformDisplayXY(const DisplayInfo &info, double logicX, double logicY) const;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     std::vector<std::pair<int32_t, TargetInfo>> GetPidAndUpdateTarget(std::shared_ptr<KeyEvent> keyEvent);
     std::vector<std::pair<int32_t, TargetInfo>> UpdateTarget(std::shared_ptr<KeyEvent> keyEvent);
@@ -116,6 +116,7 @@ public:
         int32_t& targetDisplayId, PhysicalCoordinate& coord) const;
     const DisplayInfo *GetDefaultDisplayInfo() const;
     void ReverseXY(int32_t &x, int32_t &y);
+    void SendCancelEventWhenLock();
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
@@ -127,6 +128,7 @@ public:
     bool IsAncoWindowFocus(const WindowInfo &window) const;
     void SimulatePointerExt(std::shared_ptr<PointerEvent> pointerEvent);
     void DumpAncoWindows(std::string& out) const;
+    void CleanShellWindowIds();
 #endif // OHOS_BUILD_ENABLE_ANCO
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -153,7 +155,8 @@ public:
 #endif // OHOS_BUILD_ENABLE_ANCO
 
 private:
-    void OnFoldStatusChanged(Rosen::FoldStatus foldStatus);
+    void CheckFoldChange(std::shared_ptr<PointerEvent> pointerEvent);
+    void OnFoldStatusChanged(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const;
     void PrintWindowInfo(const std::vector<WindowInfo> &windowsInfo);
     void PrintDisplayInfo();
@@ -211,6 +214,7 @@ private:
     bool SelectPointerChangeArea(const WindowInfo &windowInfo, PointerStyle &pointerStyle,
         int32_t logicalX, int32_t logicalY);
     void UpdatePointerChangeAreas(const DisplayGroupInfo &displayGroupInfo);
+    void AdjustDisplayRotation();
 #endif // OHOS_BUILD_ENABLE_POINTER
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
@@ -222,6 +226,10 @@ bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
     bool SkipAnnotationWindow(uint32_t flag, int32_t toolType);
     bool SkipNavigationWindow(WindowInputType windowType, int32_t toolType);
     int32_t UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent);
+    bool IsValidNavigationWindow(const WindowInfo& touchWindow, double physicalX, double physicalY);
+    bool IsNavigationWindowInjectEvent(std::shared_ptr<PointerEvent> pointerEvent);
+    void UpdateTransformDisplayXY(std::shared_ptr<PointerEvent> pointerEvent,
+        const std::vector<WindowInfo>& windowsInfo, const DisplayInfo& displayInfo);
     void PullEnterLeaveEvent(int32_t logicalX, int32_t logicalY,
         const std::shared_ptr<PointerEvent> pointerEvent, const WindowInfo* touchWindow);
     void DispatchTouch(int32_t pointerAction);
@@ -276,6 +284,7 @@ private:
     int32_t lastTouchLogicY_ { -1 };
     WindowInfo lastTouchWindowInfo_;
     std::shared_ptr<PointerEvent> lastTouchEvent_ { nullptr };
+    std::shared_ptr<PointerEvent> lastTouchEventOnBackGesture_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_POINTER
     DisplayGroupInfo displayGroupInfoTmp_;
     DisplayGroupInfo displayGroupInfo_;
@@ -309,7 +318,7 @@ private:
     int32_t pointerActionFlag_ { -1 };
     int32_t currentUserId_ { -1 };
     std::shared_ptr<KnuckleDynamicDrawingManager> knuckleDynamicDrawingManager_ { nullptr };
-    std::shared_ptr<PointerEvent> lastPointerEventForFold_ { nullptr };
+    uint32_t lastFoldStatus_ {};
     Direction lastDirection_ = static_cast<Direction>(-1);
     std::map<int32_t, WindowInfo> lastMatchedWindow_;
     std::vector<SwitchFocusKey> vecWhiteList_;

@@ -43,7 +43,7 @@ public:
         return true;
     }
     virtual void DeletePointerVisible(int32_t pid) {}
-    virtual int32_t SetPointerVisible(int32_t pid, bool visible, int32_t priority)
+    virtual int32_t SetPointerVisible(int32_t pid, bool visible, int32_t priority, bool isHap)
     {
         return 0;
     }
@@ -73,7 +73,7 @@ public:
     {
         return 0;
     }
-    virtual void DrawPointerStyle(const PointerStyle& pointerStyle) {}
+    virtual void DrawPointerStyle(const PointerStyle& pointerStyle, bool simulate = false) {}
     virtual bool IsPointerVisible()
     {
         return false;
@@ -137,6 +137,11 @@ public:
     }
     virtual void ForceClearPointerVisiableStatus();
     virtual void InitPointerObserver() {}
+    virtual void OnSessionLost(int32_t pid) {}
+    virtual int32_t SkipPointerLayer(bool isSkip)
+    {
+        return 0;
+    }
 public:
     static inline std::shared_ptr<IPointerDrawingManager> iPointDrawMgr_ { nullptr };
 };

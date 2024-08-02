@@ -56,11 +56,10 @@
 #include "multimodal_input_connect_def_parcel.h"
 #include "permission_helper.h"
 #include "timer_manager.h"
+#include "tokenid_kit.h"
 #include "touch_event_normalize.h"
 #include "util.h"
 #include "util_ex.h"
-#include "watchdog_task.h"
-#include "xcollie/watchdog.h"
 #include "xcollie/xcollie.h"
 #include "xcollie/xcollie_define.h"
 #ifdef OHOS_RSS_CLIENT
@@ -68,6 +67,7 @@
 #include "res_type.h"
 #include "system_ability_definition.h"
 #endif // OHOS_RSS_CLIENT
+#include "setting_datashare.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MMIService"
@@ -215,65 +215,6 @@ bool MMIService::IsRunning() const
     return (state_ == ServiceRunningState::STATE_RUNNING);
 }
 
-void MMIService::RegisterFoldStatusListener()
-{
-    CALL_INFO_TRACE;
-    if (!Rosen::DisplayManager::GetInstance().IsFoldable()) {
-        MMI_HILOG_HANDLERW("No need register fold status listener");
-        return;
-    }
-    foldStatusListener_ = sptr<FoldStatusLisener>::MakeSptr(this);
-    CHKPV(foldStatusListener_);
-    auto ret = Rosen::DisplayManager::GetInstance().RegisterFoldStatusListener(foldStatusListener_);
-    if (ret != Rosen::DMError::DM_OK) {
-        MMI_HILOG_HANDLERE("Failed to register fold status listener");
-        foldStatusListener_ = nullptr;
-    } else {
-        MMI_HILOG_HANDLERI("Register fold status listener successed");
-    }
-}
-
-void MMIService::UnregisterFoldStatusListener()
-{
-    CALL_INFO_TRACE;
-    CHKPV(foldStatusListener_);
-    auto ret = Rosen::DisplayManager::GetInstance().UnregisterFoldStatusListener(foldStatusListener_);
-    if (ret != Rosen::DMError::DM_OK) {
-        MMI_HILOG_HANDLERE("Failed to unregister fold status listener");
-    }
-}
-
-MMIService::FoldStatusLisener::~FoldStatusLisener()
-{
-    std::lock_guard<std::mutex> lock(mutex_);
-    server_ = nullptr;
-}
-
-void MMIService::FoldStatusLisener::OnFoldStatusChanged(Rosen::FoldStatus foldStatus)
-{
-    MMI_HILOG_HANDLERI("currentFoldStatus:%{public}d, lastFoldStatus:%{public}d", foldStatus, lastFoldStatus_);
-    if (lastFoldStatus_ == foldStatus) {
-        MMI_HILOG_HANDLERD("No need to set foldStatus");
-        return;
-    }
-    lastFoldStatus_ = foldStatus;
-    std::lock_guard<std::mutex> lock(mutex_);
-    CHKPV(server_);
-    server_->OnFoldStatusChanged(foldStatus);
-}
-
-void MMIService::OnFoldStatusChanged(Rosen::FoldStatus foldStatus)
-{
-    int32_t ret = delegateTasks_.PostSyncTask([foldStatus]() {
-        WIN_MGR->OnFoldStatusChanged(foldStatus);
-        return RET_OK;
-    });
-    if (ret != RET_OK) {
-        MMI_HILOGE("Failed to report the cancel event during the fold status change, ret: %{public}d",
-            ret);
-    }
-}
-
 bool MMIService::InitLibinputService()
 {
     if (!(libinputAdapter_.Init([] (void *event, int64_t frameTime) {
@@ -338,6 +279,11 @@ bool MMIService::InitDelegateTasks()
         EpollClose();
         return false;
     }
+    std::function<int32_t(DTaskCallback)> fun = [this](DTaskCallback cb) -> int32_t {
+        return delegateTasks_.PostSyncTask(cb);
+    };
+    delegateInterface_ = std::make_shared<DelegateInterface>(fun);
+    delegateInterface_->Init();
     MMI_HILOGI("AddEpoll, epollfd:%{public}d, fd:%{public}d", mmiFd_, delegateTasks_.GetReadFd());
     return true;
 }
@@ -434,8 +380,6 @@ void MMIService::OnStart()
             MMI_HILOGI("Mmi-server Timeout");
         }
     };
-    HiviewDFX::Watchdog::GetInstance().RunPeriodicalTask("MMIService", taskFunc, WATCHDOG_INTERVAL_TIME,
-        WATCHDOG_DELAY_TIME);
     MMI_HILOGI("Run periodical task success");
 }
 
@@ -457,7 +401,6 @@ void MMIService::OnStop()
     RemoveSystemAbilityListener(RENDER_SERVICE);
     RemoveAppDebugListener();
     RemoveSystemAbilityListener(DISPLAY_MANAGER_SERVICE_SA_ID);
-    UnregisterFoldStatusListener();
 #ifdef OHOS_BUILD_ENABLE_ANCO
     StopAncoUds();
 #endif // OHOS_BUILD_ENABLE_ANCO
@@ -569,6 +512,12 @@ void MMIService::OnDisconnected(SessionPtr s)
     if (ret != RET_OK) {
         MMI_HILOGF("Remove all filter failed, ret:%{public}d", ret);
     }
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    if (s->GetProgramName() == SHELL_ASSISTANT) {
+        MMI_HILOGW("clean all shell windows because of %{public}s", s->GetProgramName().c_str());
+        IInputWindowsManager::GetInstance()->CleanShellWindowIds();
+    }
+#endif // OHOS_BUILD_ENABLE_ANCO
 #ifdef OHOS_BUILD_ENABLE_POINTER
     IPointerDrawingManager::GetInstance()->DeletePointerVisible(s->GetPid());
 #endif // OHOS_BUILD_ENABLE_POINTER
@@ -782,11 +731,17 @@ int32_t MMIService::GetMousePrimaryButton(int32_t &primaryButton)
 int32_t MMIService::SetPointerVisible(bool visible, int32_t priority)
 {
     CALL_INFO_TRACE;
+    auto tokenId = IPCSkeleton::GetCallingTokenID();
+    auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    bool isHap = false;
+    if (tokenType == OHOS::Security::AccessToken::TOKEN_HAP) {
+        isHap = true;
+    }
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t clientPid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        [clientPid, visible, priority] {
-            return IPointerDrawingManager::GetInstance()->SetPointerVisible(clientPid, visible, priority);
+        [clientPid, visible, priority, isHap] {
+            return IPointerDrawingManager::GetInstance()->SetPointerVisible(clientPid, visible, priority, isHap);
         }
         );
     if (ret != RET_OK) {
@@ -1291,7 +1246,7 @@ int32_t MMIService::AddInputHandler(InputHandlerType handlerType, HandleEventTyp
         CHKPR(sess, ERROR_NULL_POINTER);
         napData.bundleName = sess->GetProgramName();
         int32_t syncState = SUBSCRIBED;
-        MMI_HILOGD("AddInputHandler info to observer : pid:%{public}d, uid:%{public}d, bundleName:%{public}s",
+        MMI_HILOGD("AddInputHandler info to observer : pid:%{public}d, uid:%d, bundleName:%{public}s",
             napData.pid, napData.uid, napData.bundleName.c_str());
         NapProcess::GetInstance()->AddMmiSubscribedEventData(napData, syncState);
         if (NapProcess::GetInstance()->GetNapClientPid() != UNOBSERVED) {
@@ -1453,53 +1408,6 @@ int32_t MMIService::CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> 
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 }
 
-#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-int32_t MMIService::AdaptScreenResolution(std::shared_ptr<PointerEvent> pointerEvent)
-{
-    CALL_DEBUG_ENTER;
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    int32_t pointerId = pointerEvent->GetPointerId();
-    PointerEvent::PointerItem pointerItem;
-    if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
-        MMI_HILOGE("Can't find pointer item, pointerId:%{public}d", pointerId);
-        return RET_ERR;
-    }
-    auto display = OHOS::Rosen::DisplayManager::GetInstance().GetDefaultDisplay();
-    CHKPR(display, ERROR_NULL_POINTER);
-    enum ResolutionIndex {
-        FIRST = 0,
-        CURRENT = 1
-    };
-    if (displays_[FIRST] == nullptr) {
-        displays_[FIRST] = display;
-    } else {
-        displays_[CURRENT] = display;
-    }
-    if (displays_[FIRST] != nullptr && displays_[CURRENT] != nullptr) {
-        int32_t sourceX = pointerItem.GetDisplayX();
-        int32_t sourceY = pointerItem.GetDisplayY();
-        if ((displays_[FIRST]->GetWidth() == 0) || (displays_[FIRST]->GetHeight() == 0)) {
-            MMI_HILOGE("Invalid display, screen resolution width:%{public}d, height:%{public}d",
-                displays_[FIRST]->GetWidth(), displays_[FIRST]->GetHeight());
-            return RET_ERR;
-        }
-        int32_t destX = sourceX * displays_[CURRENT]->GetWidth() / displays_[FIRST]->GetWidth();
-        int32_t destY = sourceY * displays_[CURRENT]->GetHeight() / displays_[FIRST]->GetHeight();
-        pointerItem.SetDisplayX(destX);
-        pointerItem.SetDisplayY(destY);
-        if (EventLogHelper::IsBetaVersion()) {
-            MMI_HILOGI("PointerItem's displayX:%{public}d, displayY:%{public}d when first inject,"
-                "Screen resolution width:%{public}d, height:%{public}d first got,"
-                "Screen resolution width:%{public}d, height:%{public}d current got,"
-                "PointerItem's displayX:%{public}d, displayY:%{public}d after self adaptaion",
-                sourceX, sourceY, displays_[FIRST]->GetWidth(), displays_[FIRST]->GetHeight(),
-                displays_[CURRENT]->GetWidth(), displays_[CURRENT]->GetHeight(), destX, destY);
-        }
-    }
-    return RET_OK;
-}
-#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-
 int32_t MMIService::InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, bool isNativeInject)
 {
     CALL_DEBUG_ENTER;
@@ -1557,6 +1465,7 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
     }
     if (systemAbilityId == COMMON_EVENT_SERVICE_ID) {
         DEVICE_MONITOR->InitCommonEventSubscriber();
+        DISPLAY_MONITOR->InitCommonEventSubscriber();
         MMI_HILOGD("Common event service started");
     }
     if (systemAbilityId == RENDER_SERVICE) {
@@ -1565,7 +1474,11 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
     }
     if (systemAbilityId == DISPLAY_MANAGER_SERVICE_SA_ID) {
         MMI_HILOGI("Init render service state observer start");
-        RegisterFoldStatusListener();
+    }
+    if (systemAbilityId == DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID) {
+        if (SettingDataShare::GetInstance(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID).CheckIfSettingsDataReady()) {
+            IPointerDrawingManager::GetInstance()->InitPointerObserver();
+        }
     }
 }
 
@@ -1815,7 +1728,8 @@ void MMIService::OnThread()
         for (int32_t i = 0; i < count && state_ == ServiceRunningState::STATE_RUNNING; i++) {
             auto mmiEdIter = epollEventMap_.find(ev[i].data.fd);
             if (mmiEdIter == epollEventMap_.end()) {
-                return;
+                MMI_HILOGW("Invalid event %{public}d %{public}d", ev[i].data.fd, count);
+                continue;
             }
             std::shared_ptr<mmi_epoll_event> mmiEd = mmiEdIter->second;
             CHKPC(mmiEd);
@@ -2831,10 +2745,33 @@ int32_t MMIService::TransferBinderClientSrv(const sptr<IRemoteObject> &binderCli
 
 void MMIService::CalculateFuntionRunningTime(std::function<void()> func, const std::string &flag)
 {
-    int32_t id = HiviewDFX::XCollie::GetInstance().SetTimer(flag, 1, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_NOOP);
+    static int32_t BLOCK_TIME = 1;
+    std::function<void (void *)> printLog = std::bind(&MMIService::PrintLog, this, flag, BLOCK_TIME);
+    int32_t id = HiviewDFX::XCollie::GetInstance().SetTimer(flag, BLOCK_TIME, printLog, nullptr, HiviewDFX::XCOLLIE_FLAG_NOOP);
     func();
     HiviewDFX::XCollie::GetInstance().CancelTimer(id);
 }
 
+void MMIService::PrintLog(const std::string &flag, int32_t duration)
+{
+    MMI_HILOGW("MMIBlockTask name : %{public}s, duration Time : %{public}d", flag.c_str(), duration);
+}
+
+int32_t MMIService::SkipPointerLayer(bool isSkip)
+{
+    CALL_INFO_TRACE;
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [isSkip] {
+            return IPointerDrawingManager::GetInstance()->SkipPointerLayer(isSkip);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("Skip pointer layerfailed, return:%{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS

@@ -17,6 +17,7 @@ group("test") {
   testonly = true
 
   deps = [
+    "accountmanager_fuzzer:fuzztest",
     "addinputeventfilter_fuzzer:fuzztest",
     "addinterceptor_fuzzer:fuzztest",
     "addmonitor_fuzzer:fuzztest",
@@ -40,6 +41,7 @@ group("test") {
     "gettprightclicktype_fuzzer:fuzztest",
     "getwindowpid_fuzzer:fuzztest",
     "injectevent_fuzzer:fuzztest",
+    "inputdevicemanager_fuzzer:fuzztest",
     "markconsumed_fuzzer:fuzztest",
     "movemouse_fuzzer:fuzztest",
     "notifynaponline_fuzzer:fuzztest",
@@ -65,6 +67,7 @@ group("test") {
     "setshieldstatus_fuzzer:fuzztest",
     "setwindowinputeventconsumer_fuzzer:fuzztest",
     "simulateinputevent_fuzzer:fuzztest",
+    "skippointerlayer_fuzzer:fuzztest",
     "stubaddinputeventfilter_fuzzer:fuzztest",
     "stubaddinputhandler_fuzzer:fuzztest",
     "stubappendextradata_fuzzer:fuzztest",
@@ -76,7 +79,7 @@ group("test") {
     "stubgetkeyboardtype_fuzzer:fuzztest",
     "stubgetmouseprimarybutton_fuzzer:fuzztest",
     "stubgetmousescrollrows_fuzzer:fuzztest",
-    "stubgetpointerspeed_fuzzer:fuzztest",
+    "stubgetpointersnapshot_fuzzer:fuzztest",
     "stubgetpointerspeed_fuzzer:fuzztest",
     "stubgetpointerstyle_fuzzer:fuzztest",
     "stubgettouchpadpinchswitch_fuzzer:fuzztest",

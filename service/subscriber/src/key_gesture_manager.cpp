@@ -21,6 +21,7 @@
 #include "app_state_observer.h"
 #include "define_multimodal.h"
 #include "display_event_monitor.h"
+#include "event_log_helper.h"
 #include "timer_manager.h"
 #include "util.h"
 
@@ -54,12 +55,31 @@ void KeyGestureManager::Handler::ResetTimer()
 void KeyGestureManager::Handler::Trigger(std::shared_ptr<KeyEvent> keyEvent)
 {
     MMI_HILOGI("[Handler] Handler will run after %{public}dms", GetLongPressTime());
+    keyEvent_ = KeyEvent::Clone(keyEvent);
     timerId_ = TimerMgr->AddTimer(GetLongPressTime(), REPEAT_ONCE,
-        [this, tKeyEvent = KeyEvent::Clone(keyEvent)]() {
-            Run(tKeyEvent);
+        [this]() {
+            CHKPV(keyEvent_);
+            Run(keyEvent_);
+            keyEvent_ = nullptr;
+            timerId_ = INVALID_ENTITY_ID;
         });
     if (timerId_ < 0) {
         MMI_HILOGI("[Handler] AddTimer fail");
+    }
+}
+
+void KeyGestureManager::Handler::Run(std::shared_ptr<KeyEvent> keyEvent) const
+{
+    if (callback_ != nullptr) {
+        callback_(keyEvent);
+    }
+}
+
+void KeyGestureManager::Handler::RunPending()
+{
+    if (keyEvent_ != nullptr) {
+        Run(keyEvent_);
+        keyEvent_ = nullptr;
     }
 }
 
@@ -157,7 +177,10 @@ void KeyGestureManager::KeyGesture::NotifyHandlers(std::shared_ptr<KeyEvent> key
 bool KeyGestureManager::LongPressSingleKey::ShouldIntercept(std::shared_ptr<KeyOption> keyOption) const
 {
     std::set<int32_t> keys = keyOption->GetPreKeys();
-    return (keys.empty() && (keyOption->GetFinalKey() == keyCode_));
+    return (keys.empty() &&
+            (keyOption->GetFinalKey() == keyCode_) &&
+            keyOption->IsFinalKeyDown() &&
+            (keyOption->GetFinalKeyDownDuration() < COMBINATION_KEY_TIMEOUT));
 }
 
 bool KeyGestureManager::LongPressSingleKey::Intercept(std::shared_ptr<KeyEvent> keyEvent)
@@ -165,10 +188,9 @@ bool KeyGestureManager::LongPressSingleKey::Intercept(std::shared_ptr<KeyEvent> 
     if ((keyEvent->GetKeyCode() == keyCode_) && (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN)) {
         if (IsActive()) {
             int64_t now = GetSysClockTime();
-            if (now < (firstDownTime_ + MS2US(COMBINATION_KEY_TIMEOUT))) {
-                return false;
+            if (now >= (firstDownTime_ + MS2US(COMBINATION_KEY_TIMEOUT))) {
+                NotifyHandlers(keyEvent);
             }
-            NotifyHandlers(keyEvent);
         } else {
             firstDownTime_ = GetSysClockTime();
             MarkActive(true);
@@ -178,9 +200,7 @@ bool KeyGestureManager::LongPressSingleKey::Intercept(std::shared_ptr<KeyEvent> 
     }
     if (IsActive()) {
         Reset();
-        if (keyEvent->GetKeyCode() == keyCode_) {
-            NotifyHandlers(keyEvent);
-        }
+        RunPendingHandlers();
     }
     return false;
 }
@@ -195,6 +215,18 @@ void KeyGestureManager::LongPressSingleKey::Dump(std::ostringstream &output) con
         }
     }
     output << "}";
+}
+
+void KeyGestureManager::LongPressSingleKey::RunPendingHandlers()
+{
+    std::set<int32_t> foregroundPids = GetForegroundPids();
+    bool haveForeground = HaveForegroundHandler(foregroundPids);
+
+    for (auto &handler : handlers_) {
+        if (!haveForeground || (foregroundPids.find(handler.GetPid()) != foregroundPids.end())) {
+            handler.RunPending();
+        }
+    }
 }
 
 bool KeyGestureManager::LongPressCombinationKey::ShouldIntercept(std::shared_ptr<KeyOption> keyOption) const
@@ -212,21 +244,33 @@ bool KeyGestureManager::LongPressCombinationKey::Intercept(std::shared_ptr<KeyEv
             std::ostringstream output;
             output << "[LongPressCombinationKey] ";
             Dump(output);
-            MMI_HILOGI("%{public}s is active now", output.str().c_str());
+            if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+                MMI_HILOGI("%{public}s is active now", output.str().c_str());
+            } else {
+                MMI_HILOGI("%s is active now", output.str().c_str());
+            }
             return true;
         }
         if (!IsWorking()) {
             std::ostringstream output;
             output << "[LongPressCombinationKey] Switch off ";
             Dump(output);
-            MMI_HILOGI("%{public}s", output.str().c_str());
+            if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+                MMI_HILOGI("%{public}s", output.str().c_str());
+            } else {
+                MMI_HILOGI("%s switch off", output.str().c_str());
+            }
             return false;
         }
         if (handlers_.empty()) {
             std::ostringstream output;
             output << "[LongPressCombinationKey] No handler for ";
             Dump(output);
-            MMI_HILOGI("%{public}s", output.str().c_str());
+            if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+                MMI_HILOGI("%{public}s", output.str().c_str());
+            } else {
+                MMI_HILOGI("No handler for %s", output.str().c_str());
+            }
             return false;
         }
         if (RecognizeGesture(keyEvent)) {
@@ -278,7 +322,11 @@ void KeyGestureManager::LongPressCombinationKey::TriggerAll(std::shared_ptr<KeyE
     std::ostringstream output;
     output << "[LongPressCombinationKey] trigger ";
     Dump(output);
-    MMI_HILOGI("%{public}s", output.str().c_str());
+    if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+        MMI_HILOGI("%{public}s", output.str().c_str());
+    } else {
+        MMI_HILOGI("%s trigger", output.str().c_str());
+    }
     OnTriggerAll(keyEvent);
     TriggerHandlers(keyEvent);
 }
@@ -360,9 +408,12 @@ bool KeyGestureManager::Intercept(std::shared_ptr<KeyEvent> keyEvent)
     for (auto iter = keyGestures_.begin(); iter != keyGestures_.end(); ++iter) {
         if ((*iter)->Intercept(keyEvent)) {
             std::ostringstream output;
-            output << "Intercepted by ";
             (*iter)->Dump(output);
-            MMI_HILOGI("%{public}s", output.str().c_str());
+            if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+                MMI_HILOGI("Intercepted by %{public}s", output.str().c_str());
+            } else {
+                MMI_HILOGI("Intercepted by %s", output.str().c_str());
+            }
             for (++iter; iter != keyGestures_.end(); ++iter) {
                 (*iter)->Reset();
             }
@@ -372,12 +423,19 @@ bool KeyGestureManager::Intercept(std::shared_ptr<KeyEvent> keyEvent)
     return false;
 }
 
+void KeyGestureManager::ResetAll()
+{
+    for (auto &keyGesture : keyGestures_) {
+        keyGesture->Reset();
+    }
+}
+
 void KeyGestureManager::Dump() const
 {
     for (const auto &keyGesture : keyGestures_) {
         std::ostringstream output;
         keyGesture->Dump(output);
-        MMI_HILOGI("%{public}s", output.str().c_str());
+        MMI_HILOGI("%s", output.str().c_str());
     }
 }
 } // namespace MMI

@@ -26,6 +26,7 @@
 #include "event_dump.h"
 #include "event_interceptor_handler.h"
 #include "event_monitor_handler.h"
+#include "event_log_helper.h"
 #include "hos_key_event.h"
 #include "input_device_manager.h"
 #include "input_event.h"
@@ -139,7 +140,11 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
     auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
     CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
     inputEventNormalizeHandler->HandleKeyEvent(keyEvent);
-    MMI_HILOGD("Inject keyCode:%{public}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
+    if (EventLogHelper::IsBetaVersion() && !keyEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+        MMI_HILOGD("Inject keyCode:%{public}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
+    } else {
+        MMI_HILOGD("Inject keyCode:%d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
+    }
     return RET_OK;
 }
 
@@ -222,7 +227,9 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
                 return RET_ERR;
             }
             inputEventNormalizeHandler->HandleTouchEvent(pointerEvent);
-            TOUCH_DRAWING_MGR->TouchDrawHandler(pointerEvent);
+            if (!pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
+                TOUCH_DRAWING_MGR->TouchDrawHandler(pointerEvent);
+            }
 #endif // OHOS_BUILD_ENABLE_TOUCH
             break;
         }
@@ -243,11 +250,11 @@ int32_t ServerMsgHandler::OnInjectPointerEventExt(const std::shared_ptr<PointerE
             if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_ACCESSIBILITY)) {
                 break;
             } else if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_HIDE_POINTER)) {
-                IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), false, 0);
+                IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), false, 0, false);
             } else if (((pointerEvent->GetPointerAction() < PointerEvent::POINTER_ACTION_PULL_DOWN) ||
                 (pointerEvent->GetPointerAction() > PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW)) &&
                 !IPointerDrawingManager::GetInstance()->IsPointerVisible()) {
-                IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), true, 0);
+                IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), true, 0, false);
             }
 #endif // OHOS_BUILD_ENABLE_POINTER
             break;
@@ -285,7 +292,7 @@ int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointer
     auto displayInfo = WIN_MGR->GetPhysicalDisplay(cursorPos.displayId);
     CHKPR(displayInfo, ERROR_NULL_POINTER);
 #ifndef OHOS_BUILD_EMULATOR
-    if (ROTATE_POLICY == WINDOW_ROTATE) {
+    if (TOUCH_DRAWING_MGR->IsWindowRotation()) {
         CalculateOffset(displayInfo->direction, offset);
     }
 #endif // OHOS_BUILD_EMULATOR
@@ -305,8 +312,13 @@ int32_t ServerMsgHandler::AccelerateMotion(std::shared_ptr<PointerEvent> pointer
         return ret;
     }
     WIN_MGR->UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y);
-    MMI_HILOGD("Cursor move to (x:%{public}.2f,y:%{public}.2f,DisplayId:%{public}d)",
-        cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
+    if (EventLogHelper::IsBetaVersion() && !pointerEvent->HasFlag(InputEvent::EVENT_FLAG_PRIVACY_MODE)) {
+        MMI_HILOGD("Cursor move to (x:%{public}.2f, y:%{public}.2f, DisplayId:%{public}d)",
+            cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
+    } else {
+        MMI_HILOGD("Cursor move to (x:%.2f, y:%.2f, DisplayId:%d)",
+            cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
+    }
     return RET_OK;
 }
 
@@ -479,7 +491,7 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
     for (uint32_t i = 0; i < num; i++) {
         DisplayInfo info;
         pkt >> info.id >> info.x >> info.y >> info.width >> info.height >> info.dpi >> info.name
-            >> info.uniq >> info.direction >> info.displayDirection >> info.displayMode;
+            >> info.uniq >> info.direction >> info.displayDirection >> info.displayMode >> info.transform;
         displayGroupInfo.displaysInfo.push_back(info);
         if (pkt.ChkRWError()) {
             MMI_HILOGE("Packet read display info failed");

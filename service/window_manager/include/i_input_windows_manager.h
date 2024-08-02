@@ -19,9 +19,7 @@
 #include <memory>
 #include <mutex>
 
-#include "display_manager.h"
 #include "libinput.h"
-
 #include "extra_data.h"
 #ifdef OHOS_BUILD_ENABLE_ANCO
 #include "i_anco_channel.h"
@@ -48,6 +46,7 @@ struct Coordinate2D {
 
 struct CursorPosition {
     int32_t displayId { -1 };
+    Direction direction { Direction::DIRECTION0 };
     Coordinate2D cursorPos {};
 };
 
@@ -82,7 +81,6 @@ public:
     virtual const std::vector<WindowInfo>& GetWindowGroupInfoByDisplayId(int32_t displayId) const = 0;
     virtual std::pair<double, double> TransformWindowXY(const WindowInfo &, double, double) const = 0;
     virtual void ClearTargetWindowId(int32_t pointerId) = 0;
-    virtual void OnFoldStatusChanged(Rosen::FoldStatus foldStatus) {}
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     virtual std::vector<std::pair<int32_t, TargetInfo>> UpdateTarget(std::shared_ptr<KeyEvent> keyEvent) = 0;
@@ -116,6 +114,7 @@ public:
         int32_t& targetDisplayId, PhysicalCoordinate& coord) const = 0;
     virtual const DisplayInfo *GetDefaultDisplayInfo() const = 0;
     virtual void ReverseXY(int32_t &x, int32_t &y) = 0;
+    virtual void SendCancelEventWhenLock() = 0;
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -135,6 +134,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_ANCO
     virtual int32_t AncoAddChannel(sptr<IAncoChannel> channel) = 0;
     virtual int32_t AncoRemoveChannel(sptr<IAncoChannel> channel) = 0;
+    virtual void CleanShellWindowIds() = 0;
 #endif // OHOS_BUILD_ENABLE_ANCO
 
     static std::shared_ptr<IInputWindowsManager> GetInstance();

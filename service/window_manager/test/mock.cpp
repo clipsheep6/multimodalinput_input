@@ -221,6 +221,11 @@ void TouchDrawingManager::GetOriginalTouchScreenCoordinates(Direction direction,
     int32_t &physicalX, int32_t &physicalY)
 {}
 
+bool TouchDrawingManager::IsWindowRotation()
+{
+    return false;
+}
+
 PointerDrawingManager::PointerDrawingManager() {}
 
 std::shared_ptr<IPointerDrawingManager> IPointerDrawingManager::GetInstance()
@@ -244,7 +249,7 @@ bool PointerDrawingManager::Init()
     return true;
 }
 void PointerDrawingManager::DeletePointerVisible(int32_t pid) {}
-int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible, int32_t priority)
+int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible, int32_t priority, bool isHap)
 {
     return 0;
 }
@@ -274,7 +279,7 @@ int32_t PointerDrawingManager::GetPointerStyle(int32_t pid, int32_t windowId, Po
 {
     return 0;
 }
-void PointerDrawingManager::DrawPointerStyle(const PointerStyle& pointerStyle) {}
+void PointerDrawingManager::DrawPointerStyle(const PointerStyle& pointerStyle, bool simulate) {}
 bool PointerDrawingManager::IsPointerVisible()
 {
     return false;
@@ -342,7 +347,12 @@ void PointerDrawingManager::InitPointerCallback()
 {}
 void PointerDrawingManager::InitPointerObserver()
 {}
-
+void PointerDrawingManager::OnSessionLost(int pid)
+{}
+int32_t PointerDrawingManager::SkipPointerLayer(bool isSkip)
+{
+    return 0;
+}
 std::shared_ptr<IPreferenceManager> IPreferenceManager::instance_;
 std::mutex IPreferenceManager::mutex_;
 std::shared_ptr<IPreferenceManager> IPreferenceManager::GetInstance()
@@ -444,6 +454,9 @@ void KnuckleDynamicDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayI
 void KnuckleDynamicDrawingManager::KnuckleDynamicDrawHandler(std::shared_ptr<PointerEvent> pointerEvent)
 {}
 
+void KnuckleDynamicDrawingManager::SetKnuckleDrawingManager(std::shared_ptr<KnuckleDrawingManager> knuckleDrawMgr)
+{}
+
 SettingDataShare::~SettingDataShare() {}
 
 std::shared_ptr<SettingDataShare> SettingDataShare::instance_ = nullptr;
@@ -478,26 +491,9 @@ FingersenseWrapper::FingersenseWrapper() {}
 
 FingersenseWrapper::~FingersenseWrapper() {}
 
-bool Rosen::DisplayManager::IsFoldable()
-{
-    return DfsMessageParcel::messageParcel->IsFoldable();
-}
-
 bool UDSSession::SendMsg(NetPacket &pkt) const
 {
     return DfsMessageParcel::messageParcel->SendMsg(pkt);
-}
-
-Rosen::DMError Rosen::DisplayManager::RegisterFoldStatusListener(
-    sptr<Rosen::DisplayManager::IFoldStatusListener> listener)
-{
-    return DfsMessageParcel::messageParcel->RegisterFoldStatusListener(listener);
-}
-
-Rosen::DMError Rosen::DisplayManager::UnregisterFoldStatusListener(
-    sptr<Rosen::DisplayManager::IFoldStatusListener> listener)
-{
-    return DfsMessageParcel::messageParcel->UnregisterFoldStatusListener(listener);
 }
 
 bool Rosen::SceneBoardJudgement::IsSceneBoardEnabled()
@@ -515,5 +511,13 @@ int32_t InputWindowsManager::AncoRemoveConsumer(std::shared_ptr<IAncoConsumer> c
 {
     return ERR_OK;
 }
+
+void InputWindowsManager::CleanShellWindowIds()
+{}
 #endif // OHOS_BUILD_ENABLE_ANCO
+
+bool KeyCommandHandler::GetKnuckleSwitchValue()
+{
+    return false;
+}
 } // namespace OHOS

@@ -47,6 +47,8 @@ ohos_fuzztest("StubGetTouchpadPointerSpeedFuzzTest") {
     "-O0",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
+    "-Dprivate=public",
+    "-Dprotected=public",
   ]
   sources = [ "stubgettouchpadpointerspeed_fuzzer.cpp" ]
 
@@ -68,7 +70,6 @@ ohos_fuzztest("StubGetTouchpadPointerSpeedFuzzTest") {
     "ipc:ipc_single",
     "libinput:libinput-third-mmi",
     "security_component_manager:libsecurity_component_sdk",
-    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }

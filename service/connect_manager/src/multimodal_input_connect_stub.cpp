@@ -114,6 +114,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         MMI_HILOGE("Get unexpect descriptor:%{public}s", Str16ToStr8(descriptor).c_str());
         return ERR_INVALID_STATE;
     }
+    ResetLogTrace();
     BytraceAdapter::StartIpcServer(code);
     int32_t ret = RET_ERR;
     switch (code) {
@@ -2610,6 +2611,20 @@ int32_t MultimodalInputConnectStub::StubTransferBinderClientService(MessageParce
         return ret;
     }
     WRITEINT32(reply, ret);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSkipPointerLayer(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    bool isSkip = true;
+    READBOOL(data, isSkip, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SkipPointerLayer(isSkip);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SkipPointerLayer failed, ret:%{public}d", ret);
+        return ret;
+    }
+    MMI_HILOGD("Success isSkip:%{public}d, pid:%{public}d", isSkip, GetCallingPid());
     return RET_OK;
 }
 } // namespace MMI

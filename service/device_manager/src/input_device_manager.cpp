@@ -377,7 +377,7 @@ void InputDeviceManager::NotifyDevCallback(int32_t deviceId, struct InputDeviceI
     }
     if (!inDevice.sysUid.empty()) {
         devCallbacks_(deviceId, inDevice.sysUid, "add");
-        MMI_HILOGI("Send device info to window manager, device id:%{public}d, system uid:%{public}s, status:add",
+        MMI_HILOGI("Send device info to window manager, device id:%{public}d, system uid:%s, status:add",
             deviceId, inDevice.sysUid.c_str());
     } else {
         MMI_HILOGE("Get device system uid id is empty, deviceId:%{public}d", deviceId);
@@ -483,7 +483,7 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
     if (!sysUid.empty()) {
         CHKPV(devCallbacks_);
         devCallbacks_(deviceId, sysUid, "remove");
-        MMI_HILOGI("Send device info to window manager, device id:%{public}d, system uid:%{public}s, status:remove",
+        MMI_HILOGI("Send device info to window manager, device id:%{public}d, system uid:%s, status:remove",
             deviceId, sysUid.c_str());
     }
 
@@ -531,6 +531,10 @@ bool InputDeviceManager::IsPointerDevice(struct libinput_device *device) const
     std::string name = libinput_device_get_name(device);
     if (name == "hw_fingerprint_mouse") {
         return false;
+    }
+    if (name.find("TouchPad") == std::string::npos) {
+        return (udevTags & (EVDEV_UDEV_TAG_MOUSE | EVDEV_UDEV_TAG_TRACKBALL | EVDEV_UDEV_TAG_POINTINGSTICK |
+            EVDEV_UDEV_TAG_TOUCHPAD | EVDEV_UDEV_TAG_TABLET_PAD)) != 0;
     }
     return (udevTags & (EVDEV_UDEV_TAG_MOUSE | EVDEV_UDEV_TAG_TRACKBALL | EVDEV_UDEV_TAG_POINTINGSTICK |
         EVDEV_UDEV_TAG_TOUCHPAD | EVDEV_UDEV_TAG_TABLET_PAD)) != 0;

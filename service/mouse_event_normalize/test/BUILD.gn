@@ -49,7 +49,6 @@ ohos_unittest("MouseEventNormalizeTest") {
     "hilog:libhilog",
     "image_framework:image_native",
     "libinput:libinput-third-mmi",
-    "window_manager:libdm",
     "window_manager:libwm",
   ]
 }
@@ -72,6 +71,7 @@ ohos_unittest("MouseTransformProcessorMockTest") {
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/service/app_state_manager/include",
     "${mmi_path}/service/connect_manager/include",
+    "${mmi_path}/service/delegate_task/include",
     "${mmi_path}/service/device_config/include",
     "${mmi_path}/service/device_manager/include",
     "${mmi_path}/service/device_state_manager/include",
@@ -181,7 +181,6 @@ ohos_unittest("MouseTransformProcessorMockTest") {
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
-    "window_manager:libdm",
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]
