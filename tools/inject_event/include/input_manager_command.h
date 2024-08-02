@@ -54,7 +54,7 @@ private:
     int32_t PrintKeyboardTextChar(int32_t keyCode, bool isPressShift);
     bool IsSpecialChar(char character, int32_t &keyCode, bool &isPressShift);
     int32_t ProcessTouchPadFingerSwipAction();
-    int32_t ActionPinchEvent(int32_t scalePercentNumerator)
+    int32_t ActionPinchEvent(int32_t scalePercentNumerator);
     shared_ptr<PointerEvent> CreatePointerEvent(int32_t id, int32_t type, int32_t pointerId, int32_t sourceType, int32_t fingerCount);
 };
 } // namespace MMI
