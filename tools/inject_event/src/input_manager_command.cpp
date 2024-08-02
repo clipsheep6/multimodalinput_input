@@ -2189,8 +2189,8 @@ int32_t InputManagerCommand::ProcessTouchPadFingerSwipAction()
     int32_t disPlayY[5][3] = {{0, 37, 46}, {620, 37, 46 }, {592, 35, 44 }, {562, 33, 42}, {562, 33, 42}};
     int32_t eventIds[5] = {7277, 8074,  8078, 8082, 8083};
     int32_t actionType[5] = {PointerEvent::POINTER_ACTION_SWIPE_BEGIN, PointerEvent::POINTER_ACTION_SWIPE_UPDATE,
-                                PointerEvent::POINTER_ACTION_SWIPE_UPDATE, PointerEvent::POINTER_ACTION_SWIPE_UPDATE,
-                                PointerEvent::POINTER_ACTION_SWIPE_END};
+                            PointerEvent::POINTER_ACTION_SWIPE_UPDATE, PointerEvent::POINTER_ACTION_SWIPE_UPDATE,
+                            PointerEvent::POINTER_ACTION_SWIPE_END};
     int64_t actionTimeBase = GetSysClockTime() - times * milliPerSecond * milliPerSecond;
     int64_t actionTimeStartTimeDis = 5659;
     int64_t actionStartTime[5] = {0, 0, 0, 0, 0};
