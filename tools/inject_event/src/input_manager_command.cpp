@@ -2199,7 +2199,8 @@ int32_t InputManagerCommand::ProcessTouchPadFingerSwipAction()
     int64_t actionTime[5] =  {0, 0, 0, 0, 0};
     int downTimeSame = actionTimeBase  - 32587;
     int64_t downTime[5][2] = {{downTimeSame, downTimeSame}, {downTimeSame, downTimeSame},
-                                {downTimeSame, downTimeSame}, {downTimeSame, downTimeSame}, {downTimeSame, downTimeSame}};
+                                {downTimeSame, downTimeSame}, {downTimeSame, downTimeSame},
+                                {downTimeSame, downTimeSame}};
     actionTime[0] = actionTimeBase;
     actionStartTime[0] = (actionTimeBase - actionTimeStartTimeDis) / milliPerSecond;
     for(int i = 1 ;i < times; i++) {
@@ -2207,7 +2208,8 @@ int32_t InputManagerCommand::ProcessTouchPadFingerSwipAction()
         actionStartTime[i] = actionStartTime[i - 1] + actionStartTimeDis[i - 1];
     }
     for (int i = 0 ; i < times; i++) {
-        auto pointerEvent = CreatePointerEvent(eventIds[i], actionType[i], fingerCount - 1,PointerEvent::SOURCE_TYPE_TOUCHPAD,  fingerCount);
+        auto pointerEvent = CreatePointerEvent(eventIds[i], actionType[i], fingerCount - 1,
+                                            PointerEvent::SOURCE_TYPE_TOUCHPAD,  fingerCount);
         pointerEvent->SetActionTime(actionTime[i]);
         pointerEvent->SetActionStartTime(actionStartTime[i]);
         PointerEvent::PointerItem item;
