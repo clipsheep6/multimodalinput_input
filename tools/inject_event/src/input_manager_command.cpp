@@ -2092,7 +2092,6 @@ int32_t InputManagerCommand::ProcessRotateGesture(int32_t argc, char *argv[])
     return ERR_OK;
 }
 
-
 shared_ptr<PointerEvent> InputManagerCommand::CreatePointerEvent(int32_t id, int32_t type, int32_t pointerId,
                                                                 int32_t sourceType, int32_t fingerCount)
 {
@@ -2105,7 +2104,6 @@ shared_ptr<PointerEvent> InputManagerCommand::CreatePointerEvent(int32_t id, int
     pointerEvent->SetPointerId(pointerId);
     return pointerEvent;
 }
-
 
 void InputManagerCommand::SendTouchDownForPinch()
 {
@@ -2130,9 +2128,6 @@ void InputManagerCommand::SendTouchDownForPinch()
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     std::this_thread::sleep_for(std::chrono::microseconds(SLEEPTIME));
 }
-
-
-
 
 int32_t InputManagerCommand::ActionPinchEvent(int32_t scalePercentNumerator)
 {
@@ -2234,8 +2229,6 @@ int32_t InputManagerCommand::ProcessTouchPadFingerSwipAction()
     }
     return ERR_OK;
 }
-
-
 
 void InputManagerCommand::PrintMouseUsage()
 {
