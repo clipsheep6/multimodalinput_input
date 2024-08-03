@@ -157,8 +157,9 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonit
     event->eventType = subKeyNames;
     MMI_HILOGD("FinalKeyDownDuration:%{public}d", finalKeyDownDuration);
     bool isRepeat = true;
-    if (!GetNamedPropertyBool(env, argv[1], "isRepeat", isRepeat)) {
-        MMI_HILOGE("GetNamedPropertyBool failed");
+    std::optional<bool> tempIsRepeat = GetNamedPropertyBool(env, argv[1], "isRepeat");
+    if (tempIsRepeat) {
+        isRepeat = tempIsRepeat.value();
     }
     subKeyNames += std::to_string(isRepeat);
     subKeyNames += ",";
