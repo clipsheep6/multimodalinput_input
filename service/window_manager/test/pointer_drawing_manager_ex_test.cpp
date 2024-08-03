@@ -957,7 +957,6 @@ HWTEST_F(PointerDrawingManagerExTest, InputWindowsManagerTest_SetCustomCursor_00
     EXPECT_EQ(WIN_MGR->CheckWindowIdPermissionByPid(windowId, pid), RET_OK);
     int32_t ret2 = pointerDrawingManager.SetCustomCursor((void *)pixelMap.get(), pid, windowId, focusX, focusY);
     ASSERT_EQ(ret2, RET_ERR);
-
 }
 
 /**
