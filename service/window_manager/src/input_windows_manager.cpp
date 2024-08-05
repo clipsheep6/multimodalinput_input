@@ -439,7 +439,9 @@ int32_t InputWindowsManager::GetPidAndUpdateTarget(std::shared_ptr<KeyEvent> key
     CHKPR(keyEvent, INVALID_PID);
     const int32_t focusWindowId = displayGroupInfo_.focusWindowId;
     WindowInfo* windowInfo = nullptr;
-    std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(keyEvent->GetTargetDisplayId());
+    int32_t displayId = UpdateCurrentDisplayId();
+    keyEvent->SetTargetDisplayId(displayId);
+    std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(displayId);
     for (auto &item : windowsInfo) {
         if (item.id == focusWindowId) {
             windowInfo = &item;
@@ -703,6 +705,7 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
     });
     CheckFocusWindowChange(displayGroupInfo);
     UpdateCaptureMode(displayGroupInfo);
+    OnDisplayRemoved(displayGroupInfo);
     displayGroupInfoTmp_ = displayGroupInfo;
     if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled() ||
         action == WINDOW_UPDATE_ACTION::ADD_END) {
@@ -808,7 +811,7 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
             dragFlag_ = false;
             isDragBorder_ = false;
         }
-        IPointerDrawingManager::GetInstance()->DrawPointerStyle(dragPointerStyle_);
+        IPointerDrawingManager::GetInstance()->DrawPointerStyle(dragPointerStyle_, isDisplayRemoved_);
     }
 }
 
@@ -3350,6 +3353,35 @@ void InputWindowsManager::PrintChangedWindowBySync(const DisplayGroupInfo &newDi
                 oldWindows[0].id, oldWindows[0].pid, oldWindows[0].zOrder, newWindows[0].id,
                 newWindows[0].pid, newWindows[0].zOrder);
         }
+    }
+}
+
+int32_t InputWindowsManager::UpdateCurrentDisplayId()
+{
+    if (isDisplayRemoved_) {
+        isDisplayRemoved_ = false;
+        if (!displayGroupInfo_.displaysInfo.empty()) {
+            return displayGroupInfo_.displaysInfo[0].id;
+        }
+    }
+    for (const auto &item : windowsPerDisplay_) {
+        if (item.second.focusWindowId == displayGroupInfo_.focusWindowId) {
+            return item.second.displayId;
+        }
+    }
+    if (!displayGroupInfo_.displaysInfo.empty()) {
+        return displayGroupInfo_.displaysInfo[0].id;
+    }
+    return DEFAULT_DISPLAY_ID;
+}
+
+void InputWindowsManager::OnDisplayRemoved(const DisplayGroupInfo &displayGroupInfo)
+{
+    if (displayGroupInfo.displaysInfo.size() < displayGroupInfo_.displaysInfo.size()) {
+        ResetCursorPos();
+        isDisplayRemoved_ = true;
+    } else {
+        isDisplayRemoved_ = false;
     }
 }
 } // namespace MMI
