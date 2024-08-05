@@ -2109,8 +2109,8 @@ void InputManagerCommand::SendTouchDownForPinch()
 {
     int32_t fingerCount = 2;
     int32_t baseIndex = 2;
-	int32_t pix[4] = {26, 24, 96, 51};
-    auto pointerEvent = this->CreatePointerEvent(0, PointerEvent::POINTER_ACTION_DOWN, 0, 0, fingerCount);
+    int32_t pix[4] = {26, 24, 96, 51};
+    auto pointerEvent = CreatePointerEvent(0, PointerEvent::POINTER_ACTION_DOWN, 0, 0, fingerCount);
     PointerEvent::PointerItem item1;
     item1.SetPressed(true);
     item1.SetDisplayX(pix[0]);
@@ -2132,7 +2132,7 @@ void InputManagerCommand::SendTouchDownForPinch()
 int32_t InputManagerCommand::ActionPinchEvent(int32_t scalePercentNumerator)
 {
     CALL_DEBUG_ENTER;
-	double scale = scalePercentNumerator / 100;
+    double scale = scalePercentNumerator / 100;
     int32_t timesForSleep = 50;
     int32_t times = 6;
     int32_t fingerCount = 2;
@@ -2142,38 +2142,38 @@ int32_t InputManagerCommand::ActionPinchEvent(int32_t scalePercentNumerator)
     int32_t windowsY[12] = {951, 0,  951, 0, 951, 0, 951,  0, 951, 0, 951, 0};
     int32_t toolType[12] = {9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0};
     int32_t press[12] = {0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1};
-	int64_t actionTimeOrigin[6] = {479737563, 480002013, 480006680, 480011329, 480015595, 480019652};
-	int64_t actionStartTimeOrigin[6] = {479737563, 479965, 479973, 479980, 479987, 479995};
+    int64_t actionTimeOrigin[6] = {479737563, 480002013, 480006680, 480011329, 480015595, 480019652};
+    int64_t actionStartTimeOrigin[6] = {479737563, 479965, 479973, 479980, 479987, 479995};
     int64_t downTimeOrigin = 479733577;
-	int64_t fingerCountOrigin[6] = {0, 2, 2, 2, 2, 2};
+    int64_t fingerCountOrigin[6] = {0, 2, 2, 2, 2, 2};
     int32_t itemIndex = 0;
     int32_t actionType[6] = {PointerEvent::POINTER_ACTION_AXIS_BEGIN, PointerEvent::POINTER_ACTION_AXIS_UPDATE,
                                 PointerEvent::POINTER_ACTION_AXIS_UPDATE, PointerEvent::POINTER_ACTION_AXIS_UPDATE,
                                 PointerEvent::POINTER_ACTION_AXIS_UPDATE, PointerEvent::POINTER_ACTION_AXIS_UPDATE};
     this->SendTouchDownForPinch();
     for (int32_t index = 0 ; index < times; index++) {
-        auto pointerEvent = this->CreatePointerEvent(0, actionType[index], 0, PointerEvent::SOURCE_TYPE_MOUSE,
-                                                        fingerCountOrigin[index]);
+        auto pointerEvent = CreatePointerEvent(0, actionType[index], 0, PointerEvent::SOURCE_TYPE_MOUSE,
+                                                    fingerCountOrigin[index]);
         pointerEvent->SetActionTime(actionTimeOrigin[index]);
         pointerEvent->SetActionStartTime(actionStartTimeOrigin[index]);
         pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, scale);
-        PointerEvent::PointerItem item1;
-        item1.SetDownTime(pointerEvent->GetActionStartTime());
-        item1.SetDisplayX(disPlayX[fingerCount * index]);
-        item1.SetDisplayY(disPlayY[fingerCount * index]);
-        item1.SetWindowX(windowsX[fingerCount * index]);
-        item1.SetWindowY(windowsY[fingerCount * index]);
-        item1.SetToolType(toolType[fingerCount * index]);
-        pointerEvent->AddPointerItem(item1);
-        PointerEvent::PointerItem item0;
-        item0.SetPointerId(1);
-        item0.SetDownTime(downTimeOrigin);
-        item0.SetDisplayX(disPlayX[fingerCount * index + 1]);
-        item0.SetDisplayY(disPlayY[fingerCount * index + 1]);
-        item0.SetWindowX(windowsX[fingerCount * index + 1]);
-        item0.SetWindowY(windowsY[fingerCount * index + 1]);
-        item0.SetPressed(press[fingerCount * index + 1]);
-        pointerEvent->AddPointerItem(item0);
+        PointerEvent::PointerItem itemFirst;
+        itemFirst.SetDownTime(pointerEvent->GetActionStartTime());
+        itemFirst.SetDisplayX(disPlayX[fingerCount * index]);
+        itemFirst.SetDisplayY(disPlayY[fingerCount * index]);
+        itemFirst.SetWindowX(windowsX[fingerCount * index]);
+        itemFirst.SetWindowY(windowsY[fingerCount * index]);
+        itemFirst.SetToolType(toolType[fingerCount * index]);
+        pointerEvent->AddPointerItem(itemFirst);
+        PointerEvent::PointerItem itemSecond;
+        itemSecond.SetPointerId(1);
+        itemSecond.SetDownTime(downTimeOrigin);
+        itemSecond.SetDisplayX(disPlayX[fingerCount * index + 1]);
+        itemSecond.SetDisplayY(disPlayY[fingerCount * index + 1]);
+        itemSecond.SetWindowX(windowsX[fingerCount * index + 1]);
+        itemSecond.SetWindowY(windowsY[fingerCount * index + 1]);
+        itemSecond.SetPressed(press[fingerCount * index + 1]);
+        pointerEvent->AddPointerItem(itemSecond);
         InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
         std::this_thread::sleep_for(std::chrono::microseconds(SLEEPTIME * timesForSleep));
     }
@@ -2197,19 +2197,19 @@ int32_t InputManagerCommand::ProcessTouchPadFingerSwipAction()
     int64_t actionStartTimeDis[5] = {0, 0, 7, 7, 17};
     int64_t actionTimeDis[5] = {0,  9648, 11862, 10245, 10245};
     int64_t actionTime[5] =  {0, 0, 0, 0, 0};
-    int downTimeSame = actionTimeBase  - 32587;
+    int64_t downTimeSame = actionTimeBase  - 32587;
     int64_t downTime[5][2] = {{downTimeSame, downTimeSame}, {downTimeSame, downTimeSame},
                                 {downTimeSame, downTimeSame}, {downTimeSame, downTimeSame},
                                 {downTimeSame, downTimeSame}};
     actionTime[0] = actionTimeBase;
     actionStartTime[0] = (actionTimeBase - actionTimeStartTimeDis) / milliPerSecond;
-    for(int i = 1 ;i < times; i++) {
+    for (int32_t i = 1 ;i < times; i++) {
         actionTime[i] = actionTime[i - 1] + actionTimeDis[i - 1];
         actionStartTime[i] = actionStartTime[i - 1] + actionStartTimeDis[i - 1];
     }
-    for (int i = 0 ; i < times; i++) {
+    for (int32_t i = 0 ; i < times; i++) {
         auto pointerEvent = CreatePointerEvent(eventIds[i], actionType[i], fingerCount - 1,
-                                            PointerEvent::SOURCE_TYPE_TOUCHPAD,  fingerCount);
+                                            PointerEvent::SOURCE_TYPE_TOUCHPAD, fingerCount);
         pointerEvent->SetActionTime(actionTime[i]);
         pointerEvent->SetActionStartTime(actionStartTime[i]);
         PointerEvent::PointerItem item;
@@ -2217,14 +2217,14 @@ int32_t InputManagerCommand::ProcessTouchPadFingerSwipAction()
         item.SetDisplayX(disPlayX[i][0]);
         item.SetDisplayY(disPlayY[i][0]);
         pointerEvent->AddPointerItem(item);
-        for (int j = 1; j < fingerCount; j++) {
-            PointerEvent::PointerItem item1;
-            item1.SetPointerId(j);
-            item1.SetDownTime(downTime[i][j - 1]);
-            item1.SetDisplayX(disPlayX[i][j - 1]);
-            item1.SetDisplayY(disPlayY[i][j - 1]);
-            item1.SetPressed(1);
-            pointerEvent->AddPointerItem(item1);
+        for (int32_t j = 1; j < fingerCount; j++) {
+            PointerEvent::PointerItem itemFirst;
+            itemFirst.SetPointerId(j);
+            itemFirst.SetDownTime(downTime[i][j - 1]);
+            itemFirst.SetDisplayX(disPlayX[i][j - 1]);
+            itemFirst.SetDisplayY(disPlayY[i][j - 1]);
+            itemFirst.SetPressed(1);
+            pointerEvent->AddPointerItem(itemFirst);
         }
         std::this_thread::sleep_for(std::chrono::microseconds(SLEEPTIME));
         InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
