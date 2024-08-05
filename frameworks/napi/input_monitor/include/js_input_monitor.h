@@ -115,6 +115,7 @@ private:
     int32_t TransformSwipeEvent(std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
     int32_t TransformRotateEvent(std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
     int32_t TransformMultiTapEvent(std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
+    int32_t TransformSwipeInwardEvent(std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
     int32_t TransformJoystickPointerEvent(std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
 #ifdef OHOS_BUILD_ENABLE_FINGERPRINT
     int32_t TransformFingerprintEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
@@ -137,12 +138,14 @@ private:
     bool IsFourFingersSwipe(std::shared_ptr<PointerEvent> pointerEvent);
     bool IsBeginAndEnd(std::shared_ptr<PointerEvent> pointerEvent);
     bool IsThreeFingersTap(std::shared_ptr<PointerEvent> pointerEvent);
+    bool IsSwipeInward(std::shared_ptr<PointerEvent> pointerEvent);
     bool IsJoystick(std::shared_ptr<PointerEvent> pointerEvent);
     bool IsFingerprint(std::shared_ptr<PointerEvent> pointerEvent);
     MapFun GetFuns(const std::shared_ptr<PointerEvent> pointerEvent, const PointerEvent::PointerItem& item);
 private:
     std::shared_ptr<InputMonitor> monitor_ { nullptr };
     std::queue<std::shared_ptr<PointerEvent>> evQueue_;
+    std::list<std::shared_ptr<PointerEvent>> pointerQueue_;
     napi_ref receiver_ { nullptr };
     napi_env jsEnv_ { nullptr };
     std::string typeName_;
@@ -150,6 +153,7 @@ private:
     int32_t fingers_ { 0 };
     bool isMonitoring_ { false };
     std::mutex mutex_;
+    std::mutex resourcemutex_;
 };
 } // namespace MMI
 } // namespace OHOS

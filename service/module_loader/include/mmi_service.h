@@ -135,6 +135,9 @@ public:
     int32_t Authorize(bool isAuthorize) override;
     int32_t CancelInjection() override;
     int32_t SetMoveEventFilters(bool flag) override;
+#ifdef OHOS_RSS_CLIENT
+    void OnAddResSchedSystemAbility(int32_t systemAbilityId, const std::string &deviceId);
+#endif // OHOS_RSS_CLIENT
     void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
     int32_t HasIrEmitter(bool &hasIrEmitter) override;
     int32_t GetInfraredFrequencies(std::vector<InfraredFrequency>& requencys) override;
@@ -154,6 +157,7 @@ public:
     int32_t TransferBinderClientSrv(const sptr<IRemoteObject> &binderClientObject) override;
     int32_t SetTouchpadScrollRows(int32_t rows) override;
     int32_t GetTouchpadScrollRows(int32_t &rows) override;
+    int32_t SkipPointerLayer(bool isSkip) override;
     void CalculateFuntionRunningTime(std::function<void()> func, const std::string &flag);
 #ifdef OHOS_BUILD_ENABLE_ANCO
     void InitAncoUds();

@@ -140,16 +140,6 @@ PointerDrawingManager::PointerDrawingManager()
 #ifdef OHOS_BUILD_ENABLE_MAGICCURSOR
     MMI_HILOGI("magiccurosr InitStyle");
     hasMagicCursor_.name = "isMagicCursor";
-    TimerMgr->AddTimer(WAIT_TIME_FOR_MAGIC_CURSOR, 1, [this]() {
-        MMI_HILOGD("Timer callback");
-        if (hasInitObserver_ == false) {
-            int32_t ret = CreatePointerSwitchObserver(hasMagicCursor_);
-            if (ret == RET_OK) {
-                hasInitObserver_ = true;
-                MMI_HILOGD("Create pointer switch observer success on timer");
-            }
-        }
-    });
     MAGIC_CURSOR->InitStyle();
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
     InitStyle();
@@ -1534,6 +1524,7 @@ void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPo
         hasPointerDevice ? "true" : "false", isPointerVisible? "true" : "false");
     hasPointerDevice_ = hasPointerDevice;
     if (hasPointerDevice_) {
+        WIN_MGR->UpdatePointerChangeAreas();
         bool pointerVisible = isPointerVisible;
         if (!isHotPlug) {
             pointerVisible = (pointerVisible && IsPointerVisible());
@@ -2057,6 +2048,15 @@ void PointerDrawingManager::RotateDegree(Direction direction)
     surfaceNode_->SetPivot(0, 0);
     float degree = (static_cast<int>(DIRECTION0) - static_cast<int>(direction)) * ROTATION_ANGLE90;
     surfaceNode_->SetRotation(degree);
+}
+
+int32_t PointerDrawingManager::SkipPointerLayer(bool isSkip)
+{
+    CALL_INFO_TRACE;
+    if (surfaceNode_ != nullptr) {
+        surfaceNode_->SetSkipLayer(isSkip);
+    }
+    return RET_OK;
 }
 
 void PointerDrawingManager::Dump(int32_t fd, const std::vector<std::string> &args)

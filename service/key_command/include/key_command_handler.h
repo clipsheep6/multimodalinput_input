@@ -181,10 +181,10 @@ public:
     void HandlePointerActionDownEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void HandlePointerActionMoveEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void HandlePointerActionUpEvent(const std::shared_ptr<PointerEvent> touchEvent);
+#endif // OHOS_BUILD_ENABLE_TOUCH
     void SetKnuckleDoubleTapIntervalTime(int64_t interval);
     void SetKnuckleDoubleTapDistance(float distance);
     bool GetKnuckleSwitchValue();
-#endif // OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     bool OnHandleEvent(const std::shared_ptr<KeyEvent> keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -210,6 +210,7 @@ private:
     void LaunchAbility(const Ability &ability, int64_t delay);
     void LaunchAbility(const ShortcutKey &key);
     void LaunchAbility(const Sequence &sequence);
+    void LaunchRepeatKeyAbility(const RepeatKey &item, bool &isLaunched, const std::shared_ptr<KeyEvent> keyEvent);
     bool IsKeyMatch(const ShortcutKey &shortcutKey, const std::shared_ptr<KeyEvent> &key);
     bool IsRepeatKeyEvent(const SequenceKey &sequenceKey);
     bool HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, const ShortcutKey &shortcutKey);
@@ -219,8 +220,11 @@ private:
     bool HandleEvent(const std::shared_ptr<KeyEvent> key);
     bool HandleKeyUpCancel(const RepeatKey &item, const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleRepeatKeyCount(const RepeatKey &item, const std::shared_ptr<KeyEvent> keyEvent);
+    void HandleRepeatKeyOwnCount(const RepeatKey &item);
     bool HandleRepeatKey(const RepeatKey& item, bool &isLaunchAbility, const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleRepeatKeys(const std::shared_ptr<KeyEvent> keyEvent);
+    bool HandleRepeatKeyAbility(const RepeatKey &item, bool &isLaunched,
+        const std::shared_ptr<KeyEvent> keyEvent, bool isMaxTimes);
     bool HandleSequence(Sequence& sequence, bool &isLaunchAbility);
     bool HandleNormalSequence(Sequence& sequence, bool &isLaunchAbility);
     bool HandleMatchedSequence(Sequence& sequence, bool &isLaunchAbility);
@@ -265,12 +269,16 @@ private:
     }
     bool SkipFinalKey(const int32_t keyCode, const std::shared_ptr<KeyEvent> &key);
 
+#ifdef OHOS_BUILD_ENABLE_TOUCH
     void OnHandleTouchEvent(const std::shared_ptr<PointerEvent> touchEvent);
+#endif // OHOS_BUILD_ENABLE_TOUCH
+#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     void StartTwoFingerGesture();
     void StopTwoFingerGesture();
     bool CheckTwoFingerGestureAction() const;
+#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     bool CheckInputMethodArea(const std::shared_ptr<PointerEvent> touchEvent);
-#ifdef OHOS_BUILD_ENABLE_TOUCH
+#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     void HandleFingerGestureDownEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void HandleFingerGestureUpEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void HandleKnuckleGestureDownEvent(const std::shared_ptr<PointerEvent> touchEvent);
@@ -283,6 +291,8 @@ private:
     void UpdateKnuckleGestureInfo(const std::shared_ptr<PointerEvent> touchEvent, KnuckleGesture &knuckleGesture);
     void AdjustTimeIntervalConfigIfNeed(int64_t intervalTime);
     void AdjustDistanceConfigIfNeed(float distance);
+#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
+#ifdef OHOS_BUILD_ENABLE_TOUCH
     int32_t ConvertVPToPX(int32_t vp) const;
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
@@ -316,6 +326,9 @@ private:
     bool isParseExcludeConfig_ { false };
     std::map<int32_t, int32_t> specialKeys_;
     std::map<int32_t, std::list<int32_t>> specialTimers_;
+    std::map<int32_t, int32_t> repeatKeyMaxTimes_;
+    std::map<std::string, int32_t> repeatKeyTimerIds_;
+    std::map<std::string, int32_t> repeatKeyCountMap_;
     TwoFingerGesture twoFingerGesture_;
     KnuckleGesture singleKnuckleGesture_;
     KnuckleGesture doubleKnuckleGesture_;
@@ -337,6 +350,8 @@ private:
     int32_t repeatTimerId_ { -1 };
     int32_t knuckleCount_ { 0 };
     int64_t downActionTime_ { 0 };
+    int64_t lastDownActionTime_ { 0 };
+    int64_t lastVolumeDownActionTime_ { 0 };
     int64_t upActionTime_ { 0 };
     int32_t launchAbilityCount_ { 0 };
     int64_t intervalTime_ { 120000 };

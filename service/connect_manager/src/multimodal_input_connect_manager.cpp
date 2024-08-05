@@ -473,7 +473,7 @@ int32_t MultimodalInputConnectManager::SetPointerLocation(int32_t x, int32_t y)
     return multimodalInputConnectService_->SetPointerLocation(x, y);
 }
 
-bool MultimodalInputConnectManager::ConnectMultimodalInputService()
+bool MultimodalInputConnectManager::ConnectMultimodalInputService() __attribute__((no_sanitize("cfi")))
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
@@ -869,5 +869,12 @@ int32_t MultimodalInputConnectManager::AncoRemoveChannel(sptr<IAncoChannel> chan
     return multimodalInputConnectService_->AncoRemoveChannel(channel);
 }
 #endif // OHOS_BUILD_ENABLE_ANCO
+
+int32_t MultimodalInputConnectManager::SkipPointerLayer(bool isSkip)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SkipPointerLayer(isSkip);
+}
 } // namespace MMI
 } // namespace OHOS

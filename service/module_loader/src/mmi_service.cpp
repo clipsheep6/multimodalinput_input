@@ -67,6 +67,7 @@
 #include "res_type.h"
 #include "system_ability_definition.h"
 #endif // OHOS_RSS_CLIENT
+#include "setting_datashare.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "MMIService"
@@ -362,10 +363,17 @@ void MMIService::OnStart()
     MMI_HILOGI("Add app manager service listener end");
     AddAppDebugListener();
     AddSystemAbilityListener(DISPLAY_MANAGER_SERVICE_SA_ID);
+#if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
+    MMI_HILOGI("Add system ability listener start");
+    AddSystemAbilityListener(PLAYER_DISTRIBUTED_SERVICE_ID);
+    MMI_HILOGI("Add system ability listener end");
+#endif
 #ifdef OHOS_BUILD_ENABLE_ANCO
     InitAncoUds();
 #endif // OHOS_BUILD_ENABLE_ANCO
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     IPointerDrawingManager::GetInstance()->InitPointerObserver();
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     InitPreferences();
     TimerMgr->AddTimer(WATCHDOG_INTERVAL_TIME, -1, [this]() {
         MMI_HILOGI("Set thread status flag to true");
@@ -400,6 +408,9 @@ void MMIService::OnStop()
     RemoveSystemAbilityListener(RENDER_SERVICE);
     RemoveAppDebugListener();
     RemoveSystemAbilityListener(DISPLAY_MANAGER_SERVICE_SA_ID);
+#if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
+    RemoveSystemAbilityListener(PLAYER_DISTRIBUTED_SERVICE_ID);
+#endif
 #ifdef OHOS_BUILD_ENABLE_ANCO
     StopAncoUds();
 #endif // OHOS_BUILD_ENABLE_ANCO
@@ -1475,25 +1486,32 @@ int32_t MMIService::InjectPointerEvent(const std::shared_ptr<PointerEvent> point
     return RET_OK;
 }
 
+#ifdef OHOS_RSS_CLIENT
+void MMIService::OnAddResSchedSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
+{
+    int sleepSeconds = 1;
+    sleep(sleepSeconds);
+    uint64_t tid = tid_.load();
+    int32_t userInteraction = 2;
+    std::unordered_map<std::string, std::string> payload;
+    payload["uid"] = std::to_string(getuid());
+    payload["pid"] = std::to_string(getpid());
+    payload["extType"] = "10002";
+    payload["tid"] = std::to_string(tid);
+    payload["isSa"] = "1";
+    payload["cgroupPrio"] = "1";
+    payload["threadName"] = "mmi_service";
+    ResourceSchedule::ResSchedClient::GetInstance().ReportData(
+        ResourceSchedule::ResType::RES_TYPE_KEY_PERF_SCENE, userInteraction, payload);
+}
+#endif // OHOS_RSS_CLIENT
+
 void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
 {
     CALL_INFO_TRACE;
 #ifdef OHOS_RSS_CLIENT
     if (systemAbilityId == RES_SCHED_SYS_ABILITY_ID) {
-        int sleepSeconds = 1;
-        sleep(sleepSeconds);
-        uint64_t tid = tid_.load();
-        int32_t userInteraction = 2;
-        std::unordered_map<std::string, std::string> payload;
-        payload["uid"] = std::to_string(getuid());
-        payload["pid"] = std::to_string(getpid());
-        payload["extType"] = "10002";
-        payload["tid"] = std::to_string(tid);
-        payload["isSa"] = "1";
-        payload["cgroupPrio"] = "1";
-        payload["threadName"] = "mmi_service";
-        ResourceSchedule::ResSchedClient::GetInstance().ReportData(
-            ResourceSchedule::ResType::RES_TYPE_KEY_PERF_SCENE, userInteraction, payload);
+        OnAddResSchedSystemAbility(systemAbilityId, deviceId);
     }
 #endif // OHOS_RSS_CLIENT
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
@@ -1508,15 +1526,35 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
     }
     if (systemAbilityId == COMMON_EVENT_SERVICE_ID) {
         DEVICE_MONITOR->InitCommonEventSubscriber();
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER)
+        DISPLAY_MONITOR->InitCommonEventSubscriber();
+#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
         MMI_HILOGD("Common event service started");
     }
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     if (systemAbilityId == RENDER_SERVICE) {
         MMI_HILOGI("Init render service state observer start");
         IPointerDrawingManager::GetInstance()->InitPointerCallback();
     }
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     if (systemAbilityId == DISPLAY_MANAGER_SERVICE_SA_ID) {
         MMI_HILOGI("Init render service state observer start");
     }
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    if (systemAbilityId == DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID) {
+        if (SettingDataShare::GetInstance(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID).CheckIfSettingsDataReady()) {
+            IPointerDrawingManager::GetInstance()->InitPointerObserver();
+        }
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+#if defined(OHOS_BUILD_ENABLE_MONITOR) && defined(PLAYER_FRAMEWORK_EXISTS)
+    if (systemAbilityId == PLAYER_DISTRIBUTED_SERVICE_ID) {
+        MMI_HILOGI("Init screen capture monitor listener start");
+        auto monitorHandler = InputHandler->GetMonitorHandler();
+        CHKPV(monitorHandler);
+        monitorHandler->RegisterScreenCaptureListener();
+    }
+#endif
 }
 
 int32_t MMIService::SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option)
@@ -2586,6 +2624,7 @@ int32_t MMIService::SetCurrentUser(int32_t userId)
 int32_t MMIService::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
 {
     CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [switchFlag] {
             return ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()->SetTouchpadThreeFingersTapSwitch(
@@ -2594,13 +2633,16 @@ int32_t MMIService::SetTouchpadThreeFingersTapSwitch(bool switchFlag)
         );
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to SetTouchpadThreeFingersTapSwitch status, ret:%{public}d", ret);
+        return ret;
     }
-    return ret;
+#endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
 }
 
 int32_t MMIService::GetTouchpadThreeFingersTapSwitch(bool &switchFlag)
 {
     CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(
         [&switchFlag] {
             return ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()->GetTouchpadThreeFingersTapSwitch(
@@ -2609,8 +2651,10 @@ int32_t MMIService::GetTouchpadThreeFingersTapSwitch(bool &switchFlag)
         );
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to GetTouchpadThreeFingersTapSwitch status, ret:%{public}d", ret);
+        return ret;
     }
-    return ret;
+#endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
 }
 
 int32_t MMIService::AddVirtualInputDevice(std::shared_ptr<InputDevice> device, int32_t &deviceId)
@@ -2794,6 +2838,21 @@ void MMIService::PrintLog(const std::string &flag, int32_t duration)
     MMI_HILOGW("MMIBlockTask name : %{public}s, duration Time : %{public}d", flag.c_str(), duration);
 }
 
-
+int32_t MMIService::SkipPointerLayer(bool isSkip)
+{
+    CALL_INFO_TRACE;
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [isSkip] {
+            return IPointerDrawingManager::GetInstance()->SkipPointerLayer(isSkip);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("Skip pointer layerfailed, return:%{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS

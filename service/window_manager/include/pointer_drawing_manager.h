@@ -109,6 +109,7 @@ public:
     void InitPointerCallback() override;
     void InitPointerObserver() override;
     void OnSessionLost(int32_t pid) override;
+    int32_t SkipPointerLayer(bool isSkip) override;
 
 private:
     IconStyle GetIconType(MOUSE_ICON mouseIcon);
@@ -190,7 +191,6 @@ private:
     isMagicCursor hasMagicCursor_;
     bool hasInitObserver_ { false };
     bool isInit_ { false };
-    bool simulate_ { false };
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     std::shared_ptr<HardwareCursorPointerManager> hardwareCursorPointerManager_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR

@@ -62,12 +62,15 @@ constexpr int32_t EVEN_NUMBER { 2 };
 constexpr int64_t NO_DELAY { 0 };
 constexpr int64_t FREQUENCY { 1000 };
 constexpr int64_t TAP_DOWN_INTERVAL_MILLIS { 550000 };
+constexpr int64_t SOS_INTERVAL_TIMES { 300000 };
 constexpr int32_t MAX_TAP_COUNT { 2 };
 const std::string AIBASE_BUNDLE_NAME { "com.hmos.aibase" };
 const std::string WAKEUP_ABILITY_NAME { "WakeUpExtAbility" };
 const std::string SCREENSHOT_BUNDLE_NAME { "com.hmos.screenshot" };
 const std::string SCREENSHOT_ABILITY_NAME { "com.hmos.screenshot.ServiceExtAbility" };
 const std::string SCREENRECORDER_BUNDLE_NAME { "com.hmos.screenrecorder" };
+const std::string SOS_BUNDLE_NAME { "com.hmos.emergencycommunication" };
+constexpr int32_t DEFAULT_VALUE { -1 };
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -116,12 +119,14 @@ void KeyCommandHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> poi
     }
     nextHandler_->HandleTouchEvent(pointerEvent);
 }
+#endif // OHOS_BUILD_ENABLE_TOUCH
 
 bool KeyCommandHandler::GetKnuckleSwitchValue()
 {
     return knuckleSwitch_.statusConfigValue;
 }
 
+#ifdef OHOS_BUILD_ENABLE_TOUCH
 void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> touchEvent)
 {
     CALL_DEBUG_ENTER;
@@ -184,6 +189,7 @@ void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<Point
     singleKnuckleGesture_.state = false;
     doubleKnuckleGesture_.state = false;
     switch (toolType) {
+#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
         case PointerEvent::TOOL_TYPE_FINGER: {
             HandleFingerGestureDownEvent(touchEvent);
             break;
@@ -193,6 +199,7 @@ void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<Point
             HandleKnuckleGestureDownEvent(touchEvent);
             break;
         }
+#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
         default: {
             MMI_HILOGD("Current touch event tool type:%{public}d", toolType);
             break;
@@ -224,7 +231,9 @@ void KeyCommandHandler::HandlePointerActionMoveEvent(const std::shared_ptr<Point
     auto dy = std::abs(pos->y - item.GetDisplayY());
     auto moveDistance = sqrt(pow(dx, 2) + pow(dy, 2));
     if (moveDistance > ConvertVPToPX(TOUCH_MAX_THRESHOLD)) {
+#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
         StopTwoFingerGesture();
+#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
     }
 }
 
@@ -237,6 +246,7 @@ void KeyCommandHandler::HandlePointerActionUpEvent(const std::shared_ptr<Pointer
     touchEvent->GetPointerItem(id, item);
     int32_t toolType = item.GetToolType();
     switch (toolType) {
+#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
         case PointerEvent::TOOL_TYPE_FINGER: {
             HandleFingerGestureUpEvent(touchEvent);
             break;
@@ -245,6 +255,7 @@ void KeyCommandHandler::HandlePointerActionUpEvent(const std::shared_ptr<Pointer
             HandleKnuckleGestureUpEvent(touchEvent);
             break;
         }
+#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
         default: {
             MMI_HILOGW("Current touch event tool type:%{public}d", toolType);
             break;
@@ -252,7 +263,9 @@ void KeyCommandHandler::HandlePointerActionUpEvent(const std::shared_ptr<Pointer
     }
     previousUpTime_ = touchEvent->GetActionTime();
 }
+#endif // OHOS_BUILD_ENABLE_TOUCH
 
+#ifdef OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
 void KeyCommandHandler::HandleFingerGestureDownEvent(const std::shared_ptr<PointerEvent> touchEvent)
 {
     CALL_DEBUG_ENTER;
@@ -516,6 +529,7 @@ bool KeyCommandHandler::CheckTwoFingerGestureAction() const
         return false;
     }
 
+#ifdef OHOS_BUILD_ENABLE_TOUCH
     auto devX = firstFinger.x - secondFinger.x;
     auto devY = firstFinger.y - secondFinger.y;
     auto distance = sqrt(pow(devX, 2) + pow(devY, 2));
@@ -537,10 +551,13 @@ bool KeyCommandHandler::CheckTwoFingerGestureAction() const
         MMI_HILOGI("any finger out of region");
         return false;
     }
+#endif // OHOS_BUILD_ENABLE_TOUCH
 
     return true;
 }
+#endif // OHOS_BUILD_ENABLE_GESTURESENSE_WRAPPER
 
+#ifdef OHOS_BUILD_ENABLE_TOUCH
 int32_t KeyCommandHandler::ConvertVPToPX(int32_t vp) const
 {
     if (vp <= 0) {
@@ -637,7 +654,7 @@ void KeyCommandHandler::HandleKnuckleGestureTouchMove(std::shared_ptr<PointerEve
     float eventY = item.GetDisplayY();
     float dx = std::abs(eventX - gestureLastX_);
     float dy = std::abs(eventY - gestureLastY_);
-    if (dx > MOVE_TOLERANCE || dy > MOVE_TOLERANCE) {
+    if (dx >= MOVE_TOLERANCE || dy >= MOVE_TOLERANCE) {
         gestureLastX_ = eventX;
         gestureLastY_ = eventY;
         gesturePoints_.emplace_back(gestureLastX_);
@@ -689,6 +706,7 @@ void KeyCommandHandler::HandleKnuckleGestureTouchUp(std::shared_ptr<PointerEvent
             break;
         }
     }
+    ResetKnuckleGesture();
 }
 
 void KeyCommandHandler::ProcessKnuckleGestureTouchUp(NotifyType type)
@@ -828,12 +846,17 @@ void KeyCommandHandler::ParseRepeatKeyMaxCount()
         maxCount_ = 0;
     }
     int32_t tempCount = 0;
+    int32_t tempDelay = 0;
     for (RepeatKey& item : repeatKeys_) {
         if (item.times > tempCount) {
             tempCount = item.times;
         }
+        if (item.delay > tempDelay) {
+            tempDelay = item.delay;
+        }
     }
     maxCount_ = tempCount;
+    intervalTime_ = tempDelay;
 }
 
 bool KeyCommandHandler::ParseJson(const std::string &configFile)
@@ -857,7 +880,7 @@ bool KeyCommandHandler::ParseJson(const std::string &configFile)
     bool isParseSingleKnuckleGesture = IsParseKnuckleGesture(parser, SINGLE_KNUCKLE_ABILITY, singleKnuckleGesture_);
     bool isParseDoubleKnuckleGesture = IsParseKnuckleGesture(parser, DOUBLE_KNUCKLE_ABILITY, doubleKnuckleGesture_);
     bool isParseMultiFingersTap = ParseMultiFingersTap(parser, TOUCHPAD_TRIP_TAP_ABILITY, threeFingersTap_);
-    bool isParseRepeatKeys = ParseRepeatKeys(parser, repeatKeys_);
+    bool isParseRepeatKeys = ParseRepeatKeys(parser, repeatKeys_, repeatKeyMaxTimes_);
     knuckleSwitch_.statusConfig = SETTING_KNUCKLE_SWITCH;
     if (!isParseShortKeys && !isParseSequences && !isParseTwoFingerGesture && !isParseSingleKnuckleGesture &&
         !isParseDoubleKnuckleGesture && !isParseMultiFingersTap && !isParseRepeatKeys) {
@@ -1084,13 +1107,13 @@ bool KeyCommandHandler::PreHandleEvent(const std::shared_ptr<KeyEvent> key)
     if (!isParseMaxCount_) {
         ParseRepeatKeyMaxCount();
         isParseMaxCount_ = true;
-        if (repeatKeys_.size() > 0) {
-            intervalTime_ = repeatKeys_[0].delay;
-        }
     }
     if (!isParseStatusConfig_) {
         ParseStatusConfigObserver();
         isParseStatusConfig_ = true;
+    }
+    if (key->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_DOWN || key->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_UP) {
+        lastVolumeDownActionTime_ = key->GetActionTime();
     }
     return true;
 }
@@ -1210,10 +1233,6 @@ bool KeyCommandHandler::HandleRepeatKeys(const std::shared_ptr<KeyEvent> keyEven
         return false;
     }
 
-    if (count_ > maxCount_) {
-        return false;
-    }
-
     bool isLaunched = false;
     bool waitRepeatKey = false;
 
@@ -1236,6 +1255,21 @@ bool KeyCommandHandler::HandleRepeatKeys(const std::shared_ptr<KeyEvent> keyEven
     return isLaunched || waitRepeatKey;
 }
 
+void KeyCommandHandler::HandleRepeatKeyOwnCount(const RepeatKey &item)
+{
+    if (item.ability.bundleName == SOS_BUNDLE_NAME) {
+        if (repeatKeyCountMap_[item.ability.bundleName] == 1) {
+            if (downActionTime_ - lastVolumeDownActionTime_ > SOS_INTERVAL_TIMES) {
+                repeatKeyCountMap_[item.ability.bundleName]++;
+            }
+        } else if (downActionTime_ - lastDownActionTime_ < item.delay) {
+            repeatKeyCountMap_[item.ability.bundleName]++;
+        }
+    } else if (downActionTime_ - upActionTime_ < item.delay) {
+        repeatKeyCountMap_[item.ability.bundleName]++;
+    }
+}
+
 bool KeyCommandHandler::HandleRepeatKey(const RepeatKey &item, bool &isLaunched,
     const std::shared_ptr<KeyEvent> keyEvent)
 {
@@ -1245,30 +1279,94 @@ bool KeyCommandHandler::HandleRepeatKey(const RepeatKey &item, bool &isLaunched,
     if (keyEvent->GetKeyCode() != item.keyCode) {
         return false;
     }
-    if (count_ == item.times) {
-        bool statusValue = true;
-        auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
-            .GetBoolValue(item.statusConfig, statusValue);
-        if (ret != RET_OK) {
-            MMI_HILOGE("Get value from setting date fail");
-            return false;
+    if (keyEvent->GetKeyAction() != KeyEvent::KEY_ACTION_DOWN) {
+        return true;
+    }
+    auto it = repeatKeyCountMap_.find(item.ability.bundleName);
+    if (it == repeatKeyCountMap_.end()) {
+        repeatKeyCountMap_.emplace(item.ability.bundleName, 1);
+        lastDownActionTime_ = downActionTime_;
+        return true;
+    }
+    HandleRepeatKeyOwnCount(item);
+    lastDownActionTime_ = downActionTime_;
+    if (repeatKeyCountMap_[item.ability.bundleName] == item.times) {
+        if (!item.statusConfig.empty()) {
+            bool statusValue = true;
+            auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
+                .GetBoolValue(item.statusConfig, statusValue);
+            if (ret != RET_OK) {
+                MMI_HILOGE("Get value from setting data fail");
+                return false;
+            }
+            if (!statusValue) {
+                MMI_HILOGE("Get value from setting data, result is false");
+                return false;
+            }
         }
-        if (!statusValue) {
-            return false;
+        if (repeatKeyMaxTimes_.find(item.keyCode) != repeatKeyMaxTimes_.end()) {
+            if (item.times < repeatKeyMaxTimes_[item.keyCode]) {
+                return HandleRepeatKeyAbility(item, isLaunched, keyEvent, false);
+            }
+            return HandleRepeatKeyAbility(item, isLaunched, keyEvent, true);
         }
-        MMI_HILOGI("Repeat key matched keycode:%{public}d", keyEvent->GetKeyCode());
-        BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_REPEAT_KEY, item.ability.bundleName);
-        LaunchAbility(item.ability);
-        BytraceAdapter::StopLaunchAbility();
+    }
+    if (count_ > item.times && repeatKeyMaxTimes_.find(item.keyCode) != repeatKeyMaxTimes_.end() &&
+        repeatKeyTimerIds_.find(item.ability.bundleName) != repeatKeyTimerIds_.end()) {
+        if (count_ < repeatKeyMaxTimes_[item.keyCode] && repeatKeyTimerIds_[item.ability.bundleName] >= 0) {
+            TimerMgr->RemoveTimer(repeatKeyTimerIds_[item.ability.bundleName]);
+            repeatKeyTimerIds_.erase(item.ability.bundleName);
+            return true;
+        }
+    }
+    return true;
+}
 
-        launchAbilityCount_ = count_;
-        isLaunched = true;
-        isDownStart_ = false;
+bool KeyCommandHandler::HandleRepeatKeyAbility(const RepeatKey &item, bool &isLaunched,
+    const std::shared_ptr<KeyEvent> keyEvent, bool isMaxTimes)
+{
+    if (!isMaxTimes) {
+        int64_t delaytime = intervalTime_ - (downActionTime_ - upActionTime_);
+        int32_t timerId = TimerMgr->AddTimer(
+            delaytime / SECONDS_SYSTEM, 1, [this, item, &isLaunched, keyEvent] () {
+            LaunchRepeatKeyAbility(item, isLaunched, keyEvent);
+            auto it = repeatKeyTimerIds_.find(item.ability.bundleName);
+            if (it != repeatKeyTimerIds_.end()) {
+                repeatKeyTimerIds_.erase(it);
+            }
+        });
+        if (timerId < 0) {
+            return false;
+        }
+        if (repeatTimerId_ >= 0) {
+            TimerMgr->RemoveTimer(repeatTimerId_);
+            repeatTimerId_ = DEFAULT_VALUE;
+        }
+        if (repeatKeyTimerIds_.find(item.ability.bundleName) == repeatKeyTimerIds_.end()) {
+            repeatKeyTimerIds_.emplace(item.ability.bundleName, timerId);
+            return true;
+        }
+        repeatKeyTimerIds_[item.ability.bundleName] = timerId;
+        return true;
+    }
+    LaunchRepeatKeyAbility(item, isLaunched, keyEvent);
+    return true;
+}
+
+void KeyCommandHandler::LaunchRepeatKeyAbility(const RepeatKey &item, bool &isLaunched,
+    const std::shared_ptr<KeyEvent> keyEvent)
+{
+    BytraceAdapter::StartLaunchAbility(KeyCommandType::TYPE_REPEAT_KEY, item.ability.bundleName);
+    LaunchAbility(item.ability);
+    BytraceAdapter::StopLaunchAbility();
+    launchAbilityCount_ = count_;
+    isLaunched = true;
+    isDownStart_ = false;
+    if (InputHandler->GetSubscriberHandler() != nullptr) {
         auto keyEventCancel = std::make_shared<KeyEvent>(*keyEvent);
         keyEventCancel->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
         InputHandler->GetSubscriberHandler()->HandleKeyEvent(keyEventCancel);
     }
-    return true;
 }
 
 bool KeyCommandHandler::HandleKeyUpCancel(const RepeatKey &item, const std::shared_ptr<KeyEvent> keyEvent)
@@ -1289,19 +1387,6 @@ bool KeyCommandHandler::HandleRepeatKeyCount(const RepeatKey &item, const std::s
     CHKPF(keyEvent);
 
     if (keyEvent->GetKeyCode() == item.keyCode && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
-        if (repeatKey_.keyCode != item.keyCode) {
-            std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
-
-            if (pressedKeys.size() == 0) {
-                count_ = 1;
-            } else {
-                count_ = 0;
-            }
-            repeatKey_.keyCode = item.keyCode;
-        } else {
-            count_++;
-        }
-
         upActionTime_ = keyEvent->GetActionTime();
         repeatTimerId_ = TimerMgr->AddTimer(intervalTime_ / SECONDS_SYSTEM, 1, [this] () {
             SendKeyEvent();
@@ -1309,18 +1394,24 @@ bool KeyCommandHandler::HandleRepeatKeyCount(const RepeatKey &item, const std::s
         if (repeatTimerId_ < 0) {
             return false;
         }
-        repeatKey_.keyCode = item.keyCode;
         return true;
     }
 
     if (keyEvent->GetKeyCode() == item.keyCode && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
-        repeatKey_.keyCode = item.keyCode;
+        if (repeatKey_.keyCode != item.keyCode) {
+            count_ = 1;
+            repeatKeyCountMap_.clear();
+            repeatKey_.keyCode = item.keyCode;
+        } else {
+            count_++;
+        }
         isDownStart_ = true;
 
         downActionTime_ = keyEvent->GetActionTime();
         if ((downActionTime_ - upActionTime_) < intervalTime_) {
             if (repeatTimerId_ >= 0) {
                 TimerMgr->RemoveTimer(repeatTimerId_);
+                repeatTimerId_ = -1;
             }
         }
         return true;
@@ -1334,8 +1425,17 @@ void KeyCommandHandler::SendKeyEvent()
     if (!isHandleSequence_) {
         for (int32_t i = launchAbilityCount_; i < count_; i++) {
             int32_t keycode = repeatKey_.keyCode;
+            if (count_ == repeatKeyMaxTimes_[keycode] - 1 && keycode == KeyEvent::KEYCODE_POWER) {
+                break;
+            }
             if (IsSpecialType(keycode, SpecialType::KEY_DOWN_ACTION)) {
                 HandleSpecialKeys(keycode, KeyEvent::KEY_ACTION_UP);
+            }
+            if (count_ > repeatKeyMaxTimes_[keycode]) {
+                auto keyEventCancel = CreateKeyEvent(keycode, KeyEvent::KEY_ACTION_CANCEL, false);
+                CHKPV(keyEventCancel);
+                InputHandler->GetSubscriberHandler()->HandleKeyEvent(keyEventCancel);
+                continue;
             }
             if (i != 0) {
                 auto keyEventDown = CreateKeyEvent(keycode, KeyEvent::KEY_ACTION_DOWN, true);
@@ -1349,6 +1449,7 @@ void KeyCommandHandler::SendKeyEvent()
         }
     }
     count_ = 0;
+    repeatKeyCountMap_.clear();
     isDownStart_ = false;
     isHandleSequence_ = false;
     launchAbilityCount_ = 0;
@@ -1468,6 +1569,7 @@ bool KeyCommandHandler::IsActiveSequenceRepeating(std::shared_ptr<KeyEvent> keyE
 {
     return (sequenceOccurred_ && !keys_.empty() &&
             (keys_.back().keyCode == keyEvent->GetKeyCode()) &&
+            (keys_.back().keyAction == KeyEvent::KEY_ACTION_DOWN) &&
             (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN));
 }
 
@@ -1932,7 +2034,9 @@ void KeyCommandHandler::HandlePointerVisibleKeys(const std::shared_ptr<KeyEvent>
     CHKPV(keyEvent);
     if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_F9 && lastKeyEventCode_ == KeyEvent::KEYCODE_CTRL_LEFT) {
         MMI_HILOGI("force make pointer visible");
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
         IPointerDrawingManager::GetInstance()->ForceClearPointerVisiableStatus();
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     }
     lastKeyEventCode_ = keyEvent->GetKeyCode();
 }

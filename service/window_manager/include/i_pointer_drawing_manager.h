@@ -145,9 +145,13 @@ public:
     {
         return 0;
     }
-    virtual void ForceClearPointerVisiableStatus();
+    virtual void ForceClearPointerVisiableStatus() {}
     virtual void InitPointerObserver() {}
     virtual void OnSessionLost(int32_t pid) {}
+    virtual int32_t SkipPointerLayer(bool isSkip)
+    {
+        return 0;
+    }
 public:
     static inline std::shared_ptr<IPointerDrawingManager> iPointDrawMgr_ { nullptr };
 };

@@ -56,6 +56,7 @@ private:
     int32_t HandleJoystickEvent(libinput_event* event);
     void HandlePalmEvent(libinput_event* event, std::shared_ptr<PointerEvent> pointerEvent);
     int32_t GestureIdentify(libinput_event* event);
+    bool JudgeIfSwipeInward(std::shared_ptr<PointerEvent> pointerEvent);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void UpdateKeyEventHandlerChain(const std::shared_ptr<KeyEvent> keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -76,7 +77,9 @@ private:
 #endif // OHOS_BUILD_ENABLE_MOVE_EVENT_FILTERS
     void ResetTouchUpEvent(std::shared_ptr<PointerEvent> pointerEvent, struct libinput_event *event);
     bool ProcessNullEvent(libinput_event *event, int64_t frameTime);
+#ifdef OHOS_BUILD_ENABLE_SWITCH
     void RestoreTouchPadStatus();
+#endif // OHOS_BUILD_ENABLE_SWITCH
     void TerminateRotate(libinput_event* event);
     void TerminateAxis(libinput_event* event);
 };
