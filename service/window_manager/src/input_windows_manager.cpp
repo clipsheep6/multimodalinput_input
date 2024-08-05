@@ -3043,7 +3043,8 @@ int32_t InputWindowsManager::UpdateTouchPadTarget(std::shared_ptr<PointerEvent> 
 {
     CALL_DEBUG_ENTER;
     int32_t pointerAction = pointerEvent->GetPointerAction();
-    if (PointerEvent::POINTER_ACTION_SWIPE_BEGIN > pointerAction || PointerEvent::POINTER_ACTION_SWIPE_END < pointerAction) {
+    if (PointerEvent::POINTER_ACTION_SWIPE_BEGIN > pointerAction
+            || PointerEvent::POINTER_ACTION_SWIPE_END < pointerAction) {
         pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     }
     switch (pointerAction) {
