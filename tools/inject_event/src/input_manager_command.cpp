@@ -2092,7 +2092,7 @@ int32_t InputManagerCommand::ProcessRotateGesture(int32_t argc, char *argv[])
     return ERR_OK;
 }
 
-shared_ptr<PointerEvent> InputManagerCommand::CreatePointerEvent(int32_t id, int32_t type, int32_t pointerId,
+std::shared_ptr<PointerEvent> InputManagerCommand::CreatePointerEvent(int32_t id, int32_t type, int32_t pointerId,
                                                                 int32_t sourceType, int32_t fingerCount)
 {
     auto pointerEvent = PointerEvent::Create();
@@ -2117,7 +2117,7 @@ void InputManagerCommand::SendTouchDownForPinch()
     item1.SetDisplayY(pix[1]);
     pointerEvent->AddPointerItem(item1);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-    std::this_thread::sleep_for(std::chrono::microseconds(SLEEPTIME * timesForSleep));
+    std::this_thread::sleep_for(std::chrono::microseconds(SLEEPTIME));
     pointerEvent->SetPointerId(1);
     PointerEvent::PointerItem item0;
     item0.SetPointerId(1);
@@ -2146,12 +2146,11 @@ int32_t InputManagerCommand::ActionPinchEvent(int32_t scalePercentNumerator)
     int64_t actionStartTimeOrigin[6] = {479737563, 479965, 479973, 479980, 479987, 479995};
     int64_t downTimeOrigin = 479733577;
     int64_t fingerCountOrigin[6] = {0, 2, 2, 2, 2, 2};
-    int32_t itemIndex = 0;
     int32_t actionType[6] = {PointerEvent::POINTER_ACTION_AXIS_BEGIN, PointerEvent::POINTER_ACTION_AXIS_UPDATE,
                                 PointerEvent::POINTER_ACTION_AXIS_UPDATE, PointerEvent::POINTER_ACTION_AXIS_UPDATE,
                                 PointerEvent::POINTER_ACTION_AXIS_UPDATE, PointerEvent::POINTER_ACTION_AXIS_UPDATE};
     this->SendTouchDownForPinch();
-    for (int32_t index = 0 ; index < times; index++) {
+    for (int32_t index = 0; index < times; index++) {
         auto pointerEvent = CreatePointerEvent(0, actionType[index], 0, PointerEvent::SOURCE_TYPE_MOUSE,
                                                     fingerCountOrigin[index]);
         pointerEvent->SetActionTime(actionTimeOrigin[index]);
@@ -2207,7 +2206,7 @@ int32_t InputManagerCommand::ProcessTouchPadFingerSwipAction()
         actionTime[i] = actionTime[i - 1] + actionTimeDis[i - 1];
         actionStartTime[i] = actionStartTime[i - 1] + actionStartTimeDis[i - 1];
     }
-    for (int32_t i = 0 ; i < times; i++) {
+    for (int32_t i = 0; i < times; i++) {
         auto pointerEvent = CreatePointerEvent(eventIds[i], actionType[i], fingerCount - 1,
                                             PointerEvent::SOURCE_TYPE_TOUCHPAD, fingerCount);
         pointerEvent->SetActionTime(actionTime[i]);
