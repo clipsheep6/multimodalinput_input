@@ -116,6 +116,7 @@ public:
         int32_t& targetDisplayId, PhysicalCoordinate& coord) const;
     const DisplayInfo *GetDefaultDisplayInfo() const;
     void ReverseXY(int32_t &x, int32_t &y);
+    void FoldScreenRotation(std::shared_ptr<PointerEvent> pointerEvent);
     void SendCancelEventWhenLock();
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
@@ -180,7 +181,6 @@ private:
     void CoordinateCorrection(int32_t width, int32_t height, int32_t &integerX, int32_t &integerY);
     void GetWidthAndHeight(const DisplayInfo* displayInfo, int32_t &width, int32_t &height);
     void SetPrivacyModeFlag(SecureFlag privacyMode, std::shared_ptr<InputEvent> event);
-    void FoldScreenRotation(std::shared_ptr<PointerEvent> pointerEvent);
     void PrintChangedWindowByEvent(int32_t eventType, const WindowInfo &newWindowInfo);
     void PrintChangedWindowBySync(const DisplayGroupInfo &newDisplayInfo);
     bool IsMouseDrawing(int32_t currentAction);

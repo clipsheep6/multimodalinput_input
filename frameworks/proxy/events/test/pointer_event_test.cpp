@@ -561,6 +561,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_006, TestSize.L
     item.SetShortAxis(20);
     item.SetToolType(2);
     item.SetTargetWindowId(0);
+    item.SetTargetWindowPid(0);
     pointerEvent->AddPointerItem(item);
     ASSERT_TRUE(pointerEvent->IsValid());
     DumpWindowData(pointerEvent);

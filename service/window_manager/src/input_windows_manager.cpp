@@ -298,9 +298,7 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
     }
     CHKPR(udsServer_, INVALID_FD);
     if (windowInfo != nullptr) {
-        if (ROTATE_POLICY == FOLDABLE_DEVICE) {
-            FoldScreenRotation(pointerEvent);
-        }
+        FoldScreenRotation(pointerEvent);
         MMI_HILOG_DISPATCHD("get pid:%{public}d from idxPidMap", windowInfo->pid);
         return udsServer_->GetClientFd(windowInfo->pid);
     }
@@ -334,6 +332,9 @@ void InputWindowsManager::FoldScreenRotation(std::shared_ptr<PointerEvent> point
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
+    if (ROTATE_POLICY != FOLDABLE_DEVICE) {
+        return;
+    }
     auto iter = touchItemDownInfos_.find(pointerEvent->GetPointerId());
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
         if (iter == touchItemDownInfos_.end()) {
@@ -2531,6 +2532,7 @@ void InputWindowsManager::SendUIExtentionPointerEvent(int32_t logicalX, int32_t 
     pointerItem.SetWindowX(static_cast<int32_t>(windowX));
     pointerItem.SetWindowY(static_cast<int32_t>(windowY));
     pointerItem.SetTargetWindowId(windowInfo.id);
+    pointerItem.SetTargetWindowPid(windowInfo.pid);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
     auto fd = udsServer_->GetClientFd(windowInfo.pid);
     auto sess = udsServer_->GetSession(fd);
@@ -2740,6 +2742,8 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         }
     }
     if (touchWindow == nullptr) {
+        pointerItem.SetTargetWindowPid(-1);
+        pointerEvent->UpdatePointerItem(pointerId, pointerItem);
         auto it = touchItemDownInfos_.find(pointerId);
         if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
             if (it == touchItemDownInfos_.end() ||
@@ -2819,6 +2823,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     pointerItem.SetToolWindowX(pointerItem.GetToolDisplayX() + physicDisplayInfo->x - touchWindow->area.x);
     pointerItem.SetToolWindowY(pointerItem.GetToolDisplayY() + physicDisplayInfo->y - touchWindow->area.y);
     pointerItem.SetTargetWindowId(touchWindow->id);
+    pointerItem.SetTargetWindowPid(touchWindow->pid);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
     bool checkExtraData = extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
         ((pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_FINGER && extraData_.pointerId == pointerId) ||
