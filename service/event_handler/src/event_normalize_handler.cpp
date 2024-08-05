@@ -459,8 +459,22 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
         nextHandler_->HandlePointerEvent(pointerEvent);
         MULTI_FINGERTAP_HDR->ClearPointerItems(pointerEvent);
     }
-    buttonIds_.insert(seatSlot);
-    if (buttonIds_.size() == FINGER_NUM &&
+    if (type == LIBINPUT_EVENT_TOUCHPAD_DOWN) {
+        buttonIds_.insert(seatSlot);
+    }
+    struct libinput_event_gesture *gesture = libinput_event_get_gesture_event(event);
+    int32_t fingerCount = libinput_event_gesture_get_finger_count(gesture);
+    MMI_HILOGD("finger:%{public}d, button:%{public}" PRId64, fingerCount, buttonIds_.size());
+    if (fingerCount != buttonIds_.size()) {
+        if (!buttonIds_.empty()) {
+            for (const auto &id : buttonIds_) {
+                MMI_HILOGE("finger:%{public}d, button:%{public}d", fingerCount, id);
+            }
+        } else {
+            MMI_HILOGE("button is empty, finger:%{public}d", fingerCount);
+        }
+    }
+    if (fingerCount.size() == FINGER_NUM &&
         (type == LIBINPUT_EVENT_TOUCHPAD_DOWN || type == LIBINPUT_EVENT_TOUCHPAD_UP)) {
         MMI_HILOGD("Handle mouse axis event");
         HandleMouseEvent(event);
@@ -816,6 +830,11 @@ void EventNormalizeHandler::RestoreTouchPadStatus()
         mouseEvent = MouseEventHdr->GetPointerEvent(id);
         if (mouseEvent != nullptr) {
             mouseEvent->Reset();
+        }
+    }
+    if (!buttonIds_.empty()) {
+        for (const auto &id : buttonIds_) {
+            MMI_HILOGE("Left fibgercount on touchpad:%{public}d", fingerCount, id);
         }
     }
     buttonIds_.clear();
