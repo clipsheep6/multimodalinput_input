@@ -798,6 +798,9 @@ ohos_unittest("PointerDrawingManagerTest") {
     "c_utils:utils",
     "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
     "drivers_interface_display:libdisplay_composer_proxy_1.0",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
+    "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
@@ -805,9 +808,6 @@ ohos_unittest("PointerDrawingManagerTest") {
     "libinput:libinput-third-mmi",
     "window_manager:libwm",
     "window_manager:libwsutils",
-    "googletest:gmock_main",
-    "googletest:gtest_main",
-    "graphic_2d:2d_graphics",
   ]
 }
 
@@ -845,6 +845,9 @@ ohos_unittest("PointerDrawingManagerExTest") {
     "c_utils:utils",
     "drivers_interface_display:libdisplay_composer_hdi_impl_1.2",
     "drivers_interface_display:libdisplay_composer_proxy_1.0",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
+    "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "image_framework:image_native",
@@ -852,9 +855,6 @@ ohos_unittest("PointerDrawingManagerExTest") {
     "libinput:libinput-third-mmi",
     "window_manager:libwm",
     "window_manager:libwsutils",
-    "googletest:gmock_main",
-    "googletest:gtest_main",
-    "graphic_2d:2d_graphics",
   ]
 }
 

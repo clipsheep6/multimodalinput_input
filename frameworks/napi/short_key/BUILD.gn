@@ -53,6 +53,8 @@ ohos_shared_library("shortkey") {
     "c_utils:utils",
     "hilog:libhilog",
     "napi:ace_napi",
+    "eventhandler:libeventhandler",
+    "ipc:ipc_core",
   ]
 
   relative_install_dir = "module/multimodalinput"
