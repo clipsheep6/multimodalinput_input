@@ -28,6 +28,7 @@ public:
     HardwareCursorPointerManager() = default;
     ~HardwareCursorPointerManager() = default;
     void SetTargetDevice(uint32_t devId);
+    void SetHdiServiceState(bool hdiServiceState);
     bool IsSupported();
     int32_t SetPosition(int32_t x, int32_t y);
     int32_t EnableStats(bool enable);
@@ -35,6 +36,7 @@ public:
 private:
     bool isEnableState_ { false };
     bool isEnable_ { false };
+    bool isDeviceChange_ { false };
     uint32_t devId_ { 0 };
     sptr<OHOS::HDI::Display::Composer::V1_2::IDisplayComposerInterface> powerInterface_ = nullptr;
 };
