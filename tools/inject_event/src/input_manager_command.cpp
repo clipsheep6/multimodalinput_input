@@ -2203,7 +2203,7 @@ int32_t InputManagerCommand::ProcessTouchPadFingerSwipAction()
                                 {downTimeSame, downTimeSame}};
     actionTime[0] = actionTimeBase;
     actionStartTime[0] = (actionTimeBase - actionTimeStartTimeDis) / milliPerSecond;
-    for (int32_t i = 1 ;i < times; i++) {
+    for (int32_t i = 1; i < times; i++) {
         actionTime[i] = actionTime[i - 1] + actionTimeDis[i - 1];
         actionStartTime[i] = actionStartTime[i - 1] + actionStartTimeDis[i - 1];
     }
