@@ -2112,7 +2112,7 @@ void InputManagerCommand::SendTouchDownForPinch()
     item1.SetDisplayX(pix[0]);
     item1.SetDisplayY(pix[1]);
     pointerEvent->AddPointerItem(item1);
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    InputManager::GetInstance()->SimulateTouchPadEvent(pointerEvent);
     std::this_thread::sleep_for(std::chrono::microseconds(SLEEPTIME));
     pointerEvent->SetPointerId(1);
     PointerEvent::PointerItem item0;
@@ -2121,7 +2121,7 @@ void InputManagerCommand::SendTouchDownForPinch()
     item0.SetDisplayX(pix[baseIndex]);
     item0.SetDisplayY(pix[baseIndex + 1]);
     pointerEvent->AddPointerItem(item0);
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    InputManager::GetInstance()->SimulateTouchPadEvent(pointerEvent);
     std::this_thread::sleep_for(std::chrono::microseconds(SLEEPTIME));
 }
 
@@ -2169,7 +2169,7 @@ int32_t InputManagerCommand::ActionPinchEvent(int32_t scalePercentNumerator)
         itemSecond.SetWindowY(windowsY[fingerCount * index + 1]);
         itemSecond.SetPressed(press[fingerCount * index + 1]);
         pointerEvent->AddPointerItem(itemSecond);
-        InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+        InputManager::GetInstance()->SimulateTouchPadEvent(pointerEvent);
         std::this_thread::sleep_for(std::chrono::microseconds(SLEEPTIME * timesForSleep));
     }
     return RET_OK;
@@ -2222,7 +2222,7 @@ int32_t InputManagerCommand::ProcessTouchPadFingerSwipAction()
             pointerEvent->AddPointerItem(itemFirst);
         }
         std::this_thread::sleep_for(std::chrono::microseconds(SLEEPTIME));
-        InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+        InputManager::GetInstance()->SimulateTouchPadEvent(pointerEvent);
     }
     return ERR_OK;
 }
