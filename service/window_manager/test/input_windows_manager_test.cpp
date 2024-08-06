@@ -5670,7 +5670,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsMouseDrawing_001, Te
     ASSERT_FALSE(ret);
     currentAction = 1;
     ret = inputWindowsMgr.IsMouseDrawing(currentAction);
-    ASSERT_TRUE(ret); 
+    ASSERT_TRUE(ret);
 }
 
 /**
