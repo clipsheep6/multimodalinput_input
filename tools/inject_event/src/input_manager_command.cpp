@@ -73,7 +73,6 @@ constexpr int32_t KEY_PARAM_SIZE = 5;
 constexpr int32_t KEY_TIME_PARAM_SIZE = 6;
 constexpr int32_t INTERVAL_TIME_MS = 100;
 constexpr int32_t MIN_PINCH_FINGER = 2;
-constexpr int32_t MAX_PINCH_FINGER = 5;
 constexpr int32_t FINGER_LOCATION_NUMS = 4;
 constexpr int32_t MOVE_POS_ONE = 1;
 constexpr int32_t MOVE_POS_TWO = 2;
