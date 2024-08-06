@@ -840,6 +840,14 @@ int32_t MultimodalInputConnectManager::RemoveVirtualInputDevice(int32_t deviceId
     return multimodalInputConnectService_->RemoveVirtualInputDevice(deviceId);
 }
 
+int32_t MultimodalInputConnectManager::GetAllSystemShortcutKey(std::vector<std::unique_ptr<KeyOption>> &keyOptions)
+{
+    CALL_INFO_TRACE;
+    std::lock_guard<std::mutex> guard(lock_);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->GetAllSystemShortcutKey(keyOptions);
+}
+
 #ifdef OHOS_BUILD_ENABLE_ANCO
 int32_t MultimodalInputConnectManager::AncoAddChannel(sptr<IAncoChannel> channel)
 {

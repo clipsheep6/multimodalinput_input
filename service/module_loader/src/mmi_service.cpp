@@ -2806,5 +2806,27 @@ int32_t MMIService::SkipPointerLayer(bool isSkip)
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     return RET_OK;
 }
+
+int32_t MMIService::GetAllSystemShortcutKey(std::vector<std::unique_ptr<KeyOption>> &keyOptions)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, &keyOptions] {
+            return this->OnGetAllSystemShortcutKey(keyOptions);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get all system shortcut key, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::OnGetAllSystemShortcutKey(std::vector<std::unique_ptr<KeyOption>> &keyOptions)
+{
+    CALL_DEBUG_ENTER;
+    //keyOptions = keyShortcutManager::GetInstance()->GetAllSystemShortcutKey(keyOptions);
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS

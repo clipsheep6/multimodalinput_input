@@ -22,6 +22,7 @@
 #include <mutex>
 #include <vector>
 
+#include "key_option.h"
 #include "nocopyable.h"
 
 #include "i_input_device_listener.h"
@@ -58,6 +59,7 @@ public:
     void OnDevListener(int32_t deviceId, const std::string &type);
     void OnKeyboardType(int32_t userData, int32_t keyboardType);
     int32_t GetUserData();
+    int32_t GetAllSystemShortcutKey(std::vector<std::unique_ptr<KeyOption>> &keyOptions);
 
 private:
     InputDeviceImpl() = default;

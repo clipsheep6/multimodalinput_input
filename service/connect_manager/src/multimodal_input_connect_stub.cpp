@@ -420,6 +420,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::TRANSFER_BINDER_CLIENT_SERVICE):
             ret = StubTransferBinderClientService(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_SYSTEM_SHORTCUT_KEY):
+            ret = StubGetAllSystemShortcutKey(data, reply);
+            break;
         default: {
             MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
             ret = IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -2644,6 +2647,26 @@ int32_t MultimodalInputConnectStub::StubSkipPointerLayer(MessageParcel& data, Me
     }
     MMI_HILOGD("Success isSkip:%{public}d, pid:%{public}d", isSkip, GetCallingPid());
     return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubGetAllSystemShortcutKey(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    std::vector<std::unique_ptr<KeyOption>> keyOptions;
+    int32_t ret = GetAllSystemShortcutKey(keyOptions);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call GetAllSystemShortcutKey failed ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    WRITEINT32(reply, static_cast<int32_t>(keyOptions.size()), IPC_STUB_WRITE_PARCEL_ERR);
+    MMI_HILOGE("keyOptionsCount size:%{public}d", static_cast<int32_t>(keyOptions.size()));
+    for (const auto &item : keyOptions) {
+        if (!item->WriteToParcel(reply)) {
+            MMI_HILOGE("Write keyOption failed");
+            return IPC_STUB_WRITE_PARCEL_ERR;
+        }
+    }
+    return ret;
 }
 } // namespace MMI
 } // namespace OHOS

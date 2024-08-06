@@ -215,6 +215,7 @@ public:
     int32_t AncoAddChannel(std::shared_ptr<IAncoConsumer> consumer);
     int32_t AncoRemoveChannel(std::shared_ptr<IAncoConsumer> consumer);
     int32_t SkipPointerLayer(bool isSkip);
+    int32_t GetAllSystemShortcutKey(std::vector<std::unique_ptr<KeyOption>> &keyOptions, int32_t &count);
 
 private:
     int32_t PackWindowInfo(NetPacket &pkt);

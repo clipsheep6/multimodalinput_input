@@ -221,5 +221,15 @@ int32_t InputDeviceImpl::GetUserData()
 {
     return userData_;
 }
+
+int32_t InputDeviceImpl::GetAllSystemShortcutKey(std::vector<std::unique_ptr<KeyOption>> &keyOptions)
+{
+    CALL_INFO_TRACE;
+    if (MULTIMODAL_INPUT_CONNECT_MGR->GetAllSystemShortcutKey(keyOptions) != RET_OK) {
+        MMI_HILOGE("GetAllSystemShortcutKey failed");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS
