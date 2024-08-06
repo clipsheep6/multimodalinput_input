@@ -560,7 +560,7 @@ void DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(int32_t intervalTime, in
         "FINGERSENSE_KNOCK_EVENT_INFO",
         OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
         "SK_S_T", FINGERSENSE_EVENT_TIMES,
-        "SKS_T_I", intervalTime,
+        "SKS_T_I", intervalTime / CONVERSION_US_TO_MS,
         "DKS_D_I", distanceInterval,
         "TP_INFO", GetTpVendorName(),
         "S_INFO", GetAccVendorName(),
