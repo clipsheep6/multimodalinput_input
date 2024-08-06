@@ -37,7 +37,6 @@
 #include "input_manager.h"
 #include "mmi_log.h"
 #include "multimodal_event_handler.h"
-#include "pointer_event.h"
 #include "util.h"
 
 #undef MMI_LOG_TAG
@@ -1970,7 +1969,7 @@ int32_t InputManagerCommand::ProcessTouchPadGestureInput(int32_t argc, char *arg
 {
     struct option touchPadSensorOptions[] = {
         {"rotate", required_argument, nullptr, 'r'},
-        {"action", required_argument, nullptr, 's'},
+        {"swip", required_argument, nullptr, 's'},
         {"pinch", required_argument, nullptr, 'p'},
         {nullptr, 0, nullptr, 0}
     };
