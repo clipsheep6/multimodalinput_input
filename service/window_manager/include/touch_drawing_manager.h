@@ -70,6 +70,8 @@ public:
     {
         delegateProxy_ = proxy;
     }
+    std::pair<int32_t, int32_t> UpdatePointerCoordinate(const DisplayInfo& displayInfo,
+        double &physicalX, double &physicalY);
 private:
     void CreateObserver();
     void AddCanvasNode(std::shared_ptr<Rosen::RSCanvasNode>& canvasNode, bool isTrackerNode);

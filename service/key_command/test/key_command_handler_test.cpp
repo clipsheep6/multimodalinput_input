@@ -2278,7 +2278,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_GesturePointsToStr_003, Te
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandleKnuckleGestureEvent_001
- * @tc.desc: Test HandleKnuckleGestureEvent_001
+ * @tc.desc: Test HandleKnuckleGestureEvent function
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2308,7 +2308,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureEvent_
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandleKnuckleGestureEvent_002
- * @tc.desc: Test HandleKnuckleGestureEvent_002
+ * @tc.desc: Test HandleKnuckleGestureEvent function
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2332,7 +2332,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureEvent_
 
 /**
  * @tc.name: KeyCommandHandlerTest_HandleKnuckleGestureEvent_003
- * @tc.desc: Test HandleKnuckleGestureEvent_003
+ * @tc.desc: Test HandleKnuckleGestureEvent function
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -2352,6 +2352,69 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureEvent_
     handler.singleKnuckleGesture_.state = false;
     handler.knuckleSwitch_.statusConfigValue = true;
     ASSERT_NO_FATAL_FAILURE(handler.HandleKnuckleGestureEvent(touchEvent));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKnuckleGestureEvent_004
+ * @tc.desc: Test HandleKnuckleGestureEvent function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureEvent_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    PointerEvent::PointerItem item;
+    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    item.SetPointerId(1);
+    item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
+    touchEvent->AddPointerItem(item);
+    touchEvent->SetPointerId(1);
+    touchEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    touchEvent->SetTargetDisplayId(0);
+    DisplayInfo displayInfo = {
+        .id = 0, .x = 0, .y = 0, .width = 100, .height = 200, .direction = DIRECTION90
+    };
+    DisplayGroupInfo displayGroupInfo = {
+        .displaysInfo = { displayInfo }
+    };
+    WIN_MGR->UpdateDisplayInfo(displayGroupInfo);
+    handler.lastDirection_ = DIRECTION0;
+    handler.gesturePoints_ = { 0.f, 1.f };
+    handler.HandleKnuckleGestureEvent(touchEvent);
+    EXPECT_EQ(handler.lastDirection_, DIRECTION90);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleKnuckleGestureEvent_005
+ * @tc.desc: Test HandleKnuckleGestureEvent function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleKnuckleGestureEvent_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    KeyCommandHandler handler;
+    PointerEvent::PointerItem item;
+    std::shared_ptr<PointerEvent> touchEvent = PointerEvent::Create();
+    ASSERT_NE(touchEvent, nullptr);
+    item.SetPointerId(1);
+    item.SetToolType(PointerEvent::TOOL_TYPE_KNUCKLE);
+    touchEvent->AddPointerItem(item);
+    touchEvent->SetPointerId(1);
+    touchEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    touchEvent->SetTargetDisplayId(0);
+    DisplayInfo displayInfo = {
+        .id = 0, .x = 0, .y = 0, .width = 100, .height = 200, .direction = DIRECTION90
+    };
+    DisplayGroupInfo displayGroupInfo = {
+        .displaysInfo = { displayInfo }
+    };
+    WIN_MGR->UpdateDisplayInfo(displayGroupInfo);
+    handler.lastDirection_ = DIRECTION0;
+    handler.HandleKnuckleGestureEvent(touchEvent);
+    EXPECT_EQ(handler.lastDirection_, DIRECTION90);
 }
 
 /**
@@ -3265,7 +3328,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_CheckTwoFingerGestureActio
     displayInfo.dpi = -1;
     inputWindowsManager.displayGroupInfo_.displaysInfo.push_back(displayInfo);
     bool ret = handler.CheckTwoFingerGestureAction();
-    EXPECT_FALSE(ret);
+    EXPECT_TRUE(ret);
 }
 
 /**

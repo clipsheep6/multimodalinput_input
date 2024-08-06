@@ -29,6 +29,7 @@
 #endif // USE_ROSEN_DRAWING
 #include "parameters.h"
 #include "render/rs_pixel_map_util.h"
+#include "touch_drawing_manager.h"
 
 #undef MMI_LOG_TAG
 #define MMI_LOG_TAG "KnuckleDynamicDrawingManager"
@@ -210,9 +211,10 @@ void KnuckleDynamicDrawingManager::ProcessUpAndCancelEvent(std::shared_ptr<Point
         auto id = pointerEvent->GetPointerId();
         PointerEvent::PointerItem pointerItem;
         pointerEvent->GetPointerItem(id, pointerItem);
-        int32_t physicalX = pointerItem.GetDisplayX();
-        int32_t physicalY = pointerItem.GetDisplayY();
-        glowTraceSystem_->ResetDivergentPoints(physicalX, physicalY);
+        double physicalX = pointerItem.GetRawDisplayX();
+        double physicalY = pointerItem.GetRawDisplayY();
+        auto displayXY = TOUCH_DRAWING_MGR->UpdatePointerCoordinate(displayInfo_, physicalX, physicalY);
+        glowTraceSystem_->ResetDivergentPoints(displayXY.first, displayXY.second);
     }
     isDrawing_ = true;
     DestoryWindow();
@@ -238,10 +240,11 @@ void KnuckleDynamicDrawingManager::ProcessDownEvent(std::shared_ptr<PointerEvent
     auto id = pointerEvent->GetPointerId();
     PointerEvent::PointerItem pointerItem;
     pointerEvent->GetPointerItem(id, pointerItem);
-    int32_t physicalX = pointerItem.GetDisplayX();
-    int32_t physicalY = pointerItem.GetDisplayY();
-    float downToPrevDownDistance = static_cast<float>(sqrt(pow(lastDownX_ - physicalX, POW_SQUARE) +
-        pow(lastDownY_ - physicalY, POW_SQUARE)));
+    double physicalX = pointerItem.GetRawDisplayX();
+    double physicalY = pointerItem.GetRawDisplayY();
+    auto displayXY = TOUCH_DRAWING_MGR->UpdatePointerCoordinate(displayInfo_, physicalX, physicalY);
+    float downToPrevDownDistance = static_cast<float>(sqrt(pow(lastDownX_ - displayXY.first, POW_SQUARE) +
+        pow(lastDownY_ - displayXY.second, POW_SQUARE)));
     bool isDistanceReady = downToPrevDownDistance < DOUBLE_CLICK_DISTANCE_LONG_CONFIG * POW_SQUARE;
     if (isTimeIntervalReady && isDistanceReady) {
         MMI_HILOGE("Take a screenshot");
@@ -249,9 +252,9 @@ void KnuckleDynamicDrawingManager::ProcessDownEvent(std::shared_ptr<PointerEvent
         isStop_ = true;
         return;
     }
-    lastDownX_ = physicalX;
-    lastDownY_ = physicalY;
-    traceControlPoints_[pointCounter_].Set(physicalX, physicalY);
+    lastDownX_ = displayXY.first;
+    lastDownY_ = displayXY.second;
+    traceControlPoints_[pointCounter_].Set(displayXY.first, displayXY.second);
     isStop_ = false;
 }
 
@@ -266,9 +269,10 @@ void KnuckleDynamicDrawingManager::ProcessMoveEvent(std::shared_ptr<PointerEvent
     auto id = pointerEvent->GetPointerId();
     PointerEvent::PointerItem pointerItem;
     pointerEvent->GetPointerItem(id, pointerItem);
-    int32_t physicalX = pointerItem.GetDisplayX();
-    int32_t physicalY = pointerItem.GetDisplayY();
-    traceControlPoints_[pointCounter_].Set(physicalX, physicalY);
+    double physicalX = pointerItem.GetRawDisplayX();
+    double physicalY = pointerItem.GetRawDisplayY();
+    auto displayXY = TOUCH_DRAWING_MGR->UpdatePointerCoordinate(displayInfo_, physicalX, physicalY);
+    traceControlPoints_[pointCounter_].Set(displayXY.first, displayXY.second);
     int pointIndex4 = 4;
     bool draw = (pointerEvent->GetActionTime() - firstDownTime_) > WAIT_DOUBLE_CLICK_INTERVAL_TIME;
     if (pointCounter_ == pointIndex4) {
@@ -299,7 +303,7 @@ void KnuckleDynamicDrawingManager::ProcessMoveEvent(std::shared_ptr<PointerEvent
         lastUpdateTimeMillis_ = now;
     }
     if (draw) {
-        glowTraceSystem_->ResetDivergentPoints(physicalX, physicalY);
+        glowTraceSystem_->ResetDivergentPoints(displayXY.first, displayXY.second);
         isDrawing_ = false;
     }
 }
