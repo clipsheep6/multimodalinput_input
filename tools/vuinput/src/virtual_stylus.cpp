@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,18 +18,18 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t ABS_MAX_X = 31920;
-constexpr int32_t ABS_MAX_Y = 19950;
-constexpr int32_t ABS_MIN_Z = -900;
-constexpr int32_t ABS_MAX_Z = 899;
-constexpr int32_t ABS_MAX_WHEEL = 2047;
-constexpr int32_t ABS_MAX_PRESSURE = 8191;
-constexpr int32_t ABS_MIN_TILT_XY = -64;
-constexpr int32_t ABS_MAX_TILT_XY_DISTANCE = 63;
-constexpr int32_t ABS_MIN_MISC = -2147483648;
-constexpr int32_t ABS_MAX_MISC = 2147483647;
-constexpr int32_t ABS_FUZZ_XY = 4;
-constexpr int32_t STYLUS_ABS_RANGE = 200;
+constexpr int32_t ABS_MAX_X { 31920 };
+constexpr int32_t ABS_MAX_Y { 19950 };
+constexpr int32_t ABS_MIN_Z { 900 };
+constexpr int32_t ABS_MAX_Z { 899 };
+constexpr int32_t ABS_MAX_WHEEL { 2047 };
+constexpr int32_t ABS_MAX_PRESSURE { 8191 };
+constexpr int32_t ABS_MIN_TILT_XY { -64 };
+constexpr int32_t ABS_MAX_TILT_XY_DISTANCE { 63 };
+constexpr int32_t ABS_MIN_MISC { -2147483648 };
+constexpr int32_t ABS_MAX_MISC { 2147483647 };
+constexpr int32_t ABS_FUZZ_XY { 4 };
+constexpr int32_t STYLUS_ABS_RANGE { 200 };
 
 AbsInfo absInfos[] = {
     { ABS_X, 0, ABS_MAX_X, ABS_FUZZ_XY, 0 },

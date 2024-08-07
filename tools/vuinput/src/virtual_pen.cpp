@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,15 +17,15 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t ABS_MAX_X = 20479;
-constexpr int32_t ABS_MAX_Y = 12799;
-constexpr int32_t ABS_MAX_PRESSURE = 4096;
-constexpr int32_t ABS_MIN_TILT_X = -90;
-constexpr int32_t ABS_MAX_TILT_X = 90;
-constexpr int32_t ABS_MIN_TILT_Y = -90;
-constexpr int32_t ABS_MAX_TILT_Y = 90;
-constexpr int32_t ABS_MAX_TYPE = 15;
-constexpr int32_t PEN_ABS_RANGE = 200;
+constexpr int32_t ABS_MAX_X { 20479 };
+constexpr int32_t ABS_MAX_Y { 12799 };
+constexpr int32_t ABS_MAX_PRESSURE { 4096 };
+constexpr int32_t ABS_MIN_TILT_X { -90 };
+constexpr int32_t ABS_MAX_TILT_X { 90 };
+constexpr int32_t ABS_MIN_TILT_Y { -90 };
+constexpr int32_t ABS_MAX_TILT_Y { 90 };
+constexpr int32_t ABS_MAX_TYPE { 15 };
+constexpr int32_t PEN_ABS_RANGE { 200 };
 
 ResolutionInfo resolutionInfos[] = {
     { ABS_X, PEN_ABS_RANGE },

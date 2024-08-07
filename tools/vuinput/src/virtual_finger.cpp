@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,16 +18,16 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t ABS_MAX_X = 6400;
-constexpr int32_t ABS_MAX_Y = 4000;
-constexpr int32_t ABS_MAX_MT_SLOT = 9;
-constexpr int32_t ABS_MAX_MT_TOUCH_MAJOR = 21;
-constexpr int32_t ABS_MAX_MT_TOUCH_MINOR = 21;
-constexpr int32_t ABS_MAX_MT_TRACKING_ID = 65535;
-constexpr int32_t ABS_MAX_MT_PRESSURE = 8191;
-constexpr int32_t ABS_TOOL_TYPE_MAX = 15;
-constexpr int32_t ABS_MAX_MT_ORIENTATION = 1;
-constexpr int32_t FINGER_ABS_RANGE = 40;
+constexpr int32_t ABS_MAX_X { 6400 };
+constexpr int32_t ABS_MAX_Y { 4000 };
+constexpr int32_t ABS_MAX_MT_SLOT { 9 };
+constexpr int32_t ABS_MAX_MT_TOUCH_MAJOR { 21 };
+constexpr int32_t ABS_MAX_MT_TOUCH_MINOR { 21 };
+constexpr int32_t ABS_MAX_MT_TRACKING_ID { 65535 };
+constexpr int32_t ABS_MAX_MT_PRESSURE { 8191 };
+constexpr int32_t ABS_TOOL_TYPE_MAX { 15 };
+constexpr int32_t ABS_MAX_MT_ORIENTATION { 1 };
+constexpr int32_t FINGER_ABS_RANGE { 40 };
 
 ResolutionInfo resolutionInfos[] = {
     { ABS_X, FINGER_ABS_RANGE },
