@@ -2179,14 +2179,14 @@ int32_t InputManagerCommand::ProcessTouchPadFingerSwipAction()
 {
     int32_t fingerCount = 3;
     int32_t times = 5;
-    int32_t milliPerSecond = 1000;
+    int32_t thousand = 1000;
     int32_t disPlayX[5][3] = {{0, 52, 81}, {893, 52, 81 }, {894, 52, 81 }, {894, 52, 81}, {894, 52, 81}};
     int32_t disPlayY[5][3] = {{0, 37, 46}, {620, 37, 46 }, {592, 35, 44 }, {562, 33, 42}, {562, 33, 42}};
     int32_t eventIds[5] = {7277, 8074,  8078, 8082, 8083};
     int32_t actionType[5] = {PointerEvent::POINTER_ACTION_SWIPE_BEGIN, PointerEvent::POINTER_ACTION_SWIPE_UPDATE,
                             PointerEvent::POINTER_ACTION_SWIPE_UPDATE, PointerEvent::POINTER_ACTION_SWIPE_UPDATE,
                             PointerEvent::POINTER_ACTION_SWIPE_END};
-    int64_t actionTimeBase = GetSysClockTime() - times * milliPerSecond * milliPerSecond;
+    int64_t actionTimeBase = GetSysClockTime() - times * thousand * thousand;
     int64_t actionTimeStartTimeDis = 5659;
     int64_t actionStartTime[5] = {0, 0, 0, 0, 0};
     int64_t actionStartTimeDis[5] = {0, 0, 7, 7, 17};
@@ -2197,7 +2197,7 @@ int32_t InputManagerCommand::ProcessTouchPadFingerSwipAction()
                                 {downTimeSame, downTimeSame}, {downTimeSame, downTimeSame},
                                 {downTimeSame, downTimeSame}};
     actionTime[0] = actionTimeBase;
-    actionStartTime[0] = (actionTimeBase - actionTimeStartTimeDis) / milliPerSecond;
+    actionStartTime[0] = (actionTimeBase - actionTimeStartTimeDis) / thousand;
     for (int32_t i = 1; i < times; i++) {
         actionTime[i] = actionTime[i - 1] + actionTimeDis[i - 1];
         actionStartTime[i] = actionStartTime[i - 1] + actionStartTimeDis[i - 1];
