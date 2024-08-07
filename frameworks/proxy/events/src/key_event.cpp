@@ -1353,7 +1353,7 @@ std::string_view KeyEvent::ActionToShortStr(int32_t action)
 }
 
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-void KeyEvent::SetEnhanceData(const std::vector<uint8_t> enhanceData)
+void KeyEvent::SetEnhanceData(const std::vector<uint8_t>& enhanceData)
 {
     enhanceData_ = enhanceData;
 }
