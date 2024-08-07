@@ -47,6 +47,7 @@ ohos_shared_library("libmmi-napi") {
   external_deps = [
     "hilog:libhilog",
     "napi:ace_napi",
+    "c_utils:utils",
   ]
 
   innerapi_tags = [ "platformsdk" ]

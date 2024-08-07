@@ -58,6 +58,8 @@ ohos_shared_library("pointer") {
     "image_framework:image",
     "image_framework:image_native",
     "napi:ace_napi",
+    "eventhandler:libeventhandler",
+    "ipc:ipc_core",
   ]
 
   relative_install_dir = "module/multimodalinput"

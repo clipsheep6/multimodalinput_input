@@ -47,6 +47,8 @@ ohos_shared_library("inputconsumer") {
     "c_utils:utils",
     "hilog:libhilog",
     "napi:ace_napi",
+    "eventhandler:libeventhandler",
+    "ipc:ipc_core",
   ]
   branch_protector_ret = "pac_ret"
   sanitize = {

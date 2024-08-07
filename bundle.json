@@ -89,7 +89,11 @@
         "call_manager",
         "libinput",
         "screenlock_mgr",
-	"player_framework"
+        "FreeBSD",
+        "googletest",
+        "skia",
+        "player_framework",
+        "cJSON"
       ],
       "third_party": [
         "cJSON",
