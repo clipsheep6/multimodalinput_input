@@ -1310,7 +1310,8 @@ bool KeyCommandHandler::HandleRepeatKey(const RepeatKey &item, bool &isLaunched,
     if (keyEvent->GetKeyCode() != item.keyCode) {
         return false;
     }
-    if (keyEvent->GetKeyAction() != KeyEvent::KEY_ACTION_DOWN) {
+    if (keyEvent->GetKeyAction() != KeyEvent::KEY_ACTION_DOWN ||
+        (count_ > maxCount_ && keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER)) {
         return true;
     }
     auto it = repeatKeyCountMap_.find(item.ability.bundleName);
@@ -1391,6 +1392,7 @@ void KeyCommandHandler::LaunchRepeatKeyAbility(const RepeatKey &item, bool &isLa
     LaunchAbility(item.ability);
     BytraceAdapter::StopLaunchAbility();
     launchAbilityCount_ = count_;
+    repeatKeyCountMap_.clear();
     isLaunched = true;
     isDownStart_ = false;
     if (InputHandler->GetSubscriberHandler() != nullptr) {

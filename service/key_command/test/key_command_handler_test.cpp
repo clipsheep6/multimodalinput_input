@@ -3645,7 +3645,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleRepeatKey_004, TestS
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     handler.repeatKeyCountMap_.emplace(repeatKey.ability.bundleName, 2);
     handler.repeatKeyMaxTimes_.emplace(KeyEvent::KEYCODE_POWER, 5);
-    ASSERT_FALSE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
+    ASSERT_TRUE(handler.HandleRepeatKey(repeatKey, isLaunched, keyEvent));
 }
 
 /**
