@@ -130,7 +130,7 @@ napi_value JsShortKeyContext::SetKeyDownDuration(napi_env env, napi_callback_inf
 {
     CALL_DEBUG_ENTER;
     size_t argc = 3;
-    napi_value argv[3];
+    napi_value argv[3] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     size_t paramsNum = 2;
     if (argc < paramsNum) {
