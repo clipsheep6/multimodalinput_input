@@ -19,17 +19,11 @@
             OHOS::MMI::BytraceAdapter*;
             OHOS::MMI::InputDevice*;
             OHOS::MMI::InputEvent*;
-            OHOS::MMI::InputInterceptorManager*;
             OHOS::MMI::InputManager*;
-            OHOS::MMI::InputManagerImpl*;
-            OHOS::MMI::InputMonitorManager*;
             OHOS::MMI::KeyEvent*;
-            OHOS::MMI::KeyEventInputSubscribeManager*;
             OHOS::MMI::KeyOption*;
             OHOS::MMI::PointerEvent*;
             OHOS::MMI::PointerStyle*;
-            OHOS::MMI::PointerStyleColor*;
-            OHOS::MMI::MultimodalEventHandler*;
             OHOS::MMI::MMIClient*;
             "vtable for OHOS::MMI::MMIClient";
         };
