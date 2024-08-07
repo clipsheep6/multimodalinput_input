@@ -319,6 +319,10 @@ ohos_shared_library("libmmi-server") {
     "window_manager:libwsutils",
   ]
 
+  if (!build_ohos_sdk) {
+    external_deps += [ "relational_store:native_rdb" ]
+  }
+
   if (defined(use_rosen_drawing) && use_rosen_drawing) {
     defines += [ "USE_ROSEN_DRAWING" ]
   }
