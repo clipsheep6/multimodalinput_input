@@ -1806,7 +1806,7 @@ int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, Po
         MMI_HILOGE("Set pointer style failed");
         return RET_ERR;
     }
-    if (!INPUT_DEV_MGR->HasPointerDevice()) {
+    if (!INPUT_DEV_MGR->HasPointerDevice() || !WIN_MGR->IsMouseSimulate()) {
         MMI_HILOGD("The pointer device is not exist");
         return RET_OK;
     }
