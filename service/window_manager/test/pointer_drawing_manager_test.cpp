@@ -1789,5 +1789,27 @@ HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_InitPointerObserver_
         std::static_pointer_cast<PointerDrawingManager>(IPointerDrawingManager::GetInstance());
     ASSERT_NO_FATAL_FAILURE(pointerDrawingManager->InitPointerObserver());
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_DrawPointerStyle_003
+ * @tc.desc: Test DrawPointerStyle
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerDrawingManagerTest, InputWindowsManagerTest_DrawPointerStyle_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    PointerDrawingManager pointerDrawingManager;
+    PointerStyle pointerStyle;
+    pointerStyle.id = EAST;
+    pointerStyle.color = 0;
+    pointerStyle.size = 2;
+    pointerDrawingManager.hasDisplay_ = true;
+    pointerDrawingManager.hasPointerDevice_ = true;
+    bool removeResult = false;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawPointerStyle(pointerStyle, removeResult));
+    removeResult = true;
+    ASSERT_NO_FATAL_FAILURE(pointerDrawingManager.DrawPointerStyle(pointerStyle, removeResult));
+}
 } // namespace MMI
 } // namespace OHOS

@@ -274,7 +274,7 @@ int32_t PointerDrawingManager::GetPointerStyle(int32_t pid, int32_t windowId, Po
 {
     return 0;
 }
-void PointerDrawingManager::DrawPointerStyle(const PointerStyle& pointerStyle) {}
+void PointerDrawingManager::DrawPointerStyle(const PointerStyle& pointerStyle, bool removeResult) {}
 bool PointerDrawingManager::IsPointerVisible()
 {
     return false;

@@ -253,6 +253,8 @@ bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     void UpdateDisplayMode();
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+    int32_t UpdateCurrentDisplayId();
+    void OnDisplayRemoved(const DisplayGroupInfo &displayGroupInfo);
 
 private:
     UDSServer* udsServer_ { nullptr };
@@ -312,6 +314,7 @@ private:
     std::shared_ptr<PointerEvent> lastPointerEventForFold_ { nullptr };
     Direction lastDirection_ = static_cast<Direction>(-1);
     std::map<int32_t, WindowInfo> lastMatchedWindow_;
+    bool isDisplayRemoved_ { false };
 };
 } // namespace MMI
 } // namespace OHOS

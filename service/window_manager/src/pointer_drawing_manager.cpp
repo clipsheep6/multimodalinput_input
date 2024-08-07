@@ -166,6 +166,19 @@ void PointerDrawingManager::ForceClearPointerVisiableStatus()
     UpdatePointerVisible();
 }
 
+void PointerDrawingManager::UpdateBindDisplayId(int32_t displayId)
+{
+    if (lastDisplayId_ != displayId) {
+        MMI_HILOGI("mouse traversal occurs, lastDisplayId_:%{public}d, displayId:%{public}d",
+            lastDisplayId_, displayId);
+        surfaceNode_->DetachToDisplay(screenId_);
+        screenId_ = static_cast<uint64_t>(displayId);
+        MMI_HILOGI("screenId_: %{public}" PRIu64, screenId_);
+        AttachToDisplay();
+        lastDisplayId_ = displayId;
+    }
+}
+
 int32_t PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
     PointerStyle pointerStyle, Direction direction)
 {
@@ -186,9 +199,9 @@ int32_t PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physic
         }
     }
 #endif // OHOS_BUILD_ENABLE_MAGICCURSOR
+    UpdateBindDisplayId(displayId);
     if (lastMouseStyle_ == pointerStyle && !mouseIconUpdate_ && lastDirection_ == direction) {
-        surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
-            surfaceNode_->GetStagingProperties().GetBounds().z_,
+        surfaceNode_->SetBounds(physicalX, physicalY, surfaceNode_->GetStagingProperties().GetBounds().z_,
             surfaceNode_->GetStagingProperties().GetBounds().w_);
         Rosen::RSTransaction::FlushImplicitTransaction();
         MMI_HILOGD("The lastpointerStyle is equal with pointerStyle, id:%{public}d, size:%{public}d",
@@ -207,7 +220,8 @@ int32_t PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physic
         MMI_HILOGE("Init layer failed");
         return RET_ERR;
     }
-    surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
+
+    surfaceNode_->SetBounds(physicalX, physicalY,
         surfaceNode_->GetStagingProperties().GetBounds().z_,
         surfaceNode_->GetStagingProperties().GetBounds().w_);
     surfaceNode_->SetVisible(true);
@@ -223,7 +237,7 @@ void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX
 {
     CALL_DEBUG_ENTER;
     if (surfaceNode_ != nullptr) {
-        surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
+        surfaceNode_->SetBounds(physicalX, physicalY,
             surfaceNode_->GetStagingProperties().GetBounds().z_,
             surfaceNode_->GetStagingProperties().GetBounds().w_);
         Rosen::RSTransaction::FlushImplicitTransaction();
@@ -920,6 +934,7 @@ void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t physi
     screenId_ = static_cast<uint64_t>(displayId);
     std::cout << "ScreenId: " << screenId_ << std::endl;
     AttachToDisplay();
+    lastDisplayId_ = displayId;
     RotateDegree(direction);
     lastDirection_ = direction;
 
@@ -1761,7 +1776,7 @@ int32_t PointerDrawingManager::ClearWindowPointerStyle(int32_t pid, int32_t wind
     return WIN_MGR->ClearWindowPointerStyle(pid, windowId);
 }
 
-void PointerDrawingManager::DrawPointerStyle(const PointerStyle& pointerStyle)
+void PointerDrawingManager::DrawPointerStyle(const PointerStyle& pointerStyle, bool removeResult)
 {
     CALL_DEBUG_ENTER;
     if (hasDisplay_ && hasPointerDevice_) {
@@ -1773,7 +1788,7 @@ void PointerDrawingManager::DrawPointerStyle(const PointerStyle& pointerStyle)
         if (displayInfo_.displayDirection == DIRECTION0) {
             direction = displayInfo_.direction;
         }
-        if (lastPhysicalX_ == -1 || lastPhysicalY_ == -1) {
+        if (lastPhysicalX_ == -1 || lastPhysicalY_ == -1 || removeResult) {
             DrawPointer(displayInfo_.id, displayInfo_.width / CALCULATE_MIDDLE, displayInfo_.height / CALCULATE_MIDDLE,
                 pointerStyle, direction);
             MMI_HILOGD("Draw pointer style, mouseStyle:%{public}d", pointerStyle.id);

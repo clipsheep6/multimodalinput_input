@@ -83,7 +83,7 @@ public:
         bool isUiExtension = false) override;
     int32_t SetPointerSize(int32_t size) override;
     int32_t GetPointerSize() override;
-    void DrawPointerStyle(const PointerStyle& pointerStyle) override;
+    void DrawPointerStyle(const PointerStyle& pointerStyle, bool removeResult = false) override;
     bool IsPointerVisible() override;
     void SetPointerLocation(int32_t x, int32_t y) override;
     void AdjustMouseFocus(Direction direction, ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
@@ -148,6 +148,7 @@ private:
     void DrawImage(OHOS::Rosen::Drawing::Canvas &canvas, MOUSE_ICON mouseStyle);
     bool SetHardWareLocation(int32_t displayId, int32_t physicalX, int32_t physicalY);
     void ForceClearPointerVisiableStatus() override;
+    void UpdateBindDisplayId(int32_t displayId);
 
 private:
     struct PidInfo {
@@ -185,6 +186,7 @@ private:
 #ifdef OHOS_BUILD_ENABLE_HARDWARE_CURSOR
     std::shared_ptr<HardwareCursorPointerManager> hardwareCursorPointerManager_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_HARDWARE_CURSOR
+    int32_t lastDisplayId_ { DEFAULT_DISPLAY_ID };
 };
 } // namespace MMI
 } // namespace OHOS
