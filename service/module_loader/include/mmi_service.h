@@ -51,8 +51,8 @@ public:
     int32_t AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority,
         uint32_t deviceTags) override;
     int32_t RemoveInputEventFilter(int32_t filterId) override;
-    int32_t SetPointerSize(int32_t size) override;
-    int32_t GetPointerSize(int32_t &size) override;
+    int32_t SetPointerSizeGlobal(int32_t size) override;
+    int32_t GetPointerSizeGlobal(int32_t &size) override;
     int32_t SetMouseScrollRows(int32_t rows) override;
     int32_t GetMouseScrollRows(int32_t &rows) override;
     int32_t SetCustomCursor(int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap) override;
@@ -67,7 +67,9 @@ public:
     int32_t SetPointerVisible(bool visible, int32_t priority) override;
     int32_t IsPointerVisible(bool &visible) override;
     int32_t MarkProcessed(int32_t eventType, int32_t eventId) override;
+    int32_t SetPointerColorGlobal(int32_t color) override;
     int32_t SetPointerColor(int32_t color) override;
+    int32_t GetPointerColorGlobal(int32_t &color) override;
     int32_t GetPointerColor(int32_t &color) override;
     int32_t EnableCombineKey(bool enable) override;
     int32_t SetPointerSpeed(int32_t speed) override;
@@ -182,7 +184,8 @@ protected:
     int32_t ReadMousePrimaryButton(int32_t &primaryButton);
     int32_t ReadPointerSpeed(int32_t &speed);
     int32_t ReadHoverScrollState(bool &state);
-    int32_t ReadPointerColor(int32_t &color);
+    int32_t ReadPointerColorGlobal(int32_t &color);
+    int32_t ReadPointerColor(int32_t pid, int32_t &color);
     int32_t ReadTouchpadScrollSwich(bool &switchFlag);
     int32_t ReadTouchpadScrollDirection(bool &state);
     int32_t ReadTouchpadTapSwitch(bool &switchFlag);

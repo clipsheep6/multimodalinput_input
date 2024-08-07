@@ -325,7 +325,7 @@ int32_t MultimodalInputConnectProxy::GetMouseScrollRows(int32_t &rows)
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::SetPointerSize(int32_t size)
+int32_t MultimodalInputConnectProxy::SetPointerSizeGlobal(int32_t size)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -374,7 +374,7 @@ int32_t MultimodalInputConnectProxy::SetNapStatus(int32_t pid, int32_t uid, std:
     return ret;
 }
 
-int32_t MultimodalInputConnectProxy::GetPointerSize(int32_t &size)
+int32_t MultimodalInputConnectProxy::GetPointerSizeGlobal(int32_t &size)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -557,6 +557,30 @@ int32_t MultimodalInputConnectProxy::MarkProcessed(int32_t eventType, int32_t ev
     return RET_OK;
 }
 
+int32_t MultimodalInputConnectProxy::SetPointerColorGlobal(int32_t color)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+
+    WRITEINT32(data, color, ERR_INVALID_VALUE);
+
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret =
+        remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_POINTER_COLOR_GLOBAL),
+        data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
 int32_t MultimodalInputConnectProxy::SetPointerColor(int32_t color)
 {
     CALL_DEBUG_ENTER;
@@ -578,6 +602,29 @@ int32_t MultimodalInputConnectProxy::SetPointerColor(int32_t color)
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
     }
     return ret;
+}
+
+int32_t MultimodalInputConnectProxy::GetPointerColorGlobal(int32_t &color)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret =
+        remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_POINTER_COLOR_GLOBAL),
+        data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+        return ret;
+    }
+    READINT32(reply, color, IPC_PROXY_DEAD_OBJECT_ERR);
+    return RET_OK;
 }
 
 int32_t MultimodalInputConnectProxy::GetPointerColor(int32_t &color)

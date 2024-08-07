@@ -113,6 +113,7 @@ enum class MultimodalinputConnectInterfaceCode {
     REMOVE_VIRTUAL_INPUT_DEVICE = 91,
     SET_THREE_GINGERS_TAPSWITCH = 92,
     GET_THREE_GINGERS_TAPSWITCH = 93,
+    GET_POINTER_COLOR_GLOBAL = 94,
 #ifdef OHOS_BUILD_ENABLE_ANCO
     ADD_ANCO_CHANNEL = 94,
     REMOVE_ANCO_CHANNEL = 95,
@@ -122,7 +123,8 @@ enum class MultimodalinputConnectInterfaceCode {
     GET_TOUCHPAD_SCROLL_ROWS = 98,
     GET_POINTER_SNAPSHOT = 99,
     SET_MOVE_EVENT_FILTERS = 100,
-    SKIP_POINTER_LAYER = 101,
+	SKIP_POINTER_LAYER = 101,
+    SET_POINTER_COLOR_GLOBAL = 102,
 };
 
 enum class MultimodalinputEventObserverCode {

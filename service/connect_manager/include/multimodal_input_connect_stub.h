@@ -85,8 +85,10 @@ protected:
     int32_t StubGetDisplayBindInfo(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetAllMmiSubscribedEvents(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetDisplayBind(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetPointerColorGlobal(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetPointerColor(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetPointerColor(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetPointerColorGlobal(MessageParcel& data, MessageParcel& reply);
     int32_t StubEnableCombineKey(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetPointerSpeed(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetPointerSpeed(MessageParcel& data, MessageParcel& reply);

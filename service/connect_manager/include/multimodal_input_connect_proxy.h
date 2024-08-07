@@ -42,9 +42,9 @@ public:
     int32_t RemoveInputEventFilter(int32_t filterId) override;
     int32_t SetMouseScrollRows(int32_t rows) override;
     int32_t GetMouseScrollRows(int32_t &rows) override;
-    int32_t SetPointerSize(int32_t size) override;
+    int32_t SetPointerSizeGlobal(int32_t size) override;
     int32_t SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napStatus) override;
-    int32_t GetPointerSize(int32_t &size) override;
+    int32_t GetPointerSizeGlobal(int32_t &size) override;
     int32_t SetCustomCursor(int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap) override;
     int32_t SetMouseIcon(int32_t windowId, void* pixelMap) override;
     int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId) override;
@@ -56,7 +56,9 @@ public:
     int32_t SetPointerVisible(bool visible, int32_t priority) override;
     int32_t IsPointerVisible(bool &visible) override;
     int32_t MarkProcessed(int32_t eventType, int32_t eventId) override;
+    int32_t SetPointerColorGlobal(int32_t color) override;
     int32_t SetPointerColor(int32_t color) override;
+    int32_t GetPointerColorGlobal(int32_t &color) override;
     int32_t GetPointerColor(int32_t &color) override;
     int32_t SetPointerSpeed(int32_t speed) override;
     int32_t GetPointerSpeed(int32_t &speed) override;

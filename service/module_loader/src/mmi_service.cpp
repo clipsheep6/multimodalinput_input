@@ -663,13 +663,13 @@ int32_t MMIService::GetMouseScrollRows(int32_t &rows)
     return RET_OK;
 }
 
-int32_t MMIService::SetPointerSize(int32_t size)
+int32_t MMIService::SetPointerSizeGlobal(int32_t size)
 {
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t ret = delegateTasks_.PostSyncTask(
         [size] {
-            return IPointerDrawingManager::GetInstance()->SetPointerSize(size);
+            return IPointerDrawingManager::GetInstance()->SetPointerSizeGlobal(size);
         }
         );
     if (ret != RET_OK) {
@@ -683,12 +683,12 @@ int32_t MMIService::SetPointerSize(int32_t size)
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 int32_t MMIService::ReadPointerSize(int32_t &size)
 {
-    size = IPointerDrawingManager::GetInstance()->GetPointerSize();
+    size = IPointerDrawingManager::GetInstance()->GetPointerSizeGlobal();
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
-int32_t MMIService::GetPointerSize(int32_t &size)
+int32_t MMIService::GetPointerSizeGlobal(int32_t &size)
 {
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
@@ -813,13 +813,31 @@ int32_t MMIService::MarkProcessed(int32_t eventType, int32_t eventId)
     return RET_OK;
 }
 
-int32_t MMIService::SetPointerColor(int32_t color)
+int32_t MMIService::SetPointerColorGlobal(int32_t color)
 {
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t ret = delegateTasks_.PostSyncTask(
         [color] {
-            return IPointerDrawingManager::GetInstance()->SetPointerColor(color);
+            return IPointerDrawingManager::GetInstance()->SetPointerColorGlobal(color);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set pointer color failed, return:%{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+    return RET_OK;
+}
+
+int32_t MMIService::SetPointerColor(int32_t color)
+{
+    CALL_INFO_TRACE;
+    int32_t clientPid = GetCallingPid();
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [clientPid, color] {
+            return IPointerDrawingManager::GetInstance()->SetPointerColor(clientPid, color);
         }
         );
     if (ret != RET_OK) {
@@ -831,20 +849,46 @@ int32_t MMIService::SetPointerColor(int32_t color)
 }
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-int32_t MMIService::ReadPointerColor(int32_t &color)
+int32_t MMIService::ReadPointerColorGlobal(int32_t &color)
 {
-    color = IPointerDrawingManager::GetInstance()->GetPointerColor();
+    color = IPointerDrawingManager::GetInstance()->GetPointerColorGlobal();
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
-int32_t MMIService::GetPointerColor(int32_t &color)
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+int32_t MMIService::ReadPointerColor(int32_t pid, int32_t &color)
+{
+    color = IPointerDrawingManager::GetInstance()->GetPointerColor(pid);
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+
+int32_t MMIService::GetPointerColorGlobal(int32_t &color)
 {
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t ret = delegateTasks_.PostSyncTask(
         [this, &color] {
-            return this->ReadPointerColor(color);
+            return this->ReadPointerColorGlobal(color);
+        }
+        );
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get pointer color failed, return:%{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+    return RET_OK;
+}
+
+int32_t MMIService::GetPointerColor(int32_t &color)
+{
+    CALL_INFO_TRACE;
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    int32_t clientPid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        [this, clientPid, &color] {
+            return this->ReadPointerColor(clientPid, color);
         }
         );
     if (ret != RET_OK) {

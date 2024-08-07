@@ -56,6 +56,8 @@ namespace MMI {
 namespace {
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 constexpr int32_t DEFAULT_POINTER_STYLE { 0 };
+constexpr int32_t DEFAULT_POINTER_COLOR { 0x000000 };
+constexpr int32_t DEFAULT_POINTER_SIZE { 0 };
 constexpr int32_t CURSOR_CIRCLE_STYLE { 41 };
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 constexpr int32_t OUTWINDOW_HOT_AREA { 20 };
@@ -1504,6 +1506,11 @@ void InputWindowsManager::OnSessionLost(SessionPtr session)
         pointerStyle_.erase(it);
         MMI_HILOGD("Clear the pointer style map, pd:%{public}d", pid);
     }
+    auto iter = pointerSizeAndColor_.find(pid);
+    if (iter != pointerSizeAndColor_.end()) {
+        pointerSizeAndColor_.erase(iter);
+        MMI_HILOGD("Clear the pointer size and color, pd:%{public}d", pid);
+    }
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
 
@@ -1622,6 +1629,38 @@ int32_t InputWindowsManager::SetPointerStyle(int32_t pid, int32_t windowId, Poin
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
+int32_t InputWindowsManager::SetPointerColor(int32_t pid, int32_t color, int32_t size)
+{
+    CALL_DEBUG_ENTER;
+    PointerStyle pointerStyle;
+    auto it = pointerSizeAndColor_.find(pid);
+    if (it != pointerSizeAndColor_.end()) {
+        if (it->second.color != color) {
+            MMI_HILOG_CURSORD("Set Pointer color:%{public}d", color);
+            pointerStyle.size = it->second.size;
+            pointerStyle.color = color;
+            pointerSizeAndColor_[pid] = pointerStyle;
+            return RET_OK;
+        }
+        if (it->second.size != size) {
+            MMI_HILOG_CURSORD("Set Pointer size:%{public}d", size);
+            pointerStyle.size = size;
+            pointerStyle.color = it->second.size;
+            pointerSizeAndColor_[pid] = pointerStyle;
+            return RET_OK;
+        }
+        pointerSizeAndColor_.erase(it);
+    }
+
+    if (color != 0)
+
+    pointerStyle.color = color;
+    pointerStyle.size = size;
+    pointerSizeAndColor_[pid] = pointerStyle;
+    MMI_HILOG_CURSORD("The size or color insert success");
+    return RET_OK;
+}
+
 int32_t InputWindowsManager::ClearWindowPointerStyle(int32_t pid, int32_t windowId)
 {
     CALL_DEBUG_ENTER;
@@ -1690,12 +1729,26 @@ int32_t InputWindowsManager::GetPointerStyle(int32_t pid, int32_t windowId, Poin
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
+int32_t InputWindowsManager::GetPointerColor(int32_t pid, PointerStyle &pointerStyle)
+{
+    CALL_DEBUG_ENTER;
+    auto it = pointerSizeAndColor_.find(pid);
+    if (it == pointerSizeAndColor_.end()) {
+        MMI_HILOG_CURSORE("The pointer style map is not include param pd, %{public}d", pid);
+        return RET_OK;
+    }
+    pointerStyle.color = it->second.color;
+    MMI_HILOG_CURSORD("get pointer color:%{public}d success", it->second.color);
+    return RET_OK;
+}
+
 #ifdef OHOS_BUILD_ENABLE_POINTER
 void InputWindowsManager::InitPointerStyle()
 {
     CALL_DEBUG_ENTER;
     PointerStyle pointerStyle;
     pointerStyle.id = DEFAULT_POINTER_STYLE;
+    pointerStyle.color = DEFAULT_POINTER_COLOR;
     for (const auto& windowItem : displayGroupInfo_.windowsInfo) {
         int32_t pid = windowItem.pid;
         auto it = pointerStyle_.find(pid);
@@ -1703,6 +1756,15 @@ void InputWindowsManager::InitPointerStyle()
             std::map<int32_t, PointerStyle> tmpPointerStyle = {};
             auto iter = pointerStyle_.insert(std::make_pair(pid, tmpPointerStyle));
             if (!iter.second) {
+                MMI_HILOGW("The pd is duplicated");
+            }
+            continue;
+        }
+
+        auto iter = pointerSizeAndColor_.find(pid);
+        if (iter == pointerSizeAndColor_.end()) {
+            auto iterator = pointerSizeAndColor_.insert(std::make_pair(pid, pointerStyle));
+            if (!iterator.second) {
                 MMI_HILOGW("The pd is duplicated");
             }
             continue;
@@ -2255,6 +2317,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
     GetPointerStyle(touchWindow->pid, touchWindow->id, pointerStyle);
+    GetPointerColor(touchWindow->pid, pointerStyle);
     if (isUiExtension_) {
         MMI_HILOGD("updatemouse target in uiextension");
         GetPointerStyle(uiExtensionPid_, uiExtensionWindowId_, pointerStyle, isUiExtension_);
