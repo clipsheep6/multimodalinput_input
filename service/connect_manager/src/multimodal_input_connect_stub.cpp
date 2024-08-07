@@ -903,7 +903,7 @@ int32_t MultimodalInputConnectStub::StubSetPointerSpeed(MessageParcel& data, Mes
     CALL_DEBUG_ENTER;
     if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
+        return -ERROR_NOT_SYSAPI;
     }
 
     int32_t speed = 0;
@@ -921,7 +921,7 @@ int32_t MultimodalInputConnectStub::StubGetPointerSpeed(MessageParcel& data, Mes
     CALL_DEBUG_ENTER;
     if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
+        return -ERROR_NOT_SYSAPI;
     }
 
     int32_t speed = 0;
@@ -1244,7 +1244,7 @@ int32_t MultimodalInputConnectStub::StubSubscribeKeyEvent(MessageParcel& data, M
     CALL_DEBUG_ENTER;
     if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
+        return -ERROR_NOT_SYSAPI;
     }
 
     if (!IsRunning()) {
@@ -1273,7 +1273,7 @@ int32_t MultimodalInputConnectStub::StubUnsubscribeKeyEvent(MessageParcel& data,
     CALL_DEBUG_ENTER;
     if (!PER_HELPER->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
-        return ERROR_NOT_SYSAPI;
+        return -ERROR_NOT_SYSAPI;
     }
 
     if (!IsRunning()) {

@@ -303,6 +303,9 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
         subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, SubKeyEventCallback);
         if (subscribeId < 0) {
             MMI_HILOGE("SubscribeId invalid:%{public}d", subscribeId);
+            if (abs(subscribeId) == COMMON_USE_SYSAPI_ERROR) {
+                THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Permission denied, non-system app called system api.");
+            }
             delete event;
             return nullptr;
         }

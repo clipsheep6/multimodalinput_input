@@ -134,6 +134,9 @@ int32_t KeyEventInputSubscribeManager::UnsubscribeKeyEvent(int32_t subscribeId)
     CALL_INFO_TRACE;
     if (subscribeId < 0) {
         MMI_HILOGE("Subscribe id is less than 0");
+        if (abs(subscribeId) == COMMON_USE_SYSAPI_ERROR) {
+            THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Permission denied, non-system app called system api.");
+        }
         return RET_ERR;
     }
 

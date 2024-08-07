@@ -1268,6 +1268,9 @@ int32_t InputManagerImpl::SetPointerSpeed(int32_t speed)
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->SetPointerSpeed(speed);
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to set pointer speed");
+        if (abs(ret) == COMMON_USE_SYSAPI_ERROR) {
+            THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Permission denied, non-system app called system api.");
+        }
         return RET_ERR;
     }
     return RET_OK;
@@ -1284,6 +1287,9 @@ int32_t InputManagerImpl::GetPointerSpeed(int32_t &speed)
     int32_t ret = MULTIMODAL_INPUT_CONNECT_MGR->GetPointerSpeed(speed);
     if (ret != RET_OK) {
         MMI_HILOGE("Get pointer speed failed");
+        if (abs(ret) == COMMON_USE_SYSAPI_ERROR) {
+            THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Permission denied, non-system app called system api.");
+        }
         return RET_ERR;
     }
     return RET_OK;
