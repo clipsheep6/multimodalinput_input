@@ -1254,5 +1254,43 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_DrawBubble_003, TestSi
     touchDrawingMgr.pointerEvent_->AddPointerItem(item);
     EXPECT_NO_FATAL_FAILURE(touchDrawingMgr.DrawBubble());
 }
+
+/**
+ * @tc.name: TouchDrawingManagerTest_UpdatePointerCoordinate_001
+ * @tc.desc: Test UpdatePointerCoordinate
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdatePointerCoordinate_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchDrawingManager touchDrawingMgr;
+    DisplayInfo displayInfo;
+    double physicalX = 0;
+    double physicalY = 0;
+    auto retPair = touchDrawingMgr.UpdatePointerCoordinate(displayInfo, physicalX, physicalY);
+    EXPECT_EQ(retPair.first, 0);
+    EXPECT_EQ(retPair.second, 0);
+}
+
+/**
+ * @tc.name: TouchDrawingManagerTest_UpdatePointerCoordinate_002
+ * @tc.desc: Test UpdatePointerCoordinate
+ * @tc.type: Function
+ * @tc.require:
+ */
+HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_UpdatePointerCoordinate_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TouchDrawingManager touchDrawingMgr;
+    DisplayInfo displayInfo = {
+        .id = 0, .x = 0, .y = 0, .width = 100, .height = 200, .dpi = 240,
+        .transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f}
+    };
+    double physicalX = 10;
+    double physicalY = 10;
+    auto retPair = touchDrawingMgr.UpdatePointerCoordinate(displayInfo, physicalX, physicalY);
+    MMI_HILOGI("retPair.first:%{public}d, retPair.second:%{public}d", retPair.first, retPair.second);
+}
 } // namespace MMI
 } // namespace OHOS
