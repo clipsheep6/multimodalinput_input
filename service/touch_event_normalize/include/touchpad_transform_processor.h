@@ -38,6 +38,9 @@ class MultiFingersTapHandler final {
     DECLARE_DELAYED_SINGLETON(MultiFingersTapHandler);
 
 public:
+    MultiFingersTapHandler() = default;
+    ~MultiFingersTapHandler() = default;
+
     DISALLOW_COPY_AND_MOVE(MultiFingersTapHandler);
 
     enum class TapTrends : int32_t {

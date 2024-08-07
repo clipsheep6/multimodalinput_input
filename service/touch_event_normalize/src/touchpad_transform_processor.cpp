@@ -613,10 +613,6 @@ std::shared_ptr<PointerEvent> TouchPadTransformProcessor::GetPointerEvent()
     return pointerEvent_;
 }
 
-MultiFingersTapHandler::MultiFingersTapHandler() {}
-
-MultiFingersTapHandler::~MultiFingersTapHandler() {}
-
 int32_t MultiFingersTapHandler::HandleMulFingersTap(struct libinput_event_touch *event, int32_t type)
 {
     CALL_DEBUG_ENTER;
