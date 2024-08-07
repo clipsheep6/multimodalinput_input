@@ -1995,7 +1995,7 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability)
     want.SetElementName(ability.deviceId, ability.bundleName, ability.abilityName);
     want.SetAction(ability.action);
     want.SetUri(ability.uri);
-    want.SetType(ability.uri);
+    want.SetType(ability.type);
     for (const auto &entity : ability.entities) {
         want.AddEntity(entity);
     }
