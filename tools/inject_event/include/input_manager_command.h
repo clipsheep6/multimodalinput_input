@@ -18,7 +18,9 @@
 
 #include <string>
 #include <vector>
+
 #include "nocopyable.h"
+#include "pointer_event.h"
 
 namespace OHOS {
 namespace MMI {
@@ -38,6 +40,7 @@ private:
     void PrintTouchUsage();
     void PrintKnuckleUsage();
     void PrintTouchPadUsage();
+    void SendTouchDownForPinch();
     bool IsCoordinateInvalid(int32_t firstDownX, int32_t firstDownY, int32_t secondDownX, int32_t secondDownY);
     int32_t SingleKnuckleClickEvent(int32_t downX, int32_t downY);
     int32_t DoubleKnuckleClickEvent(int32_t downX, int32_t downY);
@@ -49,11 +52,13 @@ private:
     int32_t ProcessPinchGesture(int32_t argc, char *argv[], int32_t indexPercent);
     int32_t InjectPinchEvent(int32_t fingerCount, int32_t scaleNumberator);
     int32_t ProcessRotateGesture(int32_t argc, char *argv[]);
-    int32_t ProcessTouchPadFingerAction(int32_t argc, char *argv[]);
-    int32_t ActionEvent(int32_t fingerCount);
     int32_t ProcessKeyboardTextInput(int32_t argc, char *argv[]);
     int32_t PrintKeyboardTextChar(int32_t keyCode, bool isPressShift);
     bool IsSpecialChar(char character, int32_t &keyCode, bool &isPressShift);
+    int32_t ProcessTouchPadFingerSwipAction();
+    int32_t ActionPinchEvent(int32_t scalePercentNumerator);
+    std::shared_ptr<PointerEvent> CreatePointerEvent(int32_t id, int32_t type, int32_t pointerId, int32_t sourceType,
+                                    int32_t fingerCount);
 };
 } // namespace MMI
 } // namespace OHOS
