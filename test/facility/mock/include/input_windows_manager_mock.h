@@ -68,6 +68,7 @@ public:
     MOCK_METHOD(int32_t, GetPointerStyle, (int32_t, int32_t, PointerStyle&, bool), (const));
     void DispatchPointer(int32_t pointerAction, int32_t windowId = -1) override {}
     void SendPointerEvent(int32_t pointerAction) override {}
+    MOCK_METHOD(bool, IsMouseSimulate, (), (const));
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     MOCK_METHOD(bool, IsNeedRefreshLayer, (int32_t));
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
