@@ -944,6 +944,19 @@ public:
 
     int32_t SkipPointerLayer(bool isSkip);
 
+    /**
+     * @brief 获取系统设置的所有快捷键。
+     *
+     * @param shortcutKey 返回{@Link Input_KeyOptions} 类型实例数组。首次调用可传入NULL，可获取数组长度。
+     * @param count 返回系统支持快捷键的个数。
+     * @return OH_Input_GetAllSystemShortcutKey 函数错误码。
+     *         若获取成功，返回{@link INPUT_SUCCESS}；\n
+     *         若获取失败，返回{@link INPUT_PARAMETER_ERROR}。\n
+     * @syscap SystemCapability.MultimodalInput.Input.Core
+     * @since 13
+     */
+    int32_t GetAllSystemShortcutKey(std::vector<std::unique_ptr<KeyOption>> &keyOptions, int32_t &count);
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);

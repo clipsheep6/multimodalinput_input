@@ -251,6 +251,13 @@ typedef struct Input_InterceptorEventCallback {
 typedef struct Input_InterceptorOptions Input_InterceptorOptions;
 
 /**
+ * @brief 定义快捷键结构体。
+ *
+ * @since 13
+ */
+typedef struct Input_ShortcutKey Input_ShortcutKey;
+
+/**
  * @brief Queries the key state.
  *
  * @param keyState Key state.
@@ -1166,6 +1173,177 @@ Input_Result OH_Input_RemoveKeyEventInterceptor(void);
  * @since 12
  */
 Input_Result OH_Input_RemoveInputEventInterceptor(void);
+
+/**
+ * @brief 创建快捷键对象的实例。
+ *
+ * @return 如果操作成功,则返回一个{@link Input_ShortcutKey}指针对象。
+ * 否则, 返回一个空指针， 可能的原因是内存分配失败。
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_ShortcutKey* OH_Input_CreateShortcutKey();
+
+/**
+ * @brief 销毁快捷键对象的实例。
+ *
+ * @param shortcutKey 快捷键对象的实例。
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+void OH_Input_DestroyShortcutKey(Input_ShortcutKey** shortcutKey);
+
+/**
+ * @brief 设置修饰键。
+ *
+ * @param shortcutKey 快捷键对象的实例。
+ * @param pressedKeys 修饰键列表。
+ * @param pressedKeyNum 修饰键个数， 取值范围1~2个。
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+void OH_Input_SetPressedKeys(Input_ShortcutKey* shortcutKey, int32_t *pressedKeys, int32_t pressedKeyNum);
+
+/**
+ * @brief 获取修饰键。
+ *
+ * @param shortcutKey 快捷键对象的实例。
+ * @param pressedKeys 返回修饰键列表。
+ * @param pressedKeyNum 返回修饰键个数。
+ * @return OH_Input_GetpressedKeys 函数错误码。
+ *         若获取成功，返回{@link INPUT_SUCCESS}；\n
+ *         若获取失败，返回{@link INPUT_PARAMETER_ERROR}。\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_Result OH_Input_GetPressedKeys(const Input_ShortcutKey* shortcutKey, int32_t **pressedKeys,
+                                    int32_t *pressedKeyNum);
+
+/**
+ * @brief 设置被修饰键。
+ *
+ * @param shortcutKey 快捷键对象的实例。
+ * @param finalKey 被修饰键值，被修饰键值只能是1个。
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+void OH_Input_SetFinalKey(Input_ShortcutKey* shortcutKey, int32_t finalKey);
+
+/**
+ * @brief 获取被修饰键。
+ *
+ * @param shortcutKey 快捷键对象的实例。
+ * @param finalKeyCode 返回被修饰键键值。
+ * @return OH_Input_GetfinalKey 函数错误码。
+ *         若获取成功，返回{@link INPUT_SUCCESS}；\n
+ *         若获取失败，返回{@link INPUT_PARAMETER_ERROR}。\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_Result OH_Input_GetFinalKey(const Input_ShortcutKey* shortcutKey, int32_t *finalKeyCode);
+
+/**
+ * @brief 设置被修饰键的按键状态。
+ *
+ * @param shortcutKey 快捷键对象的实例。
+ * @param isFinalKeyDown 被修饰键状态。 ture表示按下, false表示抬起。
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+void OH_Input_SetIsFinalKeyDown(Input_ShortcutKey* shortcutKey, bool isFinalKeyDown);
+
+/**
+ * @brief 获取被修饰键按键状态。
+ *
+ * @param shortcutKey 快捷键对象的实例。
+ * @param isFinalKeyDown 返回被修饰键按键状态。
+ * @return OH_Input_GetIsFinalKeyDown 函数错误码。
+ *         若获取成功，返回{@link INPUT_SUCCESS}；\n
+ *         若获取失败，返回{@link INPUT_PARAMETER_ERROR}。\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_Result OH_Input_GetIsFinalKeyDown(const Input_ShortcutKey* shortcutKey, bool *isFinalKeyDown);
+
+/**
+ * @brief 设置Key事件是否重复。
+ *
+ * @param shortcutKey 快捷键对象的实例。
+ * @param isRepeat Key事件是否重复。
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+void OH_Input_SetIsRepeat(Input_ShortcutKey* shortcutKey, bool isRepeat);
+
+/**
+ * @brief 获取Key事件是否重复。
+ *
+ * @param shortcutKey 快捷键对象的实例。
+ * @param isRepeat 返回Key事件是否重复。
+ * @return OH_Input_GetIsRepeat 函数错误码。
+ *         若获取成功，返回{@link INPUT_SUCCESS}；\n
+ *         若获取失败，返回{@link INPUT_PARAMETER_ERROR}。\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_Result OH_Input_GetIsRepeat(const Input_ShortcutKey* shortcutKey, bool *isRepeat);
+
+/**
+ * @brief 设置被修饰键保持按下持续时间。
+ *
+ * @param shortcutKey 快捷键对象的实例。
+ * @param duration 被修饰键按下持续时间，单位为微秒（μs）。
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+void OH_Input_SetFinalKeyDownDuration(Input_ShortcutKey* shortcutKey, int32_t duration);
+
+/**
+ * @brief 获取被修饰键保持按下持续时间。
+ *
+ * @param shortcutKey 快捷键对象的实例。
+ * @param duration 返回被修饰键保持按下持续时间，单位为微秒（μs）。
+ * @return OH_Input_GetFinalKeyDownDuration 函数错误码。
+ *         若获取成功，返回{@link INPUT_SUCCESS}；\n
+ *         若获取失败，返回{@link INPUT_PARAMETER_ERROR}。\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_Result OH_Input_GetFinalKeyDownDuration(const Input_ShortcutKey* shortcutKey, int32_t *duration);
+
+/**
+ * @brief 创建{@Link Input_ShortcutKey}类型实例的数组。
+ *
+ * @param count 创建{@link Input_ShortcutKey}实例的数量。
+ * @return OH_Input_CreateAllSystemShortcutKey 函数错误码。
+ *         {@link INPUT_SUCCESS} 创建实例数组的双指针成功。\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+Input_ShortcutKey **OH_Input_CreateAllSystemShortcutKey(int32_t count);
+
+/**
+ * @brief 销毁{@link Input_ShortcutKey}实例数组并回收内存。
+ *
+ * @param shortcutKeys 指向{@link Input_ShortcutKey}实例数组的双指针。
+ * @param count 销毁{@link Input_ShortcutKey}实例的数量。
+ * @return OH_Input_DestroyAllSystemShortcutKey 函数错误码。
+ *         {@link INPUT_SUCCESS} 销毁实例数组内存成功。\n
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+int32_t OH_Input_DestroyAllSystemShortcutKey(Input_ShortcutKey **shortcutKeys, int32_t count);
+
+/**
+ * @brief 获取系统设置的所有快捷键。
+ *
+ * @param shortcutKey 返回{@Link Input_KeyOptions} 类型实例数组。首次调用可传入NULL，可获取数组长度。
+ * @param count 返回系统支持快捷键的个数。
+ * @return 返回0表示接口调用成功，否则，表示接口调用失败。
+ * @syscap SystemCapability.MultimodalInput.Input.Core
+ * @since 13
+ */
+int32_t OH_Input_GetAllSystemShortcutKey(Input_ShortcutKey** shortcutKey, int32_t *count);
 #ifdef __cplusplus
 }
 #endif

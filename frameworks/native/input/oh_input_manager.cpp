@@ -19,6 +19,7 @@
 #include "input_manager.h"
 #include "input_manager_impl.h"
 #include "key_event.h"
+#include "key_option.h"
 #include "mmi_log.h"
 #include "oh_axis_type.h"
 #include "oh_input_interceptor.h"
@@ -65,6 +66,14 @@ struct Input_AxisEvent {
     int64_t actionTime { -1 };
     int32_t sourceType;
     int32_t axisEventType { -1 };
+};
+
+struct Input_ShortcutKey {
+    std::set<int32_t> preKeys {};
+    int32_t finalKey { -1 };
+    bool isFinalKeyDown { false };
+    int32_t finalKeyDownDuration { 0 };
+    bool isRepeat { true };
 };
 
 static constexpr int32_t INVALID_MONITOR_ID = -1;
@@ -1414,4 +1423,41 @@ Input_Result OH_Input_RemoveInputEventInterceptor(void)
     g_pointerInterceptorId = INVALID_INTERCEPTOR_ID;
     g_pointerInterceptorCallback = nullptr;
     return retCode;
+}
+
+int32_t OH_Input_GetAllSystemShortcutKey(Input_ShortcutKey** shortcutKey, int32_t *count)
+{
+    CALL_DEBUG_ENTER;
+    if (count == nullptr) {
+        MMI_HILOGE("Parameter error");
+        return INPUT_PARAMETER_ERROR;
+    }
+    std::vector<std::unique_ptr<OHOS::MMI::KeyOption>> keyOptions;
+    int32_t shortcutKeyCount = -1;
+    int32_t ret = OHOS::MMI::InputManager::GetInstance()->GetAllSystemShortcutKey(keyOptions, shortcutKeyCount);
+    if (ret != RET_OK || shortcutKeyCount < 0) {
+        MMI_HILOGE("GetAllSystemShortcutKey fail");
+        return INPUT_PARAMETER_ERROR;
+    }
+    if (shortcutKey == nullptr) {
+        *count = static_cast<int32_t>(shortcutKeyCount);
+        MMI_HILOGE("Shortcut key count: %{public}d", *count);
+        return INPUT_SUCCESS;
+    }
+    if (static_cast<int32_t>(shortcutKeyCount) != *count) {
+        MMI_HILOGE("Count:%{public}d is invalid, should be:%{public}d", *count, shortcutKeyCount);
+        return INPUT_PARAMETER_ERROR;
+    }
+    for (int32_t i = 0; i < shortcutKeyCount; ++i) {
+        if (shortcutKey[i] == nullptr) {
+            MMI_HILOGE("shortcutKey is null, i:%{public}d", i);
+            return INPUT_PARAMETER_ERROR;
+        }
+        shortcutKey[i]->preKeys = keyOptions[i]->GetPreKeys();
+        shortcutKey[i]->finalKey = keyOptions[i]->GetFinalKey();
+        shortcutKey[i]->isFinalKeyDown = keyOptions[i]->IsFinalKeyDown();
+        shortcutKey[i]->finalKeyDownDuration = keyOptions[i]->GetFinalKeyDownDuration();
+        shortcutKey[i]->isRepeat = keyOptions[i]->IsRepeat();
+    }
+    return INPUT_SUCCESS;
 }

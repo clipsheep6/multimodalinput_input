@@ -3273,5 +3273,20 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetPointerSnapshot, TestSize.Level1)
     void *pixelMap = nullptr;
     EXPECT_NE(InputManager::GetInstance()->GetPointerSnapshot(pixelMap), RET_OK);
 }
+
+/**
+ * @tc.name: InputManagerTest_GetAllSystemShortcutKey
+ * @tc.desc: 获取系统快捷键
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetAllSystemShortcutKey_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t count = 0;
+    std::vector<std::unique_ptr<KeyOption>> keyOptions;
+    int32_t ret = InputManager::GetInstance()->GetAllSystemShortcutKey(keyOptions, count);
+    ASSERT_EQ(ret, RET_OK);
+}
 } // namespace MMI
 } // namespace OHOS

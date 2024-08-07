@@ -625,5 +625,10 @@ int32_t InputManager::SkipPointerLayer(bool isSkip)
 {
     return InputMgrImpl.SkipPointerLayer(isSkip);
 }
+
+int32_t InputManager::GetAllSystemShortcutKey(std::vector<std::unique_ptr<KeyOption>> &keyOptions, int32_t &count)
+{
+    return InputMgrImpl.GetAllSystemShortcutKey(keyOptions, count);
+}
 } // namespace MMI
 } // namespace OHOS

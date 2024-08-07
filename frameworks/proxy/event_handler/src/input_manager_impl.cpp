@@ -2347,5 +2347,16 @@ int32_t InputManagerImpl::SkipPointerLayer(bool isSkip)
 {
     return MULTIMODAL_INPUT_CONNECT_MGR->SkipPointerLayer(isSkip);
 }
+
+int32_t InputManagerImpl::GetAllSystemShortcutKey(std::vector<std::unique_ptr<KeyOption>> &keyOptions, int32_t &count)
+{
+    CALL_INFO_TRACE; 
+    if (INPUT_DEVICE_IMPL.GetAllSystemShortcutKey(keyOptions) != RET_OK) {
+        MMI_HILOGE("GetAllSystemShortcutKey failed");
+        return RET_ERR;
+    }
+    count = static_cast<int32_t>(keyOptions.size());
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS

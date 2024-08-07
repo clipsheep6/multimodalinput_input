@@ -314,5 +314,65 @@
     {
         "first_introduced": "12",
         "name": "OH_Input_RemoveInputEventInterceptor"
+    },
+    {
+        "first_introduced": "13",
+        "name": "OH_Input_CreateAllSystemShortcutKey"
+    },
+    {
+        "first_introduced": "13",
+        "name": "OH_Input_DestroyAllSystemShortcutKey"
+    },
+    {
+        "first_introduced": "13",
+        "name": "OH_Input_GetAllSystemShortcutKey"
+    },
+    {
+        "first_introduced": "13",
+        "name": "OH_Input_CreateShortcutKey"
+    },
+    {
+        "first_introduced": "13",
+        "name": "OH_Input_DestroyShortcutKey"
+    },
+    {
+        "first_introduced": "13",
+        "name": "OH_Input_SetpressedKeys"
+    },
+    {
+        "first_introduced": "13",
+        "name": "OH_Input_GetpressedKeys"
+    },
+    {
+        "first_introduced": "13",
+        "name": "OH_Input_SetfinalKey"
+    },
+    {
+        "first_introduced": "13",
+        "name": "OH_Input_GetfinalKey"
+    },
+    {
+        "first_introduced": "13",
+        "name": "OH_Input_SetIsFinalKeyDown"
+    },
+    {
+        "first_introduced": "13",
+        "name": "OH_Input_GetIsFinalKeyDown"
+    },
+    {
+        "first_introduced": "13",
+        "name": "OH_Input_SetIsRepeat"
+    },
+    {
+        "first_introduced": "13",
+        "name": "OH_Input_GetIsRepeat"
+    },
+    {
+        "first_introduced": "13",
+        "name": "OH_Input_SetFinalKeyDownDuration"
+    },
+    {
+        "first_introduced": "13",
+        "name": "OH_Input_GetFinalKeyDownDuration"
     }
 ]
