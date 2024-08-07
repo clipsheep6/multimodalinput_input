@@ -24,9 +24,8 @@
 #include "nocopyable.h"
 
 #include "circle_stream_buffer.h"
-#include "uds_socket.h"
-
 #include "i_uds_server.h"
+#include "uds_socket.h"
 
 namespace OHOS {
 namespace MMI {
