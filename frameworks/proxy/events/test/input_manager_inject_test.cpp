@@ -1865,13 +1865,12 @@ HWTEST_F(InputManagerInjectTest, InputManager_InjectMouseEvent_020, TestSize.Lev
     ASSERT_NE(vsyncCount, 1);
 }
 
-
 HWTEST_F(InputManagerInjectTest, TestSimulateTouchPadEvent_001, TestSize.Level1)
 {
-    int32_t disPlayX[3] =  {893, 52, 81 };
-    int32_t disPlayY[3] =  {620, 37, 46 };
+    int32_t disPlayX[3] = {893, 52, 81 };
+    int32_t disPlayY[3] = {620, 37, 46 };
 
-    int32_t fingerCount =3;
+    int32_t fingerCount = 3;
     auto pointerEvent = PointerEvent::Create();
     pointerEvent->SetId(0);
     pointerEvent->SetOriginPointerAction(PointerEvent::POINTER_ACTION_SWIPE_BEGIN);
@@ -1901,9 +1900,9 @@ HWTEST_F(InputManagerInjectTest, TestSimulateTouchPadEvent_001, TestSize.Level1)
 
 HWTEST_F(InputManagerInjectTest, TestSimulateTouchPadEvent_002, TestSize.Level1)
 {
-    int32_t disPlayX[3] =  {0, 52, 81};
-    int32_t disPlayY[3] =  {0, 37, 46};
-    int32_t fingerCount =3;
+    int32_t disPlayX[3] = {0, 52, 81};
+    int32_t disPlayY[3] = {0, 37, 46};
+    int32_t fingerCount = 3;
     auto pointerEvent = PointerEvent::Create();
     pointerEvent->SetId(0);
     pointerEvent->SetOriginPointerAction(PointerEvent::POINTER_ACTION_SWIPE_UPDATE);
@@ -1933,9 +1932,9 @@ HWTEST_F(InputManagerInjectTest, TestSimulateTouchPadEvent_002, TestSize.Level1)
 
 HWTEST_F(InputManagerInjectTest, TestSimulateTouchPadEvent_003, TestSize.Level1)
 {
-    int32_t disPlayX[3] =  {894, 52, 81};
-    int32_t disPlayY[3] =  {562, 33, 42};
-    int32_t fingerCount =3;
+    int32_t disPlayX[3] = {894, 52, 81};
+    int32_t disPlayY[3] = {562, 33, 42};
+    int32_t fingerCount = 3;
     auto pointerEvent = PointerEvent::Create();
     pointerEvent->SetId(0);
     pointerEvent->SetOriginPointerAction(PointerEvent::POINTER_ACTION_SWIPE_END);
@@ -1962,40 +1961,6 @@ HWTEST_F(InputManagerInjectTest, TestSimulateTouchPadEvent_003, TestSize.Level1)
     }
     InputManager::GetInstance()->SimulateTouchPadEvent(pointerEvent);
 }
-
-
-HWTEST_F(InputManagerInjectTest, TestSimulateTouchPadEvent_003, TestSize.Level1)
-{
-    int32_t disPlayX[3] =  {894, 52, 81};
-    int32_t disPlayY[3] =  {562, 33, 42};
-    int32_t fingerCount =3;
-    auto pointerEvent = PointerEvent::Create();
-    pointerEvent->SetId(0);
-    pointerEvent->SetOriginPointerAction(PointerEvent::POINTER_ACTION_SWIPE_END);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_SWIPE_END);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
-    pointerEvent->SetFingerCount(fingerCount);
-    pointerEvent->SetPointerId(fingerCount - 1);
-    int64_t actionTimeBase = GetSysClockTime();
-    pointerEvent->SetActionTime(actionTimeBase);
-    pointerEvent->SetActionStartTime(actionTimeBase);
-    PointerEvent::PointerItem item;
-    item.SetDownTime(pointerEvent->GetActionStartTime());
-    item.SetDisplayX(disPlayX[0]);
-    item.SetDisplayY(disPlayY[0]);
-    pointerEvent->AddPointerItem(item);
-    for (int32_t j = 1; j < fingerCount; j++) {
-        PointerEvent::PointerItem itemFirst;
-        itemFirst.SetPointerId(j);
-        itemFirst.SetDownTime(actionTimeBase);
-        itemFirst.SetDisplayX(disPlayX[j - 1]);
-        itemFirst.SetDisplayY(disPlayY[j - 1]);
-        itemFirst.SetPressed(1);
-        pointerEvent->AddPointerItem(itemFirst);
-    }
-    InputManager::GetInstance()->SimulateTouchPadEvent(pointerEvent);
-}
-
 
 HWTEST_F(InputManagerInjectTest, TestSimulateTouchPadEvent_004, TestSize.Level1)
 {
