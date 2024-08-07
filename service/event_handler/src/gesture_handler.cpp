@@ -66,7 +66,7 @@ int32_t GestureHandler::GestureIdentify(int32_t originType, int32_t seatSlot, do
             break;
         }
         default: {
-            MMI_HILOGE("originType is invalid");
+            MMI_HILOGE("Invalid originType:%{public}d", originType);
             break;
         }
     }
