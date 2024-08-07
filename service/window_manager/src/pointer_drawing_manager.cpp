@@ -54,6 +54,7 @@ namespace MMI {
 namespace {
 const std::string FOLD_SCREEN_FLAG = system::GetParameter("const.window.foldscreen.type", "");
 const std::string IMAGE_POINTER_DEFAULT_PATH = "/system/etc/multimodalinput/mouse_icon/";
+const std::string IMAGE_POINTER_CURSOR_PATH = "/etc/webview/ohos_nweb/";
 const std::string DefaultIconPath = IMAGE_POINTER_DEFAULT_PATH + "Default.svg";
 const std::string CursorIconPath = IMAGE_POINTER_DEFAULT_PATH + "Cursor_Circle.png";
 const std::string POINTER_COLOR { "pointerColor" };
@@ -1974,6 +1975,8 @@ void PointerDrawingManager::InitStyle()
         {RUNNING, {ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "Loading_Left.svg"}},
         {RUNNING_LEFT, {ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "Loading_Left.svg"}},
         {RUNNING_RIGHT, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Loading_Right.svg"}},
+        {CURSOR_CONTEXT_MENU, {ANGLE_NW, IMAGE_POINTER_CURSOR_PATH + "context-menu.svg"}},
+        {CURSOR_ALIAS, {ANGLE_NW, IMAGE_POINTER_CURSOR_PATH + "alias.svg"}},
         {DEVELOPER_DEFINED_ICON, {ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "Default.svg"}},
     };
     CheckMouseIconPath();
