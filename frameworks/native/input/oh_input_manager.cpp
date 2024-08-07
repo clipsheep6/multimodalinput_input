@@ -759,7 +759,9 @@ static bool SetAxisValueByAxisEventType(std::shared_ptr<OHOS::MMI::PointerEvent>
 
 static bool IsAxisEvent(int32_t action)
 {
-    if (action != AXIS_ACTION_BEGIN && action != AXIS_ACTION_UPDATE && action != AXIS_ACTION_END) {
+    if (action != OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_BEGIN &&
+        action != OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_UPDATE &&
+        action != OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_END) {
         return false;
     }
     return true;
@@ -1001,7 +1003,13 @@ static void AxisEventMonitorCallback(std::shared_ptr<OHOS::MMI::PointerEvent> ev
         OH_Input_DestroyAxisEvent(&axisEvent);
         return;
     }
-    axisEvent->axisAction = event->GetPointerAction();
+    if (event->GetPointerAction() == OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_BEGIN) {
+        axisEvent->axisAction = AXIS_ACTION_BEGIN;
+    } else if (event->GetPointerAction() == OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_UPDATE) {
+        axisEvent->axisAction = AXIS_ACTION_UPDATE;
+    } else if (event->GetPointerAction() == OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_END) {
+        axisEvent->axisAction = AXIS_ACTION_END;
+    }
     axisEvent->displayX = item.GetDisplayX();
     axisEvent->displayY = item.GetDisplayY();
     axisEvent->actionTime = event->GetActionTime();
@@ -1328,7 +1336,13 @@ static void AxisEventInterceptorCallback(std::shared_ptr<OHOS::MMI::PointerEvent
         OH_Input_DestroyAxisEvent(&axisEvent);
         return;
     }
-    axisEvent->axisAction = event->GetPointerAction();
+    if (event->GetPointerAction() == OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_BEGIN) {
+        axisEvent->axisAction = AXIS_ACTION_BEGIN;
+    } else if (event->GetPointerAction() == OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_UPDATE) {
+        axisEvent->axisAction = AXIS_ACTION_UPDATE;
+    } else if (event->GetPointerAction() == OHOS::MMI::PointerEvent::POINTER_ACTION_AXIS_END) {
+        axisEvent->axisAction = AXIS_ACTION_END;
+    }
     axisEvent->displayX = item.GetDisplayX();
     axisEvent->displayY = item.GetDisplayY();
     axisEvent->actionTime = event->GetActionTime();

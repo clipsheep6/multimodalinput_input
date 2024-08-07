@@ -147,6 +147,33 @@ typedef enum {
 } Input_TouchEventAction;
 
 /**
+ * @brief Enumerates event source types.
+ *
+ * @since 12
+ */
+typedef enum {
+    /**
+     * Indicates that the input source generates events similar to mouse cursor movement,
+     * button press and release, and wheel scrolling.
+     *
+     * @since 12
+     */
+    SOURCE_TYPE_MOUSE = 1,
+    /**
+     * Indicates that the input source generates a touchscreen multi-touch event.
+     *
+     * @since 12
+     */
+    SOURCE_TYPE_TOUCHSCREEN = 2,
+    /**
+     * Indicates that the input source generates a touchpad multi-touch event.
+     *
+     * @since 12
+     */
+    SOURCE_TYPE_TOUCHPAD = 3
+} InputEvent_SourceType;
+
+/**
  * @brief Defines key information, which identifies a key pressing behavior.
  * For example, the Ctrl key information contains the key value and key type.
  *
