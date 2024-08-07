@@ -1,0 +1,44 @@
+光标准心为左上角：
+Cursor/Default
+Cursor/Help
+Cursor/Copy
+Cursor/Forbid
+Cursor/Hand Pointing
+
+光标准心为左下角：
+Cursor/ColorSucker
+
+光标准心为中心点：
+Cursor/Text Cursor
+Cursor/Screenshot Cross
+Cursor/Cross
+Cursor/Hand Open
+Cursor/Hand Grabbing
+Cursor/Zoom In
+Cursor/Zoom Out
+Cursor/Screenshot Cursor
+Cursor/Move
+Cursor/North South
+Cursor/West East
+Cursor/North East South West
+Cursor/North West South East
+Cursor/Resize Left Right
+Cursor/Resize Up Down
+Cursor/North
+Cursor/South
+Cursor/East
+Cursor/West
+Cursor/North East
+Cursor/South East
+Cursor/South West
+Cursor/North West
+Cursor/Mouse Wheel/North South West East
+Cursor/Mouse Wheel/North South
+Cursor/Mouse Wheel/North
+Cursor/Mouse Wheel/North East
+Cursor/Mouse Wheel/East
+Cursor/Mouse Wheel/South East
+Cursor/Mouse Wheel/South
+Cursor/Mouse Wheel/South West
+Cursor/Mouse Wheel/West
+Cursor/Mouse Wheel/North West
