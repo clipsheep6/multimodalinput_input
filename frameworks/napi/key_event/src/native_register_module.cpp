@@ -22,7 +22,7 @@ static napi_module mmiKeyEventModule = {
     .nm_flags = 0,
     .nm_filename = nullptr,
     .nm_register_func = JsKeyEvent::Export,
-    .nm_modname = "multimodalInput.keyEvent",
+    .nm_modname = "multimodalInput.KeyEvent",
     .nm_priv = ((void*)0),
     .reserved = { 0 },
 };
