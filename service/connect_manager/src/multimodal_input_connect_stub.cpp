@@ -47,7 +47,7 @@ constexpr int32_t MAX_ROWS { 100 };
 constexpr int32_t TOUCHPAD_SCROLL_ROWS { 3 };
 constexpr int32_t UID_TRANSFORM_DIVISOR { 200000 };
 
-int32_t g_parseInputDevice(MessageParcel &data, std::shared_ptr<InputDevice> &inputDevice)
+int32_t ParseInputDevice(MessageParcel &data, std::shared_ptr<InputDevice> &inputDevice)
 {
     CHKPR(inputDevice, RET_ERR);
     int32_t value = 0;
@@ -2546,7 +2546,7 @@ int32_t MultimodalInputConnectStub::StubAddVirtualInputDevice(MessageParcel& dat
         return ERROR_NOT_SYSAPI;
     }
     auto device = std::make_shared<InputDevice>();
-    if (g_parseInputDevice(data, device) != RET_OK) {
+    if (ParseInputDevice(data, device) != RET_OK) {
         MMI_HILOGE("ParseInputDevice failed");
         return RET_ERR;
     }
